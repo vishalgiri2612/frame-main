@@ -7,22 +7,58 @@ export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [progressRunning, setProgressRunning] = useState(true);
 
+  const [arRevealed, setArRevealed] = useState(false);
+  const [arProgress, setArProgress] = useState(0);
+  const [isScanning, setIsScanning] = useState(false);
+
   const slides = [
     {
       src: "/m1.png",
-      alt: "Model 1"
+      badge: "ESTABLISHED 1987 / LUXURY EYEWEAR",
+      titleTop: "SEE THE",
+      titleItalic: "UNSEEN.",
+      sub: "Engineering the perfect balance between architectural precision and timeless editorial aesthetics. Explore our curated selection of global masterpieces."
     },
     {
       src: "/m2.png",
-      alt: "Model 2"
+      badge: "CRAFTED EXCELLENCE / PREMIUM SERIES",
+      titleTop: "TIMELESS",
+      titleItalic: "ELEGANCE.",
+      sub: "A fusion of heritage craftsmanship and cutting-edge design. Discover eyewear that defines your unique perspective with unparalleled clarity."
     },
     {
       src: "/m3.png",
-      alt: "Model 3"
+      badge: "MODERN VISION / ARTISAN FRAMES",
+      titleTop: "BEYOND",
+      titleItalic: "SIGHT.",
+      sub: "Sculpting the future of optics with sustainable materials and bold silhouettes. Elevate your everyday style with a vision for tomorrow."
     }
   ];
 
   const timerRef = useRef(null);
+  const scanTimerRef = useRef(null);
+
+  const toggleAR = () => {
+    if (!arRevealed && !isScanning) {
+      setIsScanning(true);
+      setArProgress(0);
+      let pct = 0;
+      clearInterval(scanTimerRef.current);
+      scanTimerRef.current = setInterval(() => {
+        pct += 2.5;
+        setArProgress(pct);
+        if (pct >= 100) {
+          clearInterval(scanTimerRef.current);
+          setArRevealed(true);
+          setIsScanning(false);
+        }
+      }, 35);
+    } else if (arRevealed) {
+      setArRevealed(false);
+      setArProgress(0);
+      setIsScanning(false);
+    }
+  };
 
   const startAutoplay = () => {
     clearInterval(timerRef.current);
@@ -59,7 +95,8 @@ export default function Hero() {
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .hero-section {
           position: relative;
           width: 100%;
@@ -126,40 +163,54 @@ export default function Hero() {
 
         .hero-badge {
           display: inline-block;
-          background: var(--gold);
-          color: var(--navy);
+          color: #111;
           font-family: var(--font-inter), sans-serif;
-          font-size: 0.72rem;
-          font-weight: 600;
-          letter-spacing: 0.08em;
+          font-size: 0.75rem;
+          font-weight: 700;
+          letter-spacing: 0.25em;
           text-transform: uppercase;
-          padding: 5px 14px;
-          border-radius: 20px;
-          margin-bottom: 18px;
+          margin-bottom: 20px;
+          text-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
-
-        .hero-sub {
+        
+        :global(.dark-mode) .hero-badge {
           color: rgba(247,244,239,0.9);
-          font-family: var(--font-inter), sans-serif;
-          font-size: 0.95rem;
-          line-height: 1.65;
-          max-width: 360px;
-          margin-bottom: 28px;
         }
 
         .hero-heading {
           font-family: var(--font-cormorant), serif;
-          font-size: clamp(2.4rem, 5.5vw, 4.2rem);
-          font-weight: 700;
-          color: #F7F4EF;
-          line-height: 1.08;
-          margin-bottom: 16px;
+          font-size: clamp(4.5rem, 9vw, 8rem);
+          font-weight: 600;
+          color: var(--gold);
+          line-height: 1.05;
+          margin-bottom: 30px;
           letter-spacing: -0.02em;
+          text-shadow: 2px 4px 15px rgba(0,0,0,0.4);
         }
 
         .hero-heading em {
           font-style: italic;
-          color: var(--gold);
+          font-weight: 400;
+        }
+
+        .hero-sub {
+          color: #111;
+          font-family: var(--font-inter), sans-serif;
+          font-size: 1.05rem;
+          line-height: 1.6;
+          max-width: 500px;
+          margin-bottom: 36px;
+          background: rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          padding: 20px 24px;
+          border-left: 3px solid #111;
+        }
+
+        :global(.dark-mode) .hero-sub {
+          color: rgba(247,244,239,0.9);
+          background: rgba(10, 14, 26, 0.4);
+          border-left-color: var(--gold);
         }
 
         .btn-primary {
@@ -192,115 +243,7 @@ export default function Hero() {
           font-size: 0.85rem;
         }
 
-        .proof-card {
-          position: absolute;
-          bottom: 7vh;
-          right: 3vw;
-          z-index: 10;
-          background: rgba(255,255,255,0.92);
-          backdrop-filter: blur(14px);
-          border-radius: 20px;
-          padding: 20px 24px;
-          width: 280px;
-          box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-          animation: fadeLeft 0.9s 0.3s ease both;
-        }
-        
-        :global(.dark-mode) .proof-card {
-          background: rgba(10,14,26,0.85);
-          border: 1px solid var(--border-subtle);
-        }
 
-        @keyframes fadeLeft {
-          from { opacity: 0; transform: translateX(30px); }
-          to   { opacity: 1; transform: translateX(0); }
-        }
-
-        .avatars {
-          display: flex;
-          margin-bottom: 10px;
-        }
-        .avatars img {
-          width: 34px; height: 34px;
-          border-radius: 50%;
-          border: 2px solid white;
-          margin-left: -8px;
-          object-fit: cover;
-        }
-        :global(.dark-mode) .avatars img {
-          border-color: var(--navy);
-        }
-        .avatars img:first-child { margin-left: 0; }
-
-        .rating-row {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          margin-bottom: 6px;
-        }
-        .rating-score {
-          font-size: 1.4rem;
-          font-weight: 700;
-          color: #0d0d0d;
-        }
-        :global(.dark-mode) .rating-score {
-          color: #F7F4EF;
-        }
-        .star { font-size: 1.1rem; }
-
-        .proof-title {
-          font-family: var(--font-cormorant), serif;
-          font-size: 1.1rem;
-          font-weight: 700;
-          color: #0d0d0d;
-          margin-bottom: 6px;
-        }
-        :global(.dark-mode) .proof-title {
-          color: #F7F4EF;
-        }
-        .proof-desc {
-          font-size: 0.78rem;
-          font-family: var(--font-inter), sans-serif;
-          color: #6b6b6b;
-          line-height: 1.5;
-          margin-bottom: 14px;
-        }
-        :global(.dark-mode) .proof-desc {
-          color: rgba(247,244,239,0.7);
-        }
-
-        .btn-ghost {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          background: #efefef;
-          color: #0d0d0d;
-          border: none;
-          border-radius: 50px;
-          padding: 10px 10px 10px 18px;
-          font-size: 0.8rem;
-          font-family: var(--font-inter), sans-serif;
-          font-weight: 600;
-          cursor: pointer;
-          width: 100%;
-          transition: background 0.2s;
-        }
-        :global(.dark-mode) .btn-ghost {
-          background: var(--navy-surface);
-          color: var(--text-primary);
-        }
-        .btn-ghost:hover { background: #e0e0e0; }
-        :global(.dark-mode) .btn-ghost:hover { background: rgba(247,244,239,0.1); }
-        
-        .btn-ghost .arrow {
-          width: 28px; height: 28px;
-          background: var(--gold);
-          color: var(--navy);
-          border-radius: 50%;
-          display: grid;
-          place-items: center;
-          font-size: 0.85rem;
-        }
 
         .indicators {
           position: absolute;
@@ -391,14 +334,14 @@ export default function Hero() {
 
         {/* HERO CONTENT */}
         <div className="hero-content">
-          <div className="hero-text">
-            <span className="hero-badge">Designed for Modern Vision</span>
-            <p className="hero-sub">
-              Thoughtfully designed sunglasses and eyeglasses crafted for clarity, comfort, and balance—made to feel effortless, look refined.
-            </p>
+          <div className="hero-text" key={currentSlide}>
+            <span className="hero-badge">{slides[currentSlide].badge}</span>
             <h1 className="hero-heading">
-              Eyewear with<br /><em>Purpose</em> and<br />Presence
+              {slides[currentSlide].titleTop}<br /><em>{slides[currentSlide].titleItalic}</em>
             </h1>
+            <p className="hero-sub">
+              {slides[currentSlide].sub}
+            </p>
             <Link href="/shop" className="btn-primary">
               Shop the Collection
               <span className="arrow">↗</span>
@@ -406,24 +349,104 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* SOCIAL PROOF CARD */}
-        <div className="proof-card">
-          <div className="avatars">
-            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="user" />
-            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="user" />
-            <img src="https://randomuser.me/api/portraits/men/65.jpg" alt="user" />
-            <img src="https://randomuser.me/api/portraits/women/12.jpg" alt="user" />
+
+
+        {/* AR Scanner Box */}
+        <div className="ar-wrapper">
+          <div className="ar-label">Virtual Try-On</div>
+
+          <div className="ar-box" onClick={toggleAR}>
+            {/* Animated scan line */}
+            <div className={`scan-line ${isScanning ? 'fast' : ''}`} style={{ opacity: arRevealed ? 0 : 1 }}></div>
+
+            {/* Corner brackets */}
+            <div className="corner tl"></div>
+            <div className="corner tr"></div>
+            <div className="corner bl"></div>
+            <div className="corner br"></div>
+
+            {/* Initial overlay without text */}
+            <div className="scan-overlay" style={{ opacity: arRevealed ? 0 : 1, pointerEvents: arRevealed ? 'none' : 'auto' }}>
+            </div>
+
+            {/* Glasses revealed after scan */}
+            <div className="glasses-reveal" style={{ opacity: arRevealed ? 1 : 0 }}>
+              <svg viewBox="0 0 220 130" width="210" height="124" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <radialGradient id="lGr" cx="38%" cy="33%" r="68%">
+                    <stop offset="0%" stopColor="#8a5828" stopOpacity="0.82"/>
+                    <stop offset="100%" stopColor="#3a1800" stopOpacity="0.97"/>
+                  </radialGradient>
+                  <radialGradient id="rGr" cx="62%" cy="33%" r="68%">
+                    <stop offset="0%" stopColor="#7a4818" stopOpacity="0.82"/>
+                    <stop offset="100%" stopColor="#2a1000" stopOpacity="0.97"/>
+                  </radialGradient>
+                  
+                  <radialGradient id="lGrAv" cx="38%" cy="33%" r="68%">
+                    <stop offset="0%" stopColor="#4a5828" stopOpacity="0.6"/>
+                    <stop offset="100%" stopColor="#1a2800" stopOpacity="0.9"/>
+                  </radialGradient>
+                  <radialGradient id="rGrAv" cx="62%" cy="33%" r="68%">
+                    <stop offset="0%" stopColor="#3a4818" stopOpacity="0.6"/>
+                    <stop offset="100%" stopColor="#0a1000" stopOpacity="0.9"/>
+                  </radialGradient>
+                </defs>
+
+                {currentSlide === 0 && (
+                  <g className="wayfarer">
+                    {/* Wayfarer Lenses/Frames */}
+                    <path d="M 30 40 C 50 30 90 35 100 45 C 110 70 90 95 65 95 C 40 95 20 80 30 40 Z" fill="url(#lGr)" stroke="#3a1800" strokeWidth="6"/>
+                    <path d="M 190 40 C 170 30 130 35 120 45 C 110 70 130 95 155 95 C 180 95 200 80 190 40 Z" fill="url(#rGr)" stroke="#3a1800" strokeWidth="6"/>
+                    <line x1="120" y1="50" x2="100" y2="50" stroke="#3a1800" strokeWidth="6" strokeLinecap="round"/>
+                    <path d="M30 40 C 15 35 5 45 0 50" stroke="#3a1800" strokeWidth="5" fill="none" strokeLinecap="round"/>
+                    <path d="M190 40 C 205 35 215 45 220 50" stroke="#3a1800" strokeWidth="5" fill="none" strokeLinecap="round"/>
+                    {/* Highlights */}
+                    <ellipse cx="60" cy="56" rx="20" ry="12" fill="rgba(255,255,255,0.06)"/>
+                    <ellipse cx="160" cy="56" rx="20" ry="12" fill="rgba(255,255,255,0.06)"/>
+                    <text x="110" y="120" textAnchor="middle" fontFamily="var(--font-inter), sans-serif" fontSize="7" letterSpacing="2.5" fill="rgba(212,175,55,0.85)">
+                      CLASSIC WAYFARER
+                    </text>
+                  </g>
+                )}
+
+                {currentSlide === 1 && (
+                  <g className="aviator">
+                    {/* Aviator Lenses/Frames */}
+                    <path d="M 35 50 C 45 35 80 35 95 45 C 105 70 90 100 65 100 C 40 100 25 80 35 50 Z" fill="url(#lGrAv)" stroke="#d4af37" strokeWidth="2.5"/>
+                    <path d="M 185 50 C 175 35 140 35 125 45 C 115 70 130 100 155 100 C 180 100 195 80 185 50 Z" fill="url(#rGrAv)" stroke="#d4af37" strokeWidth="2.5"/>
+                    <line x1="125" y1="45" x2="95" y2="45" stroke="#d4af37" strokeWidth="2.5" strokeLinecap="round"/>
+                    <path d="M 118 36 C 110 32 110 32 102 36" stroke="#d4af37" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+                    <path d="M35 50 C 20 45 10 45 0 50" stroke="#d4af37" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                    <path d="M185 50 C 200 45 210 45 220 50" stroke="#d4af37" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                    <ellipse cx="60" cy="65" rx="12" ry="20" fill="rgba(255,255,255,0.06)" transform="rotate(30 60 65)"/>
+                    <ellipse cx="160" cy="65" rx="12" ry="20" fill="rgba(255,255,255,0.06)" transform="rotate(-30 160 65)"/>
+                    <text x="110" y="120" textAnchor="middle" fontFamily="var(--font-inter), sans-serif" fontSize="7" letterSpacing="2.5" fill="rgba(212,175,55,0.85)">
+                      SIGNATURE AVIATOR
+                    </text>
+                  </g>
+                )}
+
+                {currentSlide === 2 && (
+                  <g className="round">
+                    {/* Round Lenses/Frames */}
+                    <ellipse cx="70" cy="66" rx="38" ry="38" fill="url(#lGr)" stroke="#6a4220" strokeWidth="3.5"/>
+                    <ellipse cx="150" cy="66" rx="38" ry="38" fill="url(#rGr)" stroke="#6a4220" strokeWidth="3.5"/>
+                    <path d="M 125 58 C 110 52 110 52 95 58" stroke="#d4af37" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+                    <path d="M32 60 C 20 50 10 55 0 60" stroke="#d4af37" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                    <path d="M188 60 C 200 50 210 55 220 60" stroke="#d4af37" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                    <ellipse cx="60" cy="56" rx="16" ry="10" fill="rgba(255,220,170,0.08)"/>
+                    <ellipse cx="140" cy="56" rx="16" ry="10" fill="rgba(255,220,170,0.08)"/>
+                    <text x="110" y="120" textAnchor="middle" fontFamily="var(--font-inter), sans-serif" fontSize="7" letterSpacing="2.5" fill="rgba(212,175,55,0.85)">
+                      VINTAGE ROUND
+                    </text>
+                  </g>
+                )}
+              </svg>
+            </div>
+
+            {/* Scan progress bar */}
+            <div className="ar-progress-bar" style={{ width: `${Math.min(arProgress, 100)}%` }}></div>
           </div>
-          <div className="rating-row">
-            <span className="rating-score">4.9</span>
-            <span className="star">⭐</span>
-          </div>
-          <p className="proof-title">Loved by Thousands</p>
-          <p className="proof-desc">Trusted worldwide for premium quality, comfortable fit, and eyewear that looks refined in every setting.</p>
-          <button className="btn-ghost">
-            See What Customers Say
-            <span className="arrow">↗</span>
-          </button>
         </div>
 
         {/* ARROW CONTROLS */}

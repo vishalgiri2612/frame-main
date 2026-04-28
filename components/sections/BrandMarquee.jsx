@@ -21,20 +21,20 @@ export default function BrandMarquee() {
         <span
           style={{
             fontFamily: 'var(--font-inter)',
-            fontSize: '9px',
-            fontWeight: 500,
-            letterSpacing: '0.25em',
+            fontSize: '11px',
+            fontWeight: 700,
+            letterSpacing: '0.3em',
             textTransform: 'uppercase',
-            color: 'var(--teal)',
+            color: '#111111',
           }}
         >
           Official Stockist
         </span>
-        <div style={{ height: '1px', flex: 1, background: 'var(--border-subtle)' }} />
+        <div style={{ height: '1px', flex: 1, background: 'linear-gradient(90deg, rgba(17,17,17,0.3), transparent)' }} />
       </div>
 
       {/* Dual marquee with fade mask */}
-      <div className="marquee-wrapper pb-4" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div className="marquee-wrapper pb-6" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {/* Row 1 — moves left, 40s */}
         <div className="marquee-primary select-none" aria-hidden="true">
           {[...brands, ...brands, ...brands].map((brand, i) => (
@@ -42,21 +42,28 @@ export default function BrandMarquee() {
               <span
                 style={{
                   fontFamily: 'var(--font-cormorant)',
-                  fontSize: '1.3rem',
+                  fontSize: '2rem',
                   letterSpacing: '0.15em',
                   textTransform: 'uppercase',
-                  color: 'var(--text-tertiary)',
+                  fontWeight: 600,
+                  color: '#111111',
                   cursor: 'default',
-                  transition: 'color 300ms ease, opacity 300ms ease',
-                  opacity: 0.6,
+                  transition: 'color 300ms ease, transform 300ms ease',
+                  opacity: 1,
                   whiteSpace: 'nowrap',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--gold)'; e.currentTarget.style.opacity = '1'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-tertiary)'; e.currentTarget.style.opacity = '0.6'; }}
+                onMouseEnter={(e) => { 
+                  e.currentTarget.style.color = '#C9A84C';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => { 
+                  e.currentTarget.style.color = '#111111';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
               >
                 {brand}
               </span>
-              <span style={{ margin: '0 32px', color: 'var(--gold)', opacity: 0.25, fontSize: '6px' }}>◆</span>
+              <span style={{ margin: '0 32px', color: '#C9A84C', opacity: 0.8, fontSize: '10px' }}>◆</span>
             </div>
           ))}
         </div>
@@ -68,22 +75,26 @@ export default function BrandMarquee() {
               <span
                 style={{
                   fontFamily: 'var(--font-inter)',
-                  fontSize: '10px',
-                  fontWeight: 500,
-                  letterSpacing: '0.25em',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  letterSpacing: '0.3em',
                   textTransform: 'uppercase',
-                  color: 'var(--text-tertiary)',
-                  opacity: 0.4,
+                  color: '#C9A84C',
+                  opacity: 0.9,
                   whiteSpace: 'nowrap',
                   cursor: 'default',
-                  transition: 'opacity 300ms ease',
+                  transition: 'color 300ms ease',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
-                onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.4')}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#111111';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#C9A84C';
+                }}
               >
                 {brand}
               </span>
-              <span style={{ margin: '0 32px', color: 'var(--teal)', opacity: 0.2, fontSize: '6px' }}>◆</span>
+              <span style={{ margin: '0 32px', color: '#111111', opacity: 0.3, fontSize: '8px' }}>◆</span>
             </div>
           ))}
         </div>

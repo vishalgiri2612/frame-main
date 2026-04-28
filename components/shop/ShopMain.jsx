@@ -73,7 +73,7 @@ function ProductCard({ product, index }) {
       <div
         className="card-image relative aspect-[4/3] overflow-hidden flex items-center justify-center"
         style={{
-          background: 'var(--navy-surface)',
+          background: '#FFFFFF',
           border: '1px solid var(--border-subtle)',
         }}
       >
@@ -191,7 +191,7 @@ function ProductCard({ product, index }) {
             fontFamily: 'var(--font-inter)',
             fontSize: 'clamp(0.85rem, 1.5vw, 1rem)',
             fontWeight: 600,
-            color: 'var(--text-primary)',
+            color: '#111111',
             letterSpacing: 0,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -271,13 +271,13 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
   }, []);
 
   return (
-    <div className="min-h-screen pt-24 sm:pt-32 pb-24 selection:bg-gold selection:text-navy" style={{ background: 'var(--navy)', color: 'var(--text-primary)' }}>
+    <div className="min-h-screen pt-24 sm:pt-32 pb-24 selection:bg-gold selection:text-navy" style={{ background: '#FFFFFF', color: '#111111' }}>
       {/* Dynamic Premium Background */}
       <div 
         className="fixed inset-0 pointer-events-none" 
         style={{ 
-          background: 'linear-gradient(to bottom, var(--navy-surface) 0%, var(--navy) 100%)',
-          opacity: 0.6
+          background: '#FFFFFF',
+          opacity: 1
         }} 
       />
       
@@ -309,7 +309,7 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.8 }}
-              style={{ fontFamily: 'var(--font-cormorant)', color: 'var(--text-primary)' }}
+              style={{ fontFamily: 'var(--font-cormorant)', color: '#111111' }}
               className="text-5xl sm:text-7xl lg:text-8xl font-light tracking-tighter leading-[0.9]"
             >
               CURATED <br />

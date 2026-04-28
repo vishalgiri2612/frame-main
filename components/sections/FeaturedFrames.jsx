@@ -42,7 +42,7 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
       <div
         className="card-image relative aspect-[4/3] overflow-hidden flex items-center justify-center"
         style={{
-          background: 'var(--navy-surface)',
+          background: '#FFFFFF',
           border: '1px solid var(--border-subtle)',
         }}
       >
@@ -160,7 +160,7 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
             fontFamily: 'var(--font-inter)',
             fontSize: 'clamp(0.85rem, 1.5vw, 1rem)',
             fontWeight: 600,
-            color: 'var(--text-primary)',
+            color: '#111111',
             letterSpacing: 0,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -205,23 +205,26 @@ export default function FeaturedFrames({ initialProducts = [] }) {
   );
 
   return (
-    <section style={{ paddingTop: 'var(--space-xl)', paddingBottom: 'var(--space-3xl)', background: 'var(--navy)' }}>
+    <section style={{ paddingTop: 'var(--space-xl)', paddingBottom: 'var(--space-3xl)', background: '#FFFFFF' }}>
       <div className="container mx-auto px-6">
 
         <div className="mb-10 text-left">
-          <h2
-            className="scroll-reveal"
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             style={{
               fontFamily: 'var(--font-cormorant)',
               fontSize: 'clamp(3rem, 6vw, 5rem)',
               fontWeight: 300,
-              color: 'var(--text-primary)',
+              color: '#111111',
               letterSpacing: '0.02em',
               lineHeight: 1,
             }}
           >
             Shop
-          </h2>
+          </motion.h2>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 lg:gap-10">

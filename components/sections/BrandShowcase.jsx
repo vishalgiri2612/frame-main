@@ -1,56 +1,81 @@
 'use client';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
-import { useRef } from 'react';
 
-const showcaseProducts = [
+const showcaseBrands = [
   {
-    brand: "Ray-Ban",
-    name: "Aviator Classic",
-    price: "₹14,990",
+    name: "Ray-Ban",
+    origin: "MILAN, ITALY",
+    styles: "142 STYLES",
+    est: "EST. 1937",
     image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb3025_001_58_030a_new.png",
-    slug: "ray-ban-aviator-classic",
-    accent: "#C9A96E"
+    gridClass: "lg:col-span-2 lg:row-span-2 h-[400px] lg:h-[600px]",
+    color: "#ff3333"
   },
   {
-    brand: "Ray-Ban",
-    name: "Mega Wayfarer",
-    price: "₹13,650",
+    name: "Oakley",
+    origin: "CALIFORNIA, USA",
+    styles: "89 STYLES",
+    est: "EST. 1975",
     image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__684532__p21__shad__al2_1.png",
-    slug: "ray-ban-mega-wayfarer",
-    accent: "#C9A96E"
+    gridClass: "lg:col-span-2 lg:row-span-1 h-[284px]",
+    color: "#ff7700"
   },
   {
-    brand: "Ray-Ban",
-    name: "Round Metal",
-    price: "₹12,790",
+    name: "Gucci",
+    origin: "FLORENCE, ITALY",
+    styles: "112 STYLES",
+    est: "EST. 1921",
     image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb3447_919631_030a.png",
-    slug: "ray-ban-round-metal",
-    accent: "#C9A96E"
+    gridClass: "lg:col-span-2 lg:row-span-1 h-[284px]",
+    color: "#00aa00"
   },
   {
-    brand: "Ray-Ban",
-    name: "Clubmaster",
-    price: "₹11,450",
+    name: "Prada",
+    origin: "MILAN, ITALY",
+    styles: "78 STYLES",
+    est: "EST. 1913",
     image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb2224__901_32__p21__shad__al2.png",
-    slug: "ray-ban-clubmaster",
-    accent: "#C9A96E"
+    gridClass: "lg:col-span-1 lg:row-span-1 h-[280px]",
+    color: "#333333"
+  },
+  {
+    name: "Versace",
+    origin: "REGGIO CALABRIA, ITALY",
+    styles: "94 STYLES",
+    est: "EST. 1978",
+    image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb3025_001_58_030a_new.png",
+    gridClass: "lg:col-span-1 lg:row-span-1 h-[280px]",
+    color: "#ffcc00"
+  },
+  {
+    name: "Tom Ford",
+    origin: "AUSTIN, USA",
+    styles: "65 STYLES",
+    est: "EST. 2005",
+    image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__684532__p21__shad__al2_1.png",
+    gridClass: "lg:col-span-1 lg:row-span-1 h-[280px]",
+    color: "#443322"
+  },
+  {
+    name: "Carrera",
+    origin: "VERONA, ITALY",
+    styles: "54 STYLES",
+    est: "EST. 1956",
+    image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb3447_919631_030a.png",
+    gridClass: "lg:col-span-1 lg:row-span-1 h-[280px]",
+    color: "#cc0000"
   }
 ];
 
 export default function BrandShowcase() {
   return (
-    <section className="py-24 bg-navy overflow-hidden relative">
-      {/* Decorative background element */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-[0.02] pointer-events-none"
-        style={{ backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`, backgroundSize: '40px 40px' }} />
-
+    <section className="py-24 bg-navy relative">
       <div className="container mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+        <div className="mb-16">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
             <span className="text-gold uppercase tracking-[0.5em] text-[10px] font-bold mb-4 block">The Heritage Collection</span>
@@ -58,59 +83,80 @@ export default function BrandShowcase() {
               Iconic <span className="italic text-gold">Maisons</span>
             </h2>
           </motion.div>
-
-          <Link href="/shop" className="group flex items-center gap-3 text-gold text-[10px] uppercase tracking-[0.3em] pb-2 border-b border-gold/20 hover:border-gold transition-all">
-            Browse All Styles
-            <span className="group-hover:translate-x-1 transition-transform">→</span>
-          </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {showcaseProducts.map((product, index) => (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {showcaseBrands.map((brand, index) => (
             <motion.div
-              key={product.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              key={brand.name}
+              initial={{ opacity: 0, scale: 0.98 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="group relative"
+              transition={{ duration: 0.6, delay: index * 0.05 }}
+              className={`group relative overflow-hidden rounded-[1.5rem] border border-white/5 hover:border-white/20 transition-all duration-700 ${brand.gridClass}`}
+              style={{ backgroundColor: '#05070a' }} // Deep space black base
             >
-              <Link href={`/product/${product.slug}`}>
-                <div className="relative aspect-[3/4] bg-white/[0.03] rounded-3xl overflow-hidden border border-white/5 group-hover:border-gold/30 transition-all duration-500">
-                  {/* Floating Image Effect */}
-                  <div className="absolute inset-0 flex items-center justify-center p-8 z-20">
-                    <motion.div
-                      whileHover={{ scale: 1.1, rotate: -5 }}
-                      transition={{ type: 'spring', stiffness: 200 }}
-                      className="relative w-full h-full"
-                    >
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        fill
-                        className="object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
-                      />
-                    </motion.div>
+              <Link href={`/shop?brand=${brand.name}`} className="block w-full h-full relative">
+                
+                {/* Atmospheric Aurora Glows */}
+                <div 
+                  className="absolute -top-24 -left-24 w-72 h-72 rounded-full mix-blend-screen opacity-20 group-hover:opacity-60 group-hover:scale-150 transition-all duration-1000 ease-out"
+                  style={{ background: brand.color, filter: 'blur(90px)' }}
+                />
+                
+                <div 
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full mix-blend-screen opacity-10 group-hover:opacity-30 group-hover:scale-[2] transition-all duration-1000 delay-100 ease-out"
+                  style={{ background: '#ffffff', filter: 'blur(60px)' }}
+                />
+
+                <div 
+                  className="absolute -bottom-24 -right-24 w-72 h-72 rounded-full mix-blend-screen opacity-20 group-hover:opacity-50 group-hover:scale-150 transition-all duration-1000 delay-200 ease-out"
+                  style={{ background: brand.color, filter: 'blur(90px)' }}
+                />
+
+                {/* Cinematic Film Grain Overlay */}
+                <div 
+                  className="absolute inset-0 opacity-[0.06] mix-blend-overlay z-0 pointer-events-none"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+                  }}
+                />
+
+                {/* Background Image (Floating Glasses) */}
+                <div className="absolute inset-0 flex items-center justify-center p-12 transition-transform duration-1000 group-hover:scale-110 group-hover:-translate-y-1 z-10">
+                  <img 
+                    src={brand.image} 
+                    alt={brand.name}
+                    className="w-[85%] h-[85%] object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.8)]"
+                  />
+                </div>
+
+                {/* HUD Overlay Content */}
+                <div className="absolute inset-0 z-20 p-6 flex flex-col justify-between">
+                  {/* Top: Origin and EST */}
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: brand.color }}></span>
+                      <span className="text-[9px] tracking-[0.2em] font-medium text-white/70 uppercase font-inter">{brand.origin}</span>
+                    </div>
+                    <span className="text-[9px] tracking-[0.2em] font-medium text-white/50 uppercase font-inter">{brand.est}</span>
                   </div>
 
-                  {/* Brand Watermark */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/[0.02] text-8xl font-serif font-bold pointer-events-none select-none uppercase tracking-tighter">
-                    {product.brand}
-                  </div>
-
-                  {/* Bottom Info */}
-                  <div className="absolute bottom-0 left-0 w-full p-8 z-30">
-                    <div className="flex justify-between items-end">
-                      <div>
-                        <p className="text-gold text-[8px] uppercase tracking-[0.3em] mb-1 font-bold">{product.brand}</p>
-                        <h3 className="text-xl font-serif text-cream">{product.name}</h3>
-                      </div>
-                      <p className="text-cream/50 text-xs font-light">{product.price}</p>
+                  {/* Bottom: Name and Styles */}
+                  <div className="space-y-4">
+                    <h3 className="text-4xl lg:text-5xl font-serif text-white tracking-tight group-hover:translate-x-2 transition-transform duration-500">
+                      {brand.name}
+                    </h3>
+                    
+                    <div className="pt-4 border-t border-white/10 flex justify-between items-center">
+                      <span className="text-[9px] tracking-[0.3em] font-bold text-white/40 uppercase font-inter">{brand.styles}</span>
+                      {brand.gridClass.includes('lg:col-span-2') && (
+                        <div className="flex items-center gap-2 text-[8px] tracking-[0.4em] text-white/60 uppercase font-bold">
+                          EXPLORE <span className="text-sm">→</span>
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-navy via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
               </Link>
             </motion.div>
