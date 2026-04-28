@@ -1,0 +1,430 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DESIGN TOKENS — LIGHT MODE (DEFAULT)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+:root {
+  /* Backgrounds */
+  --navy:         #FCFAF7;
+  --navy-deep:    #F5F2ED;
+  --navy-surface: #EBE7E0;
+
+  /* Text — WCAG AA compliant */
+  --text-primary:   #0F1117;
+  --text-secondary: #3A3530;
+  --text-tertiary:  #6B6259;
+  --text-disabled:  #A89E95;
+
+  /* Accents */
+  --gold:       #A68A3B;
+  --gold-light: #C9A84C;
+  --teal:       #2E7470;
+  --teal-light: #5BBDB6;
+
+  /* Borders */
+  --border-subtle: rgba(166,138,59,0.20);
+  --border-strong: rgba(166,138,59,0.50);
+
+  /* Spacing */
+  --space-xs:   8px;
+  --space-sm:   16px;
+  --space-md:   24px;
+  --space-lg:   40px;
+  --space-xl:   64px;
+  --space-2xl:  96px;
+  --space-3xl:  140px;
+  --space-hero: 180px;
+
+  /* Legacy aliases for existing components */
+  --cream:       #0F1117;
+  --cream-warm:  #3A3530;
+  --foreground:  #0F1117;
+  --background:  #FCFAF7;
+  --navy-rgb:    252, 250, 247;
+  --gold-rgb:    166, 138, 59;
+  --cream-rgb:   15, 17, 23;
+  --teal-rgb:    46, 116, 112;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DESIGN TOKENS — DARK MODE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.dark-mode {
+  --navy:         #0A0E1A;
+  --navy-deep:    #060810;
+  --navy-surface: #161D30;
+
+  --text-primary:   #F7F4EF;
+  --text-secondary: #C8BFB4;
+  --text-tertiary:  #8A8078;
+  --text-disabled:  #4A4540;
+
+  --gold:       #C9A84C;
+  --gold-light: #E8C97A;
+  --teal:       #7ECAC3;
+  --teal-light: #9DE0DA;
+
+  --border-subtle: rgba(201,168,76,0.20);
+  --border-strong: rgba(201,168,76,0.50);
+
+  --cream:       #F7F4EF;
+  --cream-warm:  #EDE8DF;
+  --foreground:  #F7F4EF;
+  --background:  #0A0E1A;
+  --navy-rgb:    10, 14, 26;
+  --gold-rgb:    201, 168, 76;
+  --cream-rgb:   247, 244, 239;
+  --teal-rgb:    126, 202, 195;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   BASE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@layer base {
+  body {
+    background-color: var(--navy);
+    color: var(--text-primary);
+    @apply font-sans antialiased;
+    overflow-x: hidden;
+    transition: background-color 0.5s ease, color 0.5s ease;
+  }
+
+  ::selection {
+    background-color: rgba(201, 168, 76, 0.25);
+    color: var(--gold);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+    color: var(--text-primary);
+  }
+
+  /* WCAG AA focus ring */
+  :focus-visible {
+    outline: 2px solid #C9A84C;
+    outline-offset: 3px;
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   UTILITIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@layer utilities {
+  .text-gold-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-gold via-gold-light to-gold;
+  }
+
+  /* Glassmorphism — NAV ONLY */
+  .glass-nav {
+    background-color: rgba(var(--navy-rgb), 0.82);
+    backdrop-filter: blur(25px) saturate(180%);
+    border-bottom: 1px solid rgba(var(--gold-rgb), 0.20);
+  }
+
+  .premium-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
+    border: 1px solid var(--border-subtle);
+    transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .premium-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 0 20px rgba(201,168,76,0.08);
+  }
+
+  .perspective-1000 { perspective: 1000px; }
+
+  /* Section padding */
+  .section-padding {
+    padding-top: var(--space-3xl);
+    padding-bottom: var(--space-3xl);
+  }
+
+  /* Luxury section label */
+  .luxury-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-inter), system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .luxury-label::before,
+  .luxury-label::after {
+    content: '';
+    flex: 1;
+    max-width: 40px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+
+  /* Section divider ──── ✦ ──── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    margin: 48px 0;
+  }
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #C9A84C, transparent);
+  }
+  .divider-diamond {
+    color: #C9A84C;
+    font-size: 8px;
+    margin: 0 16px;
+    line-height: 1;
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SIGNATURE ANIMATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (prefers-reduced-motion: no-preference) {
+
+  /* THE REVEAL */
+  @keyframes letterReveal {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes lineSwipe {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+  @keyframes curtainUp {
+    from { clip-path: inset(0 0 0 0); }
+    to   { clip-path: inset(0 0 100% 0); }
+  }
+
+  /* EDITORIAL SCROLL */
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .scroll-reveal.from-left {
+    transform: translateX(-10px);
+  }
+  .scroll-reveal.from-scale {
+    transform: scale(0.96);
+  }
+  .scroll-reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* LIQUID GOLD SHIMMER — used only on hover via ::after */
+  @keyframes shimmerSweep {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  /* MARQUEE */
+  @keyframes marquee-primary {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @keyframes marquee-secondary {
+    0%   { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+}
+
+/* Reduced-motion fallbacks */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+  }
+  [class*="blob-"] { animation: none !important; }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   LIQUID GOLD BUTTON
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.btn-liquid-gold {
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+  border: 1px solid #C9A84C;
+  color: #C9A84C;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  padding: 16px 32px;
+  cursor: pointer;
+  transition: color 300ms ease, background-color 300ms ease, box-shadow 300ms ease, transform 100ms ease;
+  text-decoration: none;
+  display: inline-block;
+}
+/* Shimmer sweep only fires on hover — not on idle load */
+.btn-liquid-gold::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(201,168,76,0.18), transparent);
+  transform: translateX(-100%);
+  transition: none;
+}
+.btn-liquid-gold:hover::after {
+  animation: shimmerSweep 0.6s ease forwards;
+}
+.btn-liquid-gold:hover {
+  background-color: #C9A84C;
+  color: #0A0E1A;
+  box-shadow: 0 0 28px rgba(201, 168, 76, 0.35);
+  transform: scale(1.02);
+}
+.btn-liquid-gold:active {
+  transform: scale(0.97);
+  box-shadow: none;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   PRODUCT CARD — MAGNETIC FRAMES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.product-card {
+  transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 400ms ease;
+}
+.product-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+}
+.product-card .card-image {
+  transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+.product-card:hover .card-image img,
+.product-card:hover .card-image .next-image {
+  transform: scale(1.04);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MARQUEE WITH FADE MASK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.marquee-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+.marquee-wrapper::before,
+.marquee-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 15%;
+  z-index: 2;
+  pointer-events: none;
+}
+.marquee-wrapper::before {
+  left: 0;
+  background: linear-gradient(to right, var(--navy), transparent);
+}
+.marquee-wrapper::after {
+  right: 0;
+  background: linear-gradient(to left, var(--navy), transparent);
+}
+.marquee-wrapper:hover .marquee-primary,
+.marquee-wrapper:hover .marquee-secondary {
+  animation-play-state: paused;
+}
+.marquee-primary {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee-primary 40s linear infinite;
+  will-change: transform;
+}
+.marquee-secondary {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee-secondary 60s linear infinite;
+  will-change: transform;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NAV LINK UNDERLINE HOVER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.nav-link {
+  position: relative;
+  color: var(--text-primary);
+  transition: color 250ms ease;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-link:hover::after,
+.nav-link.active::after { transform: scaleX(1); }
+.nav-link.active { color: var(--text-primary); }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SCROLLBAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--navy-deep); }
+::-webkit-scrollbar-thumb { background: var(--gold); }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-light); }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   LENIS SMOOTH SCROLL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+html.lenis { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-scrolling iframe { pointer-events: none; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   LENS FLARE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.lens-flare-overlay {
+  background: radial-gradient(circle, rgba(255,245,200,0.18) 0%, transparent 70%);
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CUSTOM CURSOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+body.custom-cursor-active,
+body.custom-cursor-active a,
+body.custom-cursor-active button,
+body.custom-cursor-active [role="button"] {
+  cursor: none !important;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   HERO SCRIM UTILITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.hero-scrim {
+  background: 
+    linear-gradient(to bottom, rgba(10,14,26,0.55) 0%, transparent 60%),
+    linear-gradient(to top, rgba(10,14,26,0.40) 0%, transparent 50%);
+}

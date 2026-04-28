@@ -1,0 +1,18 @@
+<svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg">
+  <!-- Left lens -->
+  <circle cx="110" cy="75" r="60"
+    stroke="#1a1a1a" stroke-width="4"
+    fill="rgba(0,0,0,0.1)" />
+  <!-- Right lens -->
+  <circle cx="290" cy="75" r="60"
+    stroke="#1a1a1a" stroke-width="4"
+    fill="rgba(0,0,0,0.1)" />
+  <!-- Bridge -->
+  <path d="M170 75 Q200 50 230 75"
+    stroke="#1a1a1a" stroke-width="3" fill="none"/>
+  <!-- Temple arms -->
+  <line x1="50" y1="75" x2="0" y2="70"
+    stroke="#1a1a1a" stroke-width="3"/>
+  <line x1="350" y1="75" x2="400" y2="70"
+    stroke="#1a1a1a" stroke-width="3"/>
+</svg>

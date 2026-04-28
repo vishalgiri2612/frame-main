@@ -1,0 +1,118 @@
+[
+  {
+    "__EMPTY": "SNO",
+    "__EMPTY_1": "BRAND",
+    "__EMPTY_2": "CATEGORY",
+    "__EMPTY_3": "MODEL NO",
+    "__EMPTY_4": "COLOUR",
+    "__EMPTY_5": "SIZE",
+    "__EMPTY_6": "PRODUCT DESCRIPTION",
+    "__EMPTY_7": "POLARISED",
+    "__EMPTY_8": "PIC 1-4",
+    "__EMPTY_9": "AMOUNT"
+  },
+  {
+    "__EMPTY": 1,
+    "__EMPTY_1": "RAYBAN",
+    "__EMPTY_2": "SUNGLASSES",
+    "__EMPTY_3": "RB3931",
+    "__EMPTY_4": "001/31",
+    "__EMPTY_5": 54,
+    "__EMPTY_6": "Metal Unisex Sunglass",
+    "__EMPTY_7": "NO",
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb3931__001_31__p21__shad__qt_1.png",
+    "__EMPTY_9": 13590
+  },
+  {
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb3931__001_31__p21__shad__fr.png"
+  },
+  {
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb3931__001_31__p21__shad__cfr.png"
+  },
+  {
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb3931__001_31__p21__shad__al2.png"
+  },
+  {
+    "__EMPTY": 2,
+    "__EMPTY_1": "RAYBAN",
+    "__EMPTY_2": "SUNGLASSES",
+    "__EMPTY_3": "RB0832S",
+    "__EMPTY_4": 684532,
+    "__EMPTY_5": 55,
+    "__EMPTY_6": "MEGA WAYFARER UNISEX",
+    "__EMPTY_7": "NO",
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__684532__p21__shad__al2_1.png",
+    "__EMPTY_9": 13650
+  },
+  {
+    "__EMPTY_5": 52,
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__684532__p21__shad__cfr_1.png"
+  },
+  {
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__684532__p21__shad__qt_1.png"
+  },
+  {
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__684532__p21__shad__lt_1.png"
+  },
+  {
+    "__EMPTY": 3,
+    "__EMPTY_1": "RAYBAN",
+    "__EMPTY_2": "SUNGLASSES",
+    "__EMPTY_3": "RB0832S",
+    "__EMPTY_4": "68463F",
+    "__EMPTY_5": 55,
+    "__EMPTY_6": "MEGA WAYFARER UNISEX",
+    "__EMPTY_7": "NO",
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__68463f__p21__shad__al2.png",
+    "__EMPTY_9": 13650
+  },
+  {
+    "__EMPTY_5": 52,
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__68463f__p21__shad__cfr.png"
+  },
+  {
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__68463f__p21__shad__lt.png"
+  },
+  {
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__68463f__p21__shad__qt.png"
+  },
+  {
+    "__EMPTY": 4,
+    "__EMPTY_1": "RAYBAN",
+    "__EMPTY_2": "SUNGLASSES",
+    "__EMPTY_3": "RB0832S",
+    "__EMPTY_4": "901/58",
+    "__EMPTY_5": 55,
+    "__EMPTY_6": "MEGA WAYFARER UNISEX",
+    "__EMPTY_7": "YES",
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__901_58__p21__shad__al2.png",
+    "__EMPTY_9": 13890
+  },
+  {
+    "__EMPTY_5": 52,
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__901_58__p21__shad__cfr.png"
+  },
+  {
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__901_58__p21__shad__lt.png"
+  },
+  {
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__901_58__p21__shad__qt.png"
+  },
+  {
+    "__EMPTY": 5,
+    "__EMPTY_1": "RAYBAN",
+    "__EMPTY_2": "SUNGLASSES",
+    "__EMPTY_3": "RB0832S",
+    "__EMPTY_4": "902/R5",
+    "__EMPTY_5": 52,
+    "__EMPTY_6": "MEGA WAYFARER UNISEX",
+    "__EMPTY_7": "NO",
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__902_r5__p21__shad__al2.png"
+  },
+  {
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__902_r5__p21__shad__cfr.png"
+  },
+  {
+    "__EMPTY_8": "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__902_r5__p21__shad__lt.png"
+  }
+]
