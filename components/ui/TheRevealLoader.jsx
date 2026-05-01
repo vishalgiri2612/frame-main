@@ -11,22 +11,22 @@ export default function TheRevealLoader() {
   const skipped = useRef(false);
 
   useEffect(() => {
-    // Allow skip after 500ms
-    const skipTimer = setTimeout(() => setSkippable(true), 500);
+    // Allow skip after 200ms
+    const skipTimer = setTimeout(() => setSkippable(true), 200);
 
     // Phase sequence timing
     const lineTimer = setTimeout(() => {
       if (!skipped.current) setPhase('line');
-    }, 1000); // after letters animate in (~10 letters × 60ms + 600ms)
+    }, 500); // speed up from 1000ms
 
     const curtainTimer = setTimeout(() => {
       if (!skipped.current) setPhase('curtain');
-    }, 2000);
+    }, 1100); // speed up from 2000ms
 
     const doneTimer = setTimeout(() => {
       if (!skipped.current) setPhase('done');
       setTimeout(() => setIsVisible(false), 200);
-    }, 2800);
+    }, 1600); // speed up from 2800ms
 
     return () => {
       clearTimeout(skipTimer);
@@ -73,8 +73,8 @@ export default function TheRevealLoader() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{
-                    delay: i * 0.06,
-                    duration: 0.55,
+                    delay: i * 0.03,
+                    duration: 0.35,
                     ease: [0.16, 1, 0.3, 1],
                   }}
                   style={{
@@ -96,7 +96,7 @@ export default function TheRevealLoader() {
               <motion.div
                 initial={{ scaleX: 0 }}
                 animate={phase !== 'letters' ? { scaleX: 1 } : { scaleX: 0 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 style={{
                   transformOrigin: 'left',
                   height: '1px',

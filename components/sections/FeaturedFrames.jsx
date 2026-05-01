@@ -1,5 +1,6 @@
 'use client';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import TryOnModal from '@/components/ui/TryOnModal';
 import { useCart } from '@/components/providers/CartProvider';
@@ -11,6 +12,7 @@ import Link from 'next/link';
 const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCart }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imageIdx, setImageIdx] = useState(0);
+  const router = useRouter();
 
   const images = Array.isArray(product.images) && product.images.length > 0
     ? product.images
@@ -38,6 +40,7 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
       className="product-card group cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => router.push(`/shop/${product.id || product.sku}`)}
     >
       <div
         className="card-image relative aspect-[4/3] overflow-hidden flex items-center justify-center"
@@ -101,44 +104,6 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
           </span>
         </div>
 
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col gap-2 items-center justify-center p-3">
-          <Link
-            href={`/shop/${product.id || product.sku}`}
-            className="w-full max-w-[160px] py-2.5 text-center transition-colors"
-            style={{
-              background: '#F7F4EF',
-              color: '#0F1117',
-              fontFamily: 'var(--font-inter)',
-              fontSize: '9px',
-              fontWeight: 600,
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = '#C9A84C')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = '#F7F4EF')}
-          >
-            View Details
-          </Link>
-          <button
-            onClick={(e) => { e.stopPropagation(); addToCart(product); }}
-            className="w-full max-w-[160px] py-2.5 transition-all"
-            style={{
-              border: '1px solid #C9A84C',
-              color: '#C9A84C',
-              background: 'transparent',
-              fontFamily: 'var(--font-inter)',
-              fontSize: '9px',
-              fontWeight: 600,
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              cursor: 'pointer',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#C9A84C'; e.currentTarget.style.color = '#0A0E1A'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#C9A84C'; }}
-          >
-            Add to Bag
-          </button>
-        </div>
       </div>
 
       <div className="mt-4 space-y-1.5">
@@ -205,7 +170,7 @@ export default function FeaturedFrames({ initialProducts = [] }) {
   );
 
   return (
-    <section style={{ paddingTop: 'var(--space-xl)', paddingBottom: 'var(--space-3xl)', background: '#FFFFFF' }}>
+    <section style={{ paddingTop: 'var(--space-xl)', paddingBottom: '60px', background: '#FFFFFF' }}>
       <div className="container mx-auto px-6">
 
         <div className="mb-10 text-left">
@@ -238,6 +203,28 @@ export default function FeaturedFrames({ initialProducts = [] }) {
               addToCart={addToCart}
             />
           ))}
+        </div>
+
+        {/* SHOW MORE / SHOP ALL BUTTON */}
+        <div className="mt-20 flex justify-center">
+          <Link 
+            href="/shop" 
+            className="group relative px-12 py-5 overflow-hidden border border-black/10 hover:border-gold transition-colors duration-500"
+          >
+            <div className="absolute inset-0 bg-gold/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+            <span className="relative z-10 font-mono text-[10px] tracking-[0.5em] text-black group-hover:text-gold uppercase font-black flex items-center gap-4 transition-colors duration-500">
+              Explore Full Archive
+              <motion.span
+                animate={{ x: [0, 5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+              </motion.span>
+            </span>
+          </Link>
         </div>
       </div>
 

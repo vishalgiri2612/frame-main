@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/components/providers/CartProvider';
@@ -22,6 +23,7 @@ function ProductCard({ product, index }) {
 
   const [isHovered, setIsHovered] = useState(false);
   const [imageIdx, setImageIdx] = useState(0);
+  const router = useRouter();
 
   const images = Array.isArray(product.images) && product.images.length > 0
     ? product.images
@@ -69,6 +71,7 @@ function ProductCard({ product, index }) {
       className="product-card group cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => router.push(`/shop/${product.id || product.sku}`)}
     >
       <div
         className="card-image relative aspect-[4/3] overflow-hidden flex items-center justify-center"
@@ -132,44 +135,6 @@ function ProductCard({ product, index }) {
           </span>
         </div>
 
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col gap-2 items-center justify-center p-3">
-          <Link
-            href={`/shop/${product.id || product.sku}`}
-            className="w-full max-w-[160px] py-2.5 text-center transition-colors"
-            style={{
-              background: '#F7F4EF',
-              color: '#0F1117',
-              fontFamily: 'var(--font-inter)',
-              fontSize: '9px',
-              fontWeight: 600,
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = '#C9A84C')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = '#F7F4EF')}
-          >
-            View Details
-          </Link>
-          <button
-            onClick={handleAddToCart}
-            className="w-full max-w-[160px] py-2.5 transition-all"
-            style={{
-              border: '1px solid #C9A84C',
-              color: '#C9A84C',
-              background: 'transparent',
-              fontFamily: 'var(--font-inter)',
-              fontSize: '9px',
-              fontWeight: 600,
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              cursor: 'pointer',
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#C9A84C'; e.currentTarget.style.color = '#0A0E1A'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#C9A84C'; }}
-          >
-            {added ? 'Added to Bag' : 'Add to Bag'}
-          </button>
-        </div>
       </div>
 
       <div className="mt-4 space-y-1.5">

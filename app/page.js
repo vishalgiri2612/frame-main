@@ -4,6 +4,7 @@ import Hero from '@/components/sections/Hero';
 import BrandMarquee from '@/components/sections/BrandMarquee';
 import BrandShowcase from '@/components/sections/BrandShowcase';
 import FeaturedFrames from '@/components/sections/FeaturedFrames';
+import CollectionGallery from '@/components/sections/CollectionGallery';
 import Magazine from '@/components/sections/Magazine';
 import AboutStrip from '@/components/sections/AboutStrip';
 import BookingSection from '@/components/sections/BookingSection';
@@ -21,6 +22,7 @@ export default async function Home() {
       <BrandMarquee />
       <BrandShowcase />
       <FeaturedFrames initialProducts={displayProducts} />
+      <CollectionGallery />
       <Magazine />
       <BookingSection />
       <AboutStrip />

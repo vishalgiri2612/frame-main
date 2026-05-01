@@ -43,21 +43,25 @@ export default function Navbar() {
     <nav
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        zIndex: 50,
+        top: isScrolled ? '20px' : '0',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: isScrolled ? 'calc(100% - 40px)' : '100%',
+        maxWidth: isScrolled ? '1400px' : '100%',
+        zIndex: 1000,
         backgroundColor: '#EBE9E4',
-        borderBottom: '1px solid rgba(0,0,0,0.05)',
-        padding: '16px 0',
-        transition: 'all 500ms ease',
+        borderBottom: isScrolled ? 'none' : '1px solid rgba(0,0,0,0.05)',
+        borderRadius: isScrolled ? '9999px' : '0',
+        padding: isScrolled ? '8px 0' : '16px 0',
+        boxShadow: isScrolled ? '0 10px 40px rgba(0, 0, 0, 0.1)' : 'none',
+        transition: 'all 500ms cubic-bezier(0.16, 1, 0.3, 1)',
       }}
     >
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       <div className="container mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex flex-col group relative z-10 shrink-0">
+        <Link href="/" className="flex flex-col group relative z-50 shrink-0">
           <motion.span
             whileHover={{ scale: 1.03 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -98,7 +102,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop nav links */}
-        <div className="hidden lg:flex items-center space-x-8">
+        <div className="hidden lg:flex items-center space-x-8 relative z-50">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -115,7 +119,7 @@ export default function Navbar() {
         </div>
 
         {/* Right actions — icons use text-primary, NOT gold */}
-        <div className="flex items-center space-x-4 md:space-x-5 shrink-0">
+        <div className="flex items-center space-x-4 md:space-x-5 shrink-0 relative z-50">
           <button
             onClick={() => setIsSearchOpen(true)}
             className="hover:scale-110 transition-transform"

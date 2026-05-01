@@ -2,18 +2,21 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [progressRunning, setProgressRunning] = useState(true);
 
-  const [arRevealed, setArRevealed] = useState(false);
-  const [arProgress, setArProgress] = useState(0);
-  const [isScanning, setIsScanning] = useState(false);
+  const [miniFrameLoaded, setMiniFrameLoaded] = useState(false);
 
   const slides = [
     {
       src: "/m1.png",
+      frameImg: "/image copy.png",
+      frameName: "Mega Wayfarer II — Tortoise",
+      frameLink: "/shop/RB0832S-902/R5",
+      theme: "rgba(212,175,55,0.4)", // Gold/Amber theme
       badge: "ESTABLISHED 1987 / LUXURY EYEWEAR",
       titleTop: "SEE THE",
       titleItalic: "UNSEEN.",
@@ -21,6 +24,10 @@ export default function Hero() {
     },
     {
       src: "/m2.png",
+      frameImg: "/image.png",
+      frameName: "Mega Wayfarer II — Black",
+      frameLink: "/shop/RB0832S-901/58",
+      theme: "rgba(255,255,255,0.25)", // White/Silver theme
       badge: "CRAFTED EXCELLENCE / PREMIUM SERIES",
       titleTop: "TIMELESS",
       titleItalic: "ELEGANCE.",
@@ -28,6 +35,10 @@ export default function Hero() {
     },
     {
       src: "/m3.png",
+      frameImg: "/image copy.png",
+      frameName: "Mega Wayfarer II — Tortoise",
+      frameLink: "/shop/RB0832S-902/R5",
+      theme: "rgba(212,175,55,0.4)", // Gold/Amber theme
       badge: "MODERN VISION / ARTISAN FRAMES",
       titleTop: "BEYOND",
       titleItalic: "SIGHT.",
@@ -36,29 +47,7 @@ export default function Hero() {
   ];
 
   const timerRef = useRef(null);
-  const scanTimerRef = useRef(null);
 
-  const toggleAR = () => {
-    if (!arRevealed && !isScanning) {
-      setIsScanning(true);
-      setArProgress(0);
-      let pct = 0;
-      clearInterval(scanTimerRef.current);
-      scanTimerRef.current = setInterval(() => {
-        pct += 2.5;
-        setArProgress(pct);
-        if (pct >= 100) {
-          clearInterval(scanTimerRef.current);
-          setArRevealed(true);
-          setIsScanning(false);
-        }
-      }, 35);
-    } else if (arRevealed) {
-      setArRevealed(false);
-      setArProgress(0);
-      setIsScanning(false);
-    }
-  };
 
   const startAutoplay = () => {
     clearInterval(timerRef.current);
@@ -317,13 +306,185 @@ export default function Hero() {
           from { width: 0; }
           to   { width: 100%; }
         }
+
+        /* ── MINI FRAME PANEL (Glasses Only) ── */
+        .mini-frame-panel {
+          position: absolute;
+          right: 3.5vw;
+          bottom: 14%;
+          z-index: 20;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .mini-frame-label {
+          font-family: var(--font-inter), sans-serif;
+          font-size: 0.6rem;
+          font-weight: 700;
+          letter-spacing: 0.24em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.5);
+        }
+
+        .mini-frame-card {
+          position: relative;
+          width: 260px;
+          height: 180px;
+          background: rgba(8, 11, 22, 0.88);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border: 1px solid var(--slide-theme, rgba(212,175,55,0.35));
+          border-radius: 6px;
+          box-shadow:
+            0 0 0 1px rgba(0,0,0,0.6),
+            0 16px 48px rgba(0,0,0,0.7),
+            inset 0 0 40px rgba(212,175,55,0.04),
+            0 0 28px var(--slide-theme-glow, rgba(212,175,55,0.12));
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: box-shadow 0.4s ease, border-color 0.4s ease, transform 0.3s ease;
+          overflow: hidden;
+          cursor: pointer;
+          text-decoration: none;
+        }
+        .mini-frame-card:hover {
+          border-color: rgba(212,175,55,0.65);
+          transform: translateY(-4px) scale(1.02);
+          box-shadow:
+            0 0 0 1px rgba(0,0,0,0.6),
+            0 24px 64px rgba(0,0,0,0.8),
+            inset 0 0 60px rgba(212,175,55,0.07),
+            0 0 48px rgba(212,175,55,0.25);
+        }
+
+        /* "View Product" badge shown on hover */
+        .mini-frame-card::after {
+          content: 'View Product ↗';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          padding: 8px 0;
+          text-align: center;
+          font-family: var(--font-inter), sans-serif;
+          font-size: 0.58rem;
+          font-weight: 700;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: rgba(10,14,26,0.95);
+          background: rgba(212,175,55,0.92);
+          transform: translateY(100%);
+          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .mini-frame-card:hover::after {
+          transform: translateY(0);
+        }
+
+        /* Gold corner brackets */
+        .mfc-corner {
+          position: absolute;
+          width: 14px;
+          height: 14px;
+          border-color: var(--slide-theme, rgba(212,175,55,0.75));
+          border-style: solid;
+          pointer-events: none;
+          transition: border-color 0.4s ease;
+        }
+        .mfc-corner.tl { top: 8px; left: 8px;  border-width: 2px 0 0 2px; }
+        .mfc-corner.tr { top: 8px; right: 8px;  border-width: 2px 2px 0 0; }
+        .mfc-corner.bl { bottom: 8px; left: 8px;  border-width: 0 0 2px 2px; }
+        .mfc-corner.br { bottom: 8px; right: 8px;  border-width: 0 2px 2px 0; }
+
+        /* Glasses real image wrapper — fade in/out on slide change */
+        .mf-glasses-wrap {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          opacity: 0;
+          transform: scale(0.96) translateY(4px);
+          transition: opacity 0.5s ease, transform 0.5s ease;
+          pointer-events: none;
+        }
+        .mf-glasses-wrap.visible {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+
+        .mf-glasses-img {
+          width: 100%;
+          height: 140px;
+          object-fit: contain;
+          object-position: center;
+          /* remove white background from product image */
+          mix-blend-mode: multiply;
+          filter: drop-shadow(0 4px 16px rgba(0,0,0,0.55));
+        }
+
+        .mf-glasses-name {
+          font-family: var(--font-inter), sans-serif;
+          font-size: 0.58rem;
+          font-weight: 600;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: rgba(212,175,55,0.85);
+          white-space: nowrap;
+        }
+
+        /* Subtle ambient glow behind glasses */
+        .mf-glow {
+          position: absolute;
+          width: 200px;
+          height: 80px;
+          border-radius: 50%;
+          background: radial-gradient(ellipse, var(--slide-theme-glow, rgba(212,175,55,0.10)) 0%, transparent 70%);
+          pointer-events: none;
+          transition: background 0.4s ease;
+        }
+
+        .mini-frame-dots {
+          display: flex;
+          gap: 6px;
+        }
+        .mini-frame-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.22);
+          transition: background 0.3s, transform 0.3s;
+          border: none;
+          padding: 0;
+          cursor: pointer;
+        }
+        .mini-frame-dot.active {
+          background: var(--gold);
+          transform: scale(1.35);
+        }
+
+        @media (max-width: 900px) {
+          .mini-frame-panel { display: none; }
+        }
       `}} />
 
       <section className="hero-section">
         {/* SLIDES */}
         {slides.map((slide, index) => (
           <div key={index} className={`hero-slide ${index === currentSlide ? 'active' : ''}`}>
-            <img className="slide-img" src={slide.src} alt={slide.alt} />
+            <Image 
+              className="slide-img" 
+              src={slide.src} 
+              alt={slide.frameName} 
+              fill
+              priority={index === 0}
+              sizes="100vw"
+              style={{ objectFit: 'cover' }}
+            />
           </div>
         ))}
 
@@ -351,101 +512,58 @@ export default function Hero() {
 
 
 
-        {/* AR Scanner Box */}
-        <div className="ar-wrapper">
-          <div className="ar-label">Virtual Try-On</div>
+        {/* MINI FRAME PANEL — Glasses Only, synced with carousel */}
+        <div className="mini-frame-panel">
+          <span className="mini-frame-label">Featured Frame</span>
 
-          <div className="ar-box" onClick={toggleAR}>
-            {/* Animated scan line */}
-            <div className={`scan-line ${isScanning ? 'fast' : ''}`} style={{ opacity: arRevealed ? 0 : 1 }}></div>
-
+          <Link
+            href={slides[currentSlide].frameLink}
+            className="mini-frame-card"
+            style={{
+              '--slide-theme': slides[currentSlide].theme,
+              '--slide-theme-glow': slides[currentSlide].theme.replace('0.4', '0.12').replace('0.25', '0.08')
+            }}
+          >
             {/* Corner brackets */}
-            <div className="corner tl"></div>
-            <div className="corner tr"></div>
-            <div className="corner bl"></div>
-            <div className="corner br"></div>
+            <div className="mfc-corner tl" />
+            <div className="mfc-corner tr" />
+            <div className="mfc-corner bl" />
+            <div className="mfc-corner br" />
 
-            {/* Initial overlay without text */}
-            <div className="scan-overlay" style={{ opacity: arRevealed ? 0 : 1, pointerEvents: arRevealed ? 'none' : 'auto' }}>
-            </div>
+            {/* Ambient glow */}
+            <div className="mf-glow" />
 
-            {/* Glasses revealed after scan */}
-            <div className="glasses-reveal" style={{ opacity: arRevealed ? 1 : 0 }}>
-              <svg viewBox="0 0 220 130" width="210" height="124" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <radialGradient id="lGr" cx="38%" cy="33%" r="68%">
-                    <stop offset="0%" stopColor="#8a5828" stopOpacity="0.82"/>
-                    <stop offset="100%" stopColor="#3a1800" stopOpacity="0.97"/>
-                  </radialGradient>
-                  <radialGradient id="rGr" cx="62%" cy="33%" r="68%">
-                    <stop offset="0%" stopColor="#7a4818" stopOpacity="0.82"/>
-                    <stop offset="100%" stopColor="#2a1000" stopOpacity="0.97"/>
-                  </radialGradient>
-                  
-                  <radialGradient id="lGrAv" cx="38%" cy="33%" r="68%">
-                    <stop offset="0%" stopColor="#4a5828" stopOpacity="0.6"/>
-                    <stop offset="100%" stopColor="#1a2800" stopOpacity="0.9"/>
-                  </radialGradient>
-                  <radialGradient id="rGrAv" cx="62%" cy="33%" r="68%">
-                    <stop offset="0%" stopColor="#3a4818" stopOpacity="0.6"/>
-                    <stop offset="100%" stopColor="#0a1000" stopOpacity="0.9"/>
-                  </radialGradient>
-                </defs>
+            {/* All glasses images stacked, only active one visible */}
+            {slides.map((slide, index) => (
+              <div
+                key={index}
+                className={`mf-glasses-wrap${index === currentSlide ? ' visible' : ''}`}
+              >
+                <div className="relative w-full h-[148px]">
+                  <Image
+                    src={slide.frameImg}
+                    alt={slide.frameName}
+                    fill
+                    sizes="300px"
+                    className="mf-glasses-img"
+                    style={{ objectFit: 'contain' }}
+                  />
+                </div>
+                <span className="mf-glasses-name">{slide.frameName}</span>
+              </div>
+            ))}
+          </Link>
 
-                {currentSlide === 0 && (
-                  <g className="wayfarer">
-                    {/* Wayfarer Lenses/Frames */}
-                    <path d="M 30 40 C 50 30 90 35 100 45 C 110 70 90 95 65 95 C 40 95 20 80 30 40 Z" fill="url(#lGr)" stroke="#3a1800" strokeWidth="6"/>
-                    <path d="M 190 40 C 170 30 130 35 120 45 C 110 70 130 95 155 95 C 180 95 200 80 190 40 Z" fill="url(#rGr)" stroke="#3a1800" strokeWidth="6"/>
-                    <line x1="120" y1="50" x2="100" y2="50" stroke="#3a1800" strokeWidth="6" strokeLinecap="round"/>
-                    <path d="M30 40 C 15 35 5 45 0 50" stroke="#3a1800" strokeWidth="5" fill="none" strokeLinecap="round"/>
-                    <path d="M190 40 C 205 35 215 45 220 50" stroke="#3a1800" strokeWidth="5" fill="none" strokeLinecap="round"/>
-                    {/* Highlights */}
-                    <ellipse cx="60" cy="56" rx="20" ry="12" fill="rgba(255,255,255,0.06)"/>
-                    <ellipse cx="160" cy="56" rx="20" ry="12" fill="rgba(255,255,255,0.06)"/>
-                    <text x="110" y="120" textAnchor="middle" fontFamily="var(--font-inter), sans-serif" fontSize="7" letterSpacing="2.5" fill="rgba(212,175,55,0.85)">
-                      CLASSIC WAYFARER
-                    </text>
-                  </g>
-                )}
-
-                {currentSlide === 1 && (
-                  <g className="aviator">
-                    {/* Aviator Lenses/Frames */}
-                    <path d="M 35 50 C 45 35 80 35 95 45 C 105 70 90 100 65 100 C 40 100 25 80 35 50 Z" fill="url(#lGrAv)" stroke="#d4af37" strokeWidth="2.5"/>
-                    <path d="M 185 50 C 175 35 140 35 125 45 C 115 70 130 100 155 100 C 180 100 195 80 185 50 Z" fill="url(#rGrAv)" stroke="#d4af37" strokeWidth="2.5"/>
-                    <line x1="125" y1="45" x2="95" y2="45" stroke="#d4af37" strokeWidth="2.5" strokeLinecap="round"/>
-                    <path d="M 118 36 C 110 32 110 32 102 36" stroke="#d4af37" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-                    <path d="M35 50 C 20 45 10 45 0 50" stroke="#d4af37" strokeWidth="2" fill="none" strokeLinecap="round"/>
-                    <path d="M185 50 C 200 45 210 45 220 50" stroke="#d4af37" strokeWidth="2" fill="none" strokeLinecap="round"/>
-                    <ellipse cx="60" cy="65" rx="12" ry="20" fill="rgba(255,255,255,0.06)" transform="rotate(30 60 65)"/>
-                    <ellipse cx="160" cy="65" rx="12" ry="20" fill="rgba(255,255,255,0.06)" transform="rotate(-30 160 65)"/>
-                    <text x="110" y="120" textAnchor="middle" fontFamily="var(--font-inter), sans-serif" fontSize="7" letterSpacing="2.5" fill="rgba(212,175,55,0.85)">
-                      SIGNATURE AVIATOR
-                    </text>
-                  </g>
-                )}
-
-                {currentSlide === 2 && (
-                  <g className="round">
-                    {/* Round Lenses/Frames */}
-                    <ellipse cx="70" cy="66" rx="38" ry="38" fill="url(#lGr)" stroke="#6a4220" strokeWidth="3.5"/>
-                    <ellipse cx="150" cy="66" rx="38" ry="38" fill="url(#rGr)" stroke="#6a4220" strokeWidth="3.5"/>
-                    <path d="M 125 58 C 110 52 110 52 95 58" stroke="#d4af37" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-                    <path d="M32 60 C 20 50 10 55 0 60" stroke="#d4af37" strokeWidth="2" fill="none" strokeLinecap="round"/>
-                    <path d="M188 60 C 200 50 210 55 220 60" stroke="#d4af37" strokeWidth="2" fill="none" strokeLinecap="round"/>
-                    <ellipse cx="60" cy="56" rx="16" ry="10" fill="rgba(255,220,170,0.08)"/>
-                    <ellipse cx="140" cy="56" rx="16" ry="10" fill="rgba(255,220,170,0.08)"/>
-                    <text x="110" y="120" textAnchor="middle" fontFamily="var(--font-inter), sans-serif" fontSize="7" letterSpacing="2.5" fill="rgba(212,175,55,0.85)">
-                      VINTAGE ROUND
-                    </text>
-                  </g>
-                )}
-              </svg>
-            </div>
-
-            {/* Scan progress bar */}
-            <div className="ar-progress-bar" style={{ width: `${Math.min(arProgress, 100)}%` }}></div>
+          {/* Mini dots — synced with main carousel */}
+          <div className="mini-frame-dots">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                className={`mini-frame-dot${index === currentSlide ? ' active' : ''}`}
+                onClick={() => goTo(index)}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
           </div>
         </div>
 
