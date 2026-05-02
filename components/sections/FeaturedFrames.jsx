@@ -88,7 +88,7 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
 
         <div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col gap-2 items-center justify-end pb-5"
-          style={{ background: 'rgba(10,14,26,0.55)' }}
+          style={{ background: 'transparent' }}
         >
           <span
             style={{
@@ -97,7 +97,7 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
               fontWeight: 500,
               letterSpacing: '0.20em',
               textTransform: 'uppercase',
-              color: '#F7F4EF',
+              color: 'var(--gold)',
             }}
           >
             View Frame
@@ -106,7 +106,7 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
 
       </div>
 
-      <div className="mt-4 space-y-1.5">
+      <div className="mt-4 space-y-3 transition-transform duration-500 group-hover:translate-x-3">
         <span
           style={{
             fontFamily: 'var(--font-inter)',
@@ -122,24 +122,28 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
         </span>
         <h3
           style={{
-            fontFamily: 'var(--font-inter)',
-            fontSize: 'clamp(0.85rem, 1.5vw, 1rem)',
+            fontFamily: 'var(--font-cormorant)',
+            fontSize: 'clamp(1.3rem, 2vw, 1.6rem)',
             fontWeight: 600,
             color: '#111111',
-            letterSpacing: 0,
+            letterSpacing: '-0.01em',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
+            lineHeight: 1.2
           }}
+          className="mb-3"
         >
           {product.name}
         </h3>
         <div className="flex items-center gap-3">
           <span
             style={{
-              fontFamily: 'var(--font-playfair)',
-              fontSize: 'clamp(0.85rem, 1.5vw, 1.05rem)',
-              fontWeight: 700,
+              fontFamily: 'var(--font-inter)',
+              fontSize: '11px',
+              fontWeight: 500,
+              letterSpacing: '0.25em',
+              textTransform: 'uppercase',
               color: 'var(--gold)',
             }}
           >

@@ -111,7 +111,7 @@ export default function Magazine() {
                       src={article.image}
                       alt={article.title}
                       fill
-                      className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                      className="object-cover transition-all duration-700 group-hover:scale-105"
                       sizes="200px"
                     />
                     <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />

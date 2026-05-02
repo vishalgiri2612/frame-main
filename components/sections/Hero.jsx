@@ -310,18 +310,18 @@ export default function Hero() {
         /* ── MINI FRAME PANEL (Glasses Only) ── */
         .mini-frame-panel {
           position: absolute;
-          right: 3.5vw;
-          bottom: 14%;
+          right: 40px;
+          bottom: 40px;
           z-index: 20;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 14px;
+          gap: 20px;
         }
 
         .mini-frame-label {
           font-family: var(--font-inter), sans-serif;
-          font-size: 0.6rem;
+          font-size: 0.8rem;
           font-weight: 700;
           letter-spacing: 0.24em;
           text-transform: uppercase;
@@ -330,8 +330,8 @@ export default function Hero() {
 
         .mini-frame-card {
           position: relative;
-          width: 260px;
-          height: 180px;
+          width: 400px;
+          height: 280px;
           background: rgba(8, 11, 22, 0.88);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
@@ -422,19 +422,20 @@ export default function Hero() {
           height: 140px;
           object-fit: contain;
           object-position: center;
-          /* remove white background from product image */
-          mix-blend-mode: multiply;
+          /* removed mix-blend-mode: multiply to prevent color change */
           filter: drop-shadow(0 4px 16px rgba(0,0,0,0.55));
         }
 
         .mf-glasses-name {
           font-family: var(--font-inter), sans-serif;
-          font-size: 0.58rem;
-          font-weight: 600;
-          letter-spacing: 0.2em;
+          font-size: 0.7rem;
+          font-weight: 700;
+          letter-spacing: 0.3em;
           text-transform: uppercase;
-          color: rgba(212,175,55,0.85);
+          color: var(--gold);
           white-space: nowrap;
+          margin-top: 12px;
+          opacity: 0.8;
         }
 
         /* Subtle ambient glow behind glasses */
@@ -476,10 +477,10 @@ export default function Hero() {
         {/* SLIDES */}
         {slides.map((slide, index) => (
           <div key={index} className={`hero-slide ${index === currentSlide ? 'active' : ''}`}>
-            <Image 
-              className="slide-img" 
-              src={slide.src} 
-              alt={slide.frameName} 
+            <Image
+              className="slide-img"
+              src={slide.src}
+              alt={slide.frameName}
               fill
               priority={index === 0}
               sizes="100vw"
@@ -539,7 +540,7 @@ export default function Hero() {
                 key={index}
                 className={`mf-glasses-wrap${index === currentSlide ? ' visible' : ''}`}
               >
-                <div className="relative w-full h-[148px]">
+                <div className="relative w-full h-[260px]">
                   <Image
                     src={slide.frameImg}
                     alt={slide.frameName}

@@ -90,7 +90,7 @@ export default function BrandDetailClient({ collection, products }) {
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center text-cream/20 font-mono text-[10px] tracking-[0.35em]">{product.id}</div>
                       )}
-                      <div className="absolute inset-0 bg-navy/55 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <span className="border border-gold text-gold px-5 py-2 text-[10px] tracking-[0.3em] uppercase font-mono">View Piece</span>
                       </div>
                     </div>
@@ -100,10 +100,10 @@ export default function BrandDetailClient({ collection, products }) {
                     </div>
                     <div className="flex justify-between items-start relative z-10">
                       <div>
-                        <h3 className="text-xl font-serif tracking-widest mb-1">{product.name}</h3>
+                        <h3 className="text-2xl font-serif italic tracking-tight mb-1">{product.name}</h3>
                         <p className="text-[10px] text-teal uppercase tracking-widest">{product.details}</p>
                       </div>
-                      <span className="text-gold font-mono">₹{product.price?.toLocaleString('en-IN')}</span>
+                      <span className="font-inter text-[11px] font-black tracking-widest text-gold uppercase">₹{product.price?.toLocaleString('en-IN')}</span>
                     </div>
                   </Link>
                 </motion.div>
