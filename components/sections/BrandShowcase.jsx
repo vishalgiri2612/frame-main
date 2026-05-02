@@ -94,29 +94,29 @@ export default function BrandShowcase() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.05 }}
               className={`group relative overflow-hidden rounded-[1.5rem] border border-white/5 hover:border-white/20 transition-all duration-700 ${brand.gridClass}`}
-              style={{ backgroundColor: '#05070a' }} // Deep space black base
+              style={{ backgroundColor: 'var(--navy-surface)' }}
             >
               <Link href={`/shop?brand=${brand.name}`} className="block w-full h-full relative">
-                
+
                 {/* Atmospheric Aurora Glows */}
-                <div 
-                  className="absolute -top-24 -left-24 w-72 h-72 rounded-full mix-blend-screen opacity-20 group-hover:opacity-60 group-hover:scale-150 transition-all duration-1000 ease-out"
+                <div
+                  className="absolute -top-24 -left-24 w-72 h-72 rounded-full mix-blend-screen opacity-10 group-hover:opacity-40 group-hover:scale-150 transition-all duration-1000 ease-out"
                   style={{ background: brand.color, filter: 'blur(90px)' }}
                 />
-                
-                <div 
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full mix-blend-screen opacity-10 group-hover:opacity-30 group-hover:scale-[2] transition-all duration-1000 delay-100 ease-out"
-                  style={{ background: '#ffffff', filter: 'blur(60px)' }}
+
+                <div
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full mix-blend-screen opacity-5 group-hover:opacity-20 group-hover:scale-[2] transition-all duration-1000 delay-100 ease-out"
+                  style={{ background: 'var(--gold)', filter: 'blur(60px)' }}
                 />
 
-                <div 
-                  className="absolute -bottom-24 -right-24 w-72 h-72 rounded-full mix-blend-screen opacity-20 group-hover:opacity-50 group-hover:scale-150 transition-all duration-1000 delay-200 ease-out"
+                <div
+                  className="absolute -bottom-24 -right-24 w-72 h-72 rounded-full mix-blend-screen opacity-10 group-hover:opacity-30 group-hover:scale-150 transition-all duration-1000 delay-200 ease-out"
                   style={{ background: brand.color, filter: 'blur(90px)' }}
                 />
 
                 {/* Cinematic Film Grain Overlay */}
-                <div 
-                  className="absolute inset-0 opacity-[0.06] mix-blend-overlay z-0 pointer-events-none"
+                <div
+                  className="absolute inset-0 opacity-[0.03] mix-blend-overlay z-0 pointer-events-none"
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
                   }}
@@ -124,10 +124,10 @@ export default function BrandShowcase() {
 
                 {/* Background Image (Floating Glasses) */}
                 <div className="absolute inset-0 flex items-center justify-center p-12 transition-transform duration-1000 group-hover:scale-110 group-hover:-translate-y-1 z-10">
-                  <img 
-                    src={brand.image} 
+                  <img
+                    src={brand.image}
                     alt={brand.name}
-                    className="w-[85%] h-[85%] object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.8)]"
+                    className="w-[85%] h-[85%] object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.3)]"
                   />
                 </div>
 
@@ -137,21 +137,21 @@ export default function BrandShowcase() {
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: brand.color }}></span>
-                      <span className="text-[9px] tracking-[0.2em] font-medium text-white/70 uppercase font-inter">{brand.origin}</span>
+                      <span className="text-[9px] tracking-[0.2em] font-medium text-cream-warm uppercase font-inter">{brand.origin}</span>
                     </div>
-                    <span className="text-[9px] tracking-[0.2em] font-medium text-white/50 uppercase font-inter">{brand.est}</span>
+                    <span className="text-[9px] tracking-[0.2em] font-medium text-cream-warm/50 uppercase font-inter">{brand.est}</span>
                   </div>
 
                   {/* Bottom: Name and Styles */}
                   <div className="space-y-4">
-                    <h3 className="text-4xl lg:text-5xl font-serif text-white tracking-tight group-hover:translate-x-2 transition-transform duration-500">
+                    <h3 className="text-4xl lg:text-5xl font-serif text-cream tracking-tight group-hover:translate-x-2 transition-transform duration-500">
                       {brand.name}
                     </h3>
-                    
-                    <div className="pt-4 border-t border-white/10 flex justify-between items-center">
-                      <span className="text-[9px] tracking-[0.3em] font-bold text-white/40 uppercase font-inter">{brand.styles}</span>
+
+                    <div className="pt-4 border-t border-cream/10 flex justify-between items-center">
+                      <span className="text-[9px] tracking-[0.3em] font-bold text-cream/40 uppercase font-inter">{brand.styles}</span>
                       {brand.gridClass.includes('lg:col-span-2') && (
-                        <div className="flex items-center gap-2 text-[8px] tracking-[0.4em] text-white/60 uppercase font-bold">
+                        <div className="flex items-center gap-2 text-[8px] tracking-[0.4em] text-cream/60 uppercase font-bold">
                           EXPLORE <span className="text-sm">→</span>
                         </div>
                       )}

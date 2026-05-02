@@ -35,9 +35,10 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
       layout
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+      viewport={{ once: true, margin: "-50px" }}
       transition={{ delay: index * 0.08, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       className="product-card group cursor-pointer"
+      style={{ transform: 'translateZ(0)', willChange: 'transform' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => router.push(`/shop/${product.id || product.sku}`)}
@@ -45,8 +46,10 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
       <div
         className="card-image relative aspect-[4/3] overflow-hidden flex items-center justify-center"
         style={{
-          background: '#FFFFFF',
+          background: 'var(--navy-surface)',
           border: '1px solid var(--border-subtle)',
+          transform: 'translateZ(0)',
+          contain: 'paint'
         }}
       >
         {images.length > 0 ? (
@@ -56,6 +59,7 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
             fill
             loading="lazy"
             className="next-image object-contain p-4 md:p-8 transition-transform duration-700 group-hover:scale-[1.04]"
+            style={{ transform: 'translateZ(0)', willChange: 'transform' }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
@@ -75,9 +79,10 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
           }}
           className="absolute top-4 right-4 z-20 p-2 rounded-full transition-all duration-300"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-            backdropFilter: 'blur(4px)',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
             color: isInWishlist(product.id || product.sku) ? '#C9A84C' : 'var(--text-tertiary)',
+            transform: 'translateZ(0)'
           }}
           aria-label="Toggle Wishlist"
         >
@@ -88,7 +93,7 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
 
         <div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col gap-2 items-center justify-end pb-5"
-          style={{ background: 'transparent' }}
+          style={{ background: 'transparent', transform: 'translateZ(0)' }}
         >
           <span
             style={{
@@ -106,43 +111,58 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
 
       </div>
 
-      <div className="mt-4 space-y-3 transition-transform duration-500 group-hover:translate-x-3">
-        <span
-          style={{
-            fontFamily: 'var(--font-inter)',
-            fontSize: '10px',
-            fontWeight: 500,
-            letterSpacing: '0.20em',
-            textTransform: 'uppercase',
-            color: 'var(--text-tertiary)',
-            display: 'block',
-          }}
-        >
-          {product.brand}
-        </span>
+      <div className="mt-4 space-y-3 transition-transform duration-500 group-hover:translate-x-5" style={{ willChange: 'transform' }}>
+        <div className="flex justify-between items-end">
+          <span
+            style={{
+              fontFamily: 'var(--font-inter)',
+              fontSize: '10px',
+              fontWeight: 500,
+              letterSpacing: '0.20em',
+              textTransform: 'uppercase',
+              color: 'var(--text-tertiary)',
+            }}
+          >
+            {product.brand}
+          </span>
+        </div>
         <h3
           style={{
             fontFamily: 'var(--font-cormorant)',
-            fontSize: 'clamp(1.3rem, 2vw, 1.6rem)',
-            fontWeight: 600,
-            color: '#111111',
-            letterSpacing: '-0.01em',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            lineHeight: 1.2
+            fontSize: 'clamp(1.4rem, 2.5vw, 1.8rem)',
+            fontWeight: 400,
+            color: 'var(--text-primary)',
+            letterSpacing: '0.02em',
+            textTransform: 'uppercase',
+            lineHeight: 1.1,
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '0.3em'
           }}
-          className="mb-3"
         >
-          {product.name}
+          {(() => {
+            const words = product.name.split(' ');
+            if (words.length <= 1) return <em style={{ fontStyle: 'italic' }}>{product.name}<span style={{ color: 'var(--gold)', fontStyle: 'normal', marginLeft: '2px' }}>.</span></em>;
+            const firstPart = words.slice(0, -1).join(' ');
+            const lastWord = words[words.length - 1];
+            return (
+              <>
+                <span>{firstPart}</span>
+                <em style={{ fontStyle: 'italic', fontWeight: 300 }}>
+                  {lastWord}
+                  <span style={{ color: 'var(--gold)', fontStyle: 'normal', marginLeft: '2px' }}>.</span>
+                </em>
+              </>
+            );
+          })()}
         </h3>
         <div className="flex items-center gap-3">
           <span
             style={{
               fontFamily: 'var(--font-inter)',
-              fontSize: '11px',
-              fontWeight: 500,
-              letterSpacing: '0.25em',
+              fontSize: '14px',
+              fontWeight: 600,
+              letterSpacing: '0.15em',
               textTransform: 'uppercase',
               color: 'var(--gold)',
             }}
@@ -174,7 +194,7 @@ export default function FeaturedFrames({ initialProducts = [] }) {
   );
 
   return (
-    <section style={{ paddingTop: 'var(--space-xl)', paddingBottom: '60px', background: '#FFFFFF' }}>
+    <section style={{ paddingTop: 'var(--space-xl)', paddingBottom: '60px', background: 'var(--navy)' }}>
       <div className="container mx-auto px-6">
 
         <div className="mb-10 text-left">
@@ -187,7 +207,7 @@ export default function FeaturedFrames({ initialProducts = [] }) {
               fontFamily: 'var(--font-cormorant)',
               fontSize: 'clamp(3rem, 6vw, 5rem)',
               fontWeight: 300,
-              color: '#111111',
+              color: 'var(--text-primary)',
               letterSpacing: '0.02em',
               lineHeight: 1,
             }}
@@ -198,7 +218,7 @@ export default function FeaturedFrames({ initialProducts = [] }) {
 
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 lg:gap-10">
           {filteredProducts.map((product, i) => (
-            <ProductCardItem 
+            <ProductCardItem
               key={product.sku || product._id}
               product={product}
               index={i}
@@ -211,18 +231,18 @@ export default function FeaturedFrames({ initialProducts = [] }) {
 
         {/* SHOW MORE / SHOP ALL BUTTON */}
         <div className="mt-20 flex justify-center">
-          <Link 
-            href="/shop" 
-            className="group relative px-12 py-5 overflow-hidden border border-black/10 hover:border-gold transition-colors duration-500"
+          <Link
+            href="/shop"
+            className="group relative px-16 py-4 overflow-hidden bg-[#E6D5B8] border border-gold/20 rounded-full transition-all duration-500 shadow-[0_15px_40px_rgba(212,175,55,0.1)] hover:bg-[#F3E2B5] hover:shadow-[0_20px_50px_rgba(212,175,55,0.2)]"
           >
-            <div className="absolute inset-0 bg-gold/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-            <span className="relative z-10 font-mono text-[10px] tracking-[0.5em] text-black group-hover:text-gold uppercase font-black flex items-center gap-4 transition-colors duration-500">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            <span className="relative z-10 font-mono text-[11px] tracking-[0.4em] text-[#0F1117] uppercase font-black flex items-center gap-6 transition-colors duration-500">
               Explore Full Archive
               <motion.span
                 animate={{ x: [0, 5, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14" />
                   <path d="m12 5 7 7-7 7" />
                 </svg>

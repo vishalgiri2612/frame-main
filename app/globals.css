@@ -126,17 +126,21 @@
     background-color: rgba(var(--navy-rgb), 0.82);
     backdrop-filter: blur(25px) saturate(180%);
     border-bottom: 1px solid rgba(var(--gold-rgb), 0.20);
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   .premium-card {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
     border: 1px solid var(--border-subtle);
     transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translateZ(0);
   }
 
   .premium-card:hover {
     border-color: var(--border-strong);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 0 20px rgba(201, 168, 76, 0.08);
+    transform: translateY(-4px) translateZ(0);
   }
 
   .perspective-1000 {
@@ -236,22 +240,23 @@
   /* EDITORIAL SCROLL */
   .scroll-reveal {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(30px) translateZ(0);
     transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
       transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
   }
 
   .scroll-reveal.from-left {
-    transform: translateX(-10px);
+    transform: translateX(-10px) translateZ(0);
   }
 
   .scroll-reveal.from-scale {
-    transform: scale(0.96);
+    transform: scale(0.96) translateZ(0);
   }
 
   .scroll-reveal.is-visible {
     opacity: 1;
-    transform: none;
+    transform: translateZ(0);
   }
 
   /* LIQUID GOLD SHIMMER — used only on hover via ::after */

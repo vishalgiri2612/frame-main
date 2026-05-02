@@ -101,6 +101,8 @@ export default function Hero() {
           opacity: 0;
           transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1);
           pointer-events: none;
+          will-change: opacity;
+          transform: translateZ(0);
         }
         .hero-slide.active {
           opacity: 1;
@@ -114,9 +116,10 @@ export default function Hero() {
           object-position: center 30%;
           filter: brightness(0.72);
           transition: transform 8s ease;
+          will-change: transform;
         }
         .hero-slide.active .slide-img {
-          transform: scale(1.02);
+          transform: scale(1.02) translateZ(0);
         }
 
         .hero-slide::after {
@@ -129,6 +132,8 @@ export default function Hero() {
             rgba(10,14,26,0.12) 55%,
             transparent 100%
           );
+          pointer-events: none;
+          transform: translateZ(0);
         }
 
         .hero-content {
@@ -138,21 +143,23 @@ export default function Hero() {
           display: flex;
           align-items: flex-end;
           padding: 0 6vw 7vh;
+          contain: layout;
         }
 
         .hero-text {
           max-width: 520px;
-          animation: fadeUp 0.8s ease both;
+          animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+          will-change: transform, opacity;
         }
 
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to   { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateY(30px) translateZ(0); }
+          to   { opacity: 1; transform: translateY(0) translateZ(0); }
         }
 
         .hero-badge {
           display: inline-block;
-          color: #111;
+          color: var(--text-primary);
           font-family: var(--font-inter), sans-serif;
           font-size: 0.75rem;
           font-weight: 700;
@@ -160,6 +167,7 @@ export default function Hero() {
           text-transform: uppercase;
           margin-bottom: 20px;
           text-shadow: 0 0 10px rgba(255,255,255,0.3);
+          transform: translateZ(0);
         }
         
         :global(.dark-mode) .hero-badge {
@@ -175,6 +183,7 @@ export default function Hero() {
           margin-bottom: 30px;
           letter-spacing: -0.02em;
           text-shadow: 2px 4px 15px rgba(0,0,0,0.4);
+          transform: translateZ(0);
         }
 
         .hero-heading em {
@@ -183,17 +192,18 @@ export default function Hero() {
         }
 
         .hero-sub {
-          color: #111;
+          color: var(--text-primary);
           font-family: var(--font-inter), sans-serif;
           font-size: 1.05rem;
           line-height: 1.6;
           max-width: 500px;
           margin-bottom: 36px;
-          background: rgba(255, 255, 255, 0.15);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
+          background: rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
           padding: 20px 24px;
-          border-left: 3px solid #111;
+          border-left: 3px solid var(--text-primary);
+          transform: translateZ(0);
         }
 
         :global(.dark-mode) .hero-sub {
@@ -427,15 +437,23 @@ export default function Hero() {
         }
 
         .mf-glasses-name {
-          font-family: var(--font-inter), sans-serif;
-          font-size: 0.7rem;
-          font-weight: 700;
-          letter-spacing: 0.3em;
+          font-family: var(--font-cormorant), serif;
+          font-size: 1.1rem;
+          font-weight: 400;
+          letter-spacing: 0.05em;
           text-transform: uppercase;
           color: var(--gold);
           white-space: nowrap;
-          margin-top: 12px;
-          opacity: 0.8;
+          margin-top: 15px;
+          opacity: 0.9;
+          display: flex;
+          justify-content: center;
+          gap: 0.3em;
+        }
+
+        .mf-glasses-name em {
+          font-style: italic;
+          font-weight: 300;
         }
 
         /* Subtle ambient glow behind glasses */
@@ -550,7 +568,20 @@ export default function Hero() {
                     style={{ objectFit: 'contain' }}
                   />
                 </div>
-                <span className="mf-glasses-name">{slide.frameName}</span>
+                <span className="mf-glasses-name">
+                  {(() => {
+                    const words = slide.frameName.split(' ');
+                    if (words.length <= 1) return <em>{slide.frameName}<span style={{ fontStyle: 'normal' }}>.</span></em>;
+                    const firstPart = words.slice(0, -1).join(' ');
+                    const lastWord = words[words.length - 1];
+                    return (
+                      <>
+                        <span>{firstPart}</span>
+                        <em>{lastWord}<span style={{ fontStyle: 'normal' }}>.</span></em>
+                      </>
+                    );
+                  })()}
+                </span>
               </div>
             ))}
           </Link>

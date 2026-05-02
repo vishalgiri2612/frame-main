@@ -26,7 +26,7 @@ export default function Footer() {
   return (
     <footer style={{ background: footerBg, paddingTop: '96px', paddingBottom: '48px', borderTop: '1px solid rgba(201,168,76,0.12)' }}>
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-20">
 
           {/* Brand */}
           <div className="space-y-8">
@@ -65,6 +65,7 @@ export default function Footer() {
 
           {/* Nav cols */}
           <FooterNav title="Shop" links={["Men's Frames", "Women's Frames", 'Sunglasses', 'Luxury Brands', 'New Arrivals']} />
+          <FooterNav title="Support" links={['Shape & Style Guide', 'FAQs', 'Orders', 'Shipping', 'Returns & Exchanges', 'Privacy Policy', 'Terms of Service', 'Refund policy']} />
           <FooterNav title="Company" links={['Our Heritage', 'Eye Examination', 'Lens Experts', 'Store Locator', 'Careers']} />
 
           {/* Newsletter */}
@@ -121,22 +122,35 @@ export default function Footer() {
 }
 
 function FooterNav({ title, links }) {
+  const getSlug = (text) => {
+    return text
+      .toLowerCase()
+      .replace(/ & /g, '-and-')
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-');
+  };
+
   return (
     <div className="space-y-6">
       <div className="luxury-label" style={{ justifyContent: 'flex-start' }}>{title}</div>
       <ul className="space-y-4">
-        {links.map((link) => (
-          <li key={link}>
-            <Link
-              href="#"
-              style={{ fontFamily: 'var(--font-inter)', fontSize: '14px', color: '#8A8078', transition: 'color 200ms ease', display: 'block' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A84C')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = '#8A8078')}
-            >
-              {link}
-            </Link>
-          </li>
-        ))}
+        {links.map((link) => {
+          const isSupport = title.toLowerCase() === 'support';
+          const href = isSupport ? `/support/${getSlug(link)}` : '#';
+          
+          return (
+            <li key={link}>
+              <Link
+                href={href}
+                style={{ fontFamily: 'var(--font-inter)', fontSize: '14px', color: '#8A8078', transition: 'color 200ms ease', display: 'block' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#C9A84C')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#8A8078')}
+              >
+                {link}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

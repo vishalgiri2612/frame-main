@@ -12,7 +12,7 @@ const collections = [
     subtext: 'Bold. Refined. Authoritative.',
     href: '/shop?category=MEN',
     image: '/men-collection.png',
-    accent: 'from-[#0F1117]/90 via-[#0F1117]/50 to-transparent',
+    accent: 'from-[var(--navy-deep)]/90 via-[var(--navy-deep)]/50 to-transparent',
     tag: 'MEN',
   },
   {
@@ -21,7 +21,7 @@ const collections = [
     subtext: 'Elegance Redefined.',
     href: '/shop?category=WOMEN',
     image: '/women-collection.png',
-    accent: 'from-[#0F1117]/90 via-[#0F1117]/50 to-transparent',
+    accent: 'from-[var(--navy-deep)]/90 via-[var(--navy-deep)]/50 to-transparent',
     tag: 'WOMEN',
   },
   {
@@ -30,7 +30,7 @@ const collections = [
     subtext: 'Playful. Protected. Premium.',
     href: '/shop?category=KIDS',
     image: '/kids-collection.png',
-    accent: 'from-[#0F1117]/90 via-[#0F1117]/50 to-transparent',
+    accent: 'from-[var(--navy-deep)]/90 via-[var(--navy-deep)]/50 to-transparent',
     tag: 'KIDS',
   },
 ];
@@ -50,7 +50,7 @@ const CollectionCard = ({ col, index }) => {
     >
       <Link href={col.href} className="block w-full h-full">
         {/* Image */}
-        <div className="relative aspect-[3/4] overflow-hidden bg-[#0F1117]">
+        <div className="relative aspect-[3/4] overflow-hidden bg-[var(--navy-deep)]">
           <Image
             src={col.image}
             alt={col.label}
@@ -85,7 +85,7 @@ const CollectionCard = ({ col, index }) => {
               {col.subtext}
             </motion.p>
 
-            <h3 className="font-serif italic text-white font-black text-4xl md:text-5xl tracking-tight leading-none mb-6 drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
+            <h3 className="font-serif italic text-cream font-black text-4xl md:text-5xl tracking-tight leading-none mb-6 drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]">
               {col.label}
             </h3>
 
@@ -103,7 +103,7 @@ const CollectionCard = ({ col, index }) => {
 
 export default function CollectionGallery() {
   return (
-    <section className="relative bg-[#0F1117] py-0 overflow-hidden">
+    <section className="relative bg-[var(--navy)] py-0 overflow-hidden">
       {/* Background texture line */}
       <div className="absolute top-0 left-1/2 -ml-px w-px h-full bg-gold/5 pointer-events-none" />
 

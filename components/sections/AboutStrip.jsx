@@ -51,6 +51,7 @@ export default function AboutStrip() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
                 className="flex gap-4 group"
+                style={{ transform: 'translateZ(0)' }}
               >
                 <div className="w-12 h-12 rounded-full border border-gold/20 flex items-center justify-center shrink-0 group-hover:bg-gold group-hover:text-navy transition-all duration-500">
                   <item.icon size={20} className="text-gold group-hover:text-navy transition-colors" />

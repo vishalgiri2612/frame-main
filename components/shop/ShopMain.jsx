@@ -47,16 +47,16 @@ function ProductCard({ product, index }) {
     addToCart(product);
     setAdded(true);
     toast.success(`${product.name} added to bag`, {
-       icon: '🛒',
-       style: {
-         borderRadius: '0px',
-         background: '#0A0E1A',
-         color: '#D4AF37',
-         border: '1px solid rgba(212,175,55,0.2)',
-         fontFamily: 'monospace',
-         fontSize: '10px',
-         letterSpacing: '0.1em'
-       }
+      icon: '🛒',
+      style: {
+        borderRadius: '0px',
+        background: 'var(--navy-deep)',
+        color: 'var(--gold)',
+        border: '1px solid var(--border-subtle)',
+        fontFamily: 'monospace',
+        fontSize: '10px',
+        letterSpacing: '0.1em'
+      }
     });
     setTimeout(() => setAdded(false), 1500);
   };
@@ -76,7 +76,7 @@ function ProductCard({ product, index }) {
       <div
         className="card-image relative aspect-[4/3] overflow-hidden flex items-center justify-center"
         style={{
-          background: '#FFFFFF',
+          background: 'var(--navy-surface)',
           border: '1px solid var(--border-subtle)',
         }}
       >
@@ -106,9 +106,10 @@ function ProductCard({ product, index }) {
           }}
           className="absolute top-4 right-4 z-20 p-2 rounded-full transition-all duration-300"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-            backdropFilter: 'blur(4px)',
-            color: isLiked ? '#C9A84C' : 'var(--text-tertiary)',
+            backgroundColor: 'var(--navy-deep)',
+            backdropFilter: 'blur(8px)',
+            color: isLiked ? 'var(--gold)' : 'var(--text-tertiary)',
+            border: '1px solid var(--border-subtle)',
           }}
           aria-label="Toggle Wishlist"
         >
@@ -137,42 +138,58 @@ function ProductCard({ product, index }) {
 
       </div>
 
-      <div className="mt-4 space-y-3 transition-transform duration-500 group-hover:translate-x-3">
-        <span
-          style={{
-            fontFamily: 'var(--font-inter)',
-            fontSize: '10px',
-            fontWeight: 500,
-            letterSpacing: '0.20em',
-            textTransform: 'uppercase',
-            color: 'var(--text-tertiary)',
-            display: 'block',
-          }}
-        >
-          {product.brand}
-        </span>
+      <div className="mt-4 space-y-3 transition-transform duration-500 group-hover:translate-x-5" style={{ willChange: 'transform' }}>
+        <div className="flex justify-between items-end">
+          <span
+            style={{
+              fontFamily: 'var(--font-inter)',
+              fontSize: '10px',
+              fontWeight: 500,
+              letterSpacing: '0.20em',
+              textTransform: 'uppercase',
+              color: 'var(--text-tertiary)',
+            }}
+          >
+            {product.brand}
+          </span>
+        </div>
         <h3
           style={{
             fontFamily: 'var(--font-cormorant)',
-            fontSize: 'clamp(1.3rem, 2vw, 1.6rem)',
-            fontWeight: 600,
-            color: '#111111',
-            letterSpacing: '-0.01em',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            lineHeight: 1.2
+            fontSize: 'clamp(1.4rem, 2.5vw, 1.8rem)',
+            fontWeight: 400,
+            color: 'var(--text-primary)',
+            letterSpacing: '0.02em',
+            textTransform: 'uppercase',
+            lineHeight: 1.1,
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '0.3em'
           }}
         >
-          {product.name}
+          {(() => {
+            const words = product.name.split(' ');
+            if (words.length <= 1) return <em style={{ fontStyle: 'italic' }}>{product.name}<span style={{ color: 'var(--gold)', fontStyle: 'normal', marginLeft: '2px' }}>.</span></em>;
+            const firstPart = words.slice(0, -1).join(' ');
+            const lastWord = words[words.length - 1];
+            return (
+              <>
+                <span>{firstPart}</span>
+                <em style={{ fontStyle: 'italic', fontWeight: 300 }}>
+                  {lastWord}
+                  <span style={{ color: 'var(--gold)', fontStyle: 'normal', marginLeft: '2px' }}>.</span>
+                </em>
+              </>
+            );
+          })()}
         </h3>
         <div className="flex items-center gap-3">
           <span
             style={{
               fontFamily: 'var(--font-inter)',
-              fontSize: '11px',
-              fontWeight: 500,
-              letterSpacing: '0.25em',
+              fontSize: '14px',
+              fontWeight: 600,
+              letterSpacing: '0.15em',
               textTransform: 'uppercase',
               color: 'var(--gold)',
             }}
@@ -239,18 +256,18 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
   }, []);
 
   return (
-    <div className="min-h-screen pt-24 sm:pt-32 pb-24 selection:bg-gold selection:text-navy" style={{ background: '#FFFFFF', color: '#111111' }}>
+    <div className="min-h-screen pt-24 sm:pt-32 pb-24 selection:bg-gold selection:text-navy" style={{ background: 'var(--navy)', color: 'var(--text-primary)' }}>
       {/* Dynamic Premium Background */}
-      <div 
-        className="fixed inset-0 pointer-events-none" 
-        style={{ 
-          background: '#FFFFFF',
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          background: 'var(--navy)',
           opacity: 1
-        }} 
+        }}
       />
-      
+
       {/* Subtle grid pattern overlay for texture */}
-      <div 
+      <div
         className="fixed inset-0 pointer-events-none opacity-[0.03]"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm1 1h38v38H1V1z' fill='%23C9A84C' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E")`
@@ -271,66 +288,66 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
             <span className="w-8 sm:w-12 h-px" style={{ background: 'var(--gold)' }} />
             BEYOND WORTH ARCHIVE
           </motion.div>
-          
+
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 sm:gap-8">
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.8 }}
-              style={{ fontFamily: 'var(--font-cormorant)', color: '#111111' }}
+              style={{ fontFamily: 'var(--font-cormorant)', color: 'var(--text-primary)' }}
               className="text-5xl sm:text-7xl lg:text-8xl font-light tracking-tighter leading-[0.9]"
             >
               CURATED <br />
               <span className="italic text-gold" style={{ fontFamily: 'var(--font-cormorant)' }}>MAISONS.</span>
             </motion.h1>
 
-            <motion.div 
-               initial={{ opacity: 0 }}
-               animate={{ opacity: 1 }}
-               transition={{ delay: 0.3 }}
-               className="flex flex-row-reverse lg:flex-row items-center justify-between lg:justify-end gap-6 w-full lg:w-auto"
-            >
-              <div className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase lg:text-right leading-relaxed flex flex-col items-start lg:items-end">
-                <span style={{ fontFamily: 'var(--font-inter)', color: 'var(--text-tertiary)' }}>COLLECTION_V2.0</span>
-                <span className="font-semibold tracking-[0.4em]" style={{ fontFamily: 'var(--font-inter)', color: 'var(--text-primary)' }}>
-                  {filtered.length} PIECES DETECTED
-                </span>
-              </div>
-              <button 
-                onClick={() => setFilterOpen(true)}
-                className="flex items-center gap-3 px-6 py-3.5 border rounded-full transition-all duration-300 group hover:shadow-lg"
-                style={{ borderColor: 'var(--border-subtle)', background: 'var(--navy-surface)' }}
-              >
-                <SlidersHorizontal size={16} className="text-gold group-hover:scale-110 transition-transform" />
-                <span className="text-[10px] tracking-[0.2em] uppercase font-medium" style={{ fontFamily: 'var(--font-inter)', color: 'var(--text-primary)' }}>Filters</span>
-              </button>
-            </motion.div>
+            {/* Metadata moved to filters row */}
           </div>
         </header>
 
-        {/* TOP FILTERS (DESKTOP) */}
-        <div className="hidden lg:flex flex-wrap items-center gap-4 mb-12">
-          {categories.map(cat => {
-            const name = typeof cat === 'string' ? cat : cat.name;
-            const isActive = activeCategory === name;
-            return (
-              <button
-                key={name}
-                onClick={() => setCategory(name)}
-                className="px-6 py-2.5 text-[10px] uppercase transition-all duration-500 rounded-full border"
-                style={{
-                  fontFamily: 'var(--font-inter)',
-                  fontWeight: isActive ? 600 : 500,
-                  letterSpacing: '0.15em',
-                  borderColor: isActive ? 'var(--gold)' : 'var(--border-subtle)',
-                  backgroundColor: isActive ? 'var(--gold)' : 'transparent',
-                  color: isActive ? 'var(--navy)' : 'var(--text-primary)'
-                }}
-              >
-                {name}
-              </button>
-            );
-          })}
+        {/* UNIFIED FILTERS DASHBOARD */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-16 pb-8 border-b border-gold/5">
+          <div className="flex flex-wrap items-center gap-4">
+            {categories.map(cat => {
+              const name = typeof cat === 'string' ? cat : cat.name;
+              const isActive = activeCategory === name;
+              return (
+                <button
+                  key={name}
+                  onClick={() => setCategory(name)}
+                  className="px-8 py-3 text-[10px] uppercase transition-all duration-500 rounded-full border"
+                  style={{
+                    fontFamily: 'var(--font-inter)',
+                    fontWeight: isActive ? 600 : 500,
+                    letterSpacing: '0.2em',
+                    borderColor: isActive ? 'var(--gold)' : 'var(--border-subtle)',
+                    backgroundColor: isActive ? 'var(--gold)' : 'transparent',
+                    color: isActive ? 'var(--navy)' : 'var(--text-primary)'
+                  }}
+                >
+                  {name}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center gap-10">
+            <div className="hidden sm:flex flex-col items-end">
+              <span className="text-[8px] tracking-[0.4em] text-gold/40 uppercase font-mono">Archive Status</span>
+              <span className="text-[10px] tracking-[0.3em] text-[var(--text-primary)] uppercase font-bold font-mono">
+                {filtered.length} PIECES DETECTED
+              </span>
+            </div>
+            
+            <button
+              onClick={() => setFilterOpen(true)}
+              className="flex items-center gap-4 px-10 py-4 border rounded-full transition-all duration-500 group hover:border-gold hover:shadow-[0_10px_30px_rgba(201,168,76,0.1)]"
+              style={{ borderColor: 'var(--border-subtle)', background: 'var(--navy-surface)' }}
+            >
+              <SlidersHorizontal size={14} className="text-gold group-hover:rotate-180 transition-transform duration-700" />
+              <span className="text-[10px] tracking-[0.25em] uppercase font-black" style={{ fontFamily: 'var(--font-inter)', color: 'var(--text-primary)' }}>Filter Archive</span>
+            </button>
+          </div>
         </div>
 
         {/* SEARCH BAR */}
@@ -342,8 +359,8 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full pl-6 bg-transparent outline-none text-sm sm:text-base transition-all placeholder:opacity-40"
-            style={{ 
-              fontFamily: 'var(--font-inter)', 
+            style={{
+              fontFamily: 'var(--font-inter)',
               color: 'var(--text-primary)',
             }}
           />
@@ -363,7 +380,7 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
                 <X size={24} className="text-gold/20" />
               </div>
               <p className="text-gold/40 font-mono tracking-[0.3em] sm:tracking-[0.5em] text-[8px] sm:text-[10px] uppercase">No archives match the signature</p>
-              <button 
+              <button
                 onClick={resetFilters}
                 className="text-gold border-b border-gold/30 pb-1 text-[8px] sm:text-[9px] font-mono tracking-[0.4em] uppercase hover:text-cream hover:border-cream transition-all"
               >
@@ -395,65 +412,102 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
       <AnimatePresence>
         {isFilterOpen && (
           <>
-            <motion.div 
-               initial={{ opacity: 0 }}
-               animate={{ opacity: 1 }}
-               exit={{ opacity: 0 }}
-               onClick={() => setFilterOpen(false)}
-               className="fixed inset-0 bg-navy/90 backdrop-blur-md z-[100]"
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setFilterOpen(false)}
+              className="fixed inset-0 bg-navy/40 backdrop-blur-md z-[9998]"
             />
-            <motion.div 
-               initial={{ x: '100%' }}
-               animate={{ x: 0 }}
-               exit={{ x: '100%' }}
-               className="fixed right-0 top-0 bottom-0 w-full max-w-[350px] bg-navy-deep border-l border-gold/10 z-[101] p-10 shadow-2xl"
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="fixed right-0 top-0 bottom-0 w-full max-w-[380px] bg-[var(--navy)] z-[9999] p-10 shadow-[0_0_100px_rgba(0,0,0,0.03)] flex flex-col"
             >
-              <div className="flex justify-between items-center mb-16">
-                <h2 className="text-2xl font-serif italic text-gold">Filters</h2>
-                <button onClick={() => setFilterOpen(false)} className="text-cream/50 hover:text-cream"><X size={24} /></button>
+              <div className="flex justify-between items-start mb-12">
+                <div className="space-y-1">
+                  <h2 className="text-3xl font-light tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-cormorant)' }}>Archive Filter</h2>
+                  <p className="text-[9px] tracking-[0.2em] uppercase text-gold/60 font-medium">Bespoke Collection</p>
+                </div>
+                <button 
+                  onClick={() => setFilterOpen(false)} 
+                  className="p-2 hover:bg-gold/10 rounded-full transition-all duration-500 hover:rotate-90"
+                >
+                  <X size={18} className="text-[var(--text-primary)]" />
+                </button>
               </div>
-              
-              <div className="space-y-12">
+
+              <div className="flex-1 space-y-12">
+                {/* SORTING - COMPACT */}
                 <div className="space-y-6">
-                   <h3 className="font-mono text-[10px] tracking-[0.4em] text-gold uppercase">Sort By</h3>
-                   <div className="flex flex-col gap-2">
-                     {sortOptions.map(opt => (
-                       <button 
+                  <h3 className="text-[9px] tracking-[0.3em] text-[var(--text-tertiary)] uppercase font-bold border-b border-gold/10 pb-2">Sort By</h3>
+                  <div className="flex flex-col">
+                    {sortOptions.map(opt => {
+                      const isActive = sortBy === opt.value;
+                      return (
+                        <button
                           key={opt.value}
                           onClick={() => { setSort(opt.value); setFilterOpen(false); }}
-                          className={`text-left px-4 py-3 text-[10px] font-mono tracking-[0.2em] uppercase border ${sortBy === opt.value ? 'bg-gold text-navy border-gold' : 'border-gold/10 text-cream/40'}`}
-                       >
-                         {opt.label}
-                       </button>
-                     ))}
-                   </div>
+                          className="group py-3.5 flex items-center gap-4 text-left transition-all duration-500"
+                        >
+                          <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 shrink-0 ${isActive ? 'bg-gold scale-100' : 'bg-transparent scale-0 group-hover:bg-gold/30 group-hover:scale-100'}`} />
+                          <span 
+                            className={`text-[11px] tracking-[0.15em] uppercase transition-all duration-500 ${isActive ? 'text-[var(--text-primary)] font-bold translate-x-0' : 'text-[var(--text-tertiary)] group-hover:text-[var(--text-primary)] font-medium translate-x-[-10px] group-hover:translate-x-0'}`}
+                            style={{ fontFamily: 'var(--font-inter)' }}
+                          >
+                            {opt.label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
+                {/* BRANDS - COMPACT */}
                 <div className="space-y-6">
-                   <h3 className="font-mono text-[10px] tracking-[0.4em] text-gold uppercase">Brand Archive</h3>
-                   <div className="flex flex-wrap gap-2">
-                     {brands.map(b => {
-                       const name = typeof b === 'string' ? b : b.name;
-                       return (
-                         <button 
-                            key={name}
-                            onClick={() => { setBrand(name); setFilterOpen(false); }}
-                            className={`px-4 py-2 text-[8px] font-mono tracking-[0.2em] uppercase border ${activeBrand === name ? 'bg-gold text-navy border-gold' : 'border-gold/10 text-cream/40'}`}
-                         >
-                           {name}
-                         </button>
-                       );
-                     })}
-                   </div>
+                  <h3 className="text-[9px] tracking-[0.3em] text-[var(--text-tertiary)] uppercase font-bold border-b border-gold/10 pb-2">Maison Archive</h3>
+                  <div className="flex flex-col gap-1 py-2">
+                    {brands.map(b => {
+                      const name = typeof b === 'string' ? b : b.name;
+                      const isActive = activeBrand === name;
+                      return (
+                        <button
+                          key={name}
+                          onClick={() => { setBrand(name); setFilterOpen(false); }}
+                          className="group py-3 flex items-center justify-between transition-all duration-500"
+                        >
+                          <span 
+                            className={`text-[11px] tracking-[0.15em] uppercase transition-all duration-500 ${isActive ? 'text-[var(--text-primary)] font-bold' : 'text-[var(--text-tertiary)] group-hover:text-[var(--text-primary)] font-medium'}`}
+                            style={{ fontFamily: 'var(--font-inter)' }}
+                          >
+                            {name}
+                          </span>
+                          {isActive && <div className="w-1.5 h-1.5 rounded-full bg-gold" />}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
-              <button 
+              <div className="mt-auto pt-10">
+                <button
                   onClick={() => { resetFilters(); setFilterOpen(false); }}
-                  className="absolute bottom-10 left-10 right-10 py-4 border border-gold/20 text-gold font-mono text-[10px] tracking-[0.5em] uppercase hover:bg-gold/5"
-              >
-                Reset Archive
-              </button>
+                  className="group relative w-full py-6 transition-all duration-700"
+                >
+                  <div className="absolute inset-0 border border-gold/20 scale-100 group-hover:scale-[1.02] transition-transform duration-700" />
+                  <span className="relative z-10 text-gold text-[9px] tracking-[0.4em] uppercase font-bold group-hover:text-gold/60 transition-colors" style={{ fontFamily: 'var(--font-inter)' }}>
+                    Reset Archive
+                  </span>
+                </button>
+                
+                <div className="flex justify-between items-center px-1 mt-8 opacity-20">
+                  <span className="text-[7px] tracking-[0.3em] text-[var(--text-tertiary)] uppercase font-medium">Punjab Optical</span>
+                  <span className="text-[7px] tracking-[0.3em] text-[var(--text-tertiary)] uppercase font-medium">V2.0</span>
+                </div>
+              </div>
             </motion.div>
           </>
         )}

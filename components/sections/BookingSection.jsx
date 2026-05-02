@@ -105,7 +105,7 @@ export default function BookingSection() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="grid grid-cols-1 md:grid-cols-2 gap-12"
+                  className="grid grid-cols-1 md:grid-cols-[1.2fr_0.8fr] gap-8 md:gap-12"
                 >
                   <div className="custom-calendar flex justify-center lg:justify-start w-full overflow-hidden">
                     <DayPicker
@@ -232,15 +232,19 @@ export default function BookingSection() {
 
       <style dangerouslySetInnerHTML={{ __html: `
         .custom-calendar .rdp {
-          --rdp-cell-size: 40px;
-          --rdp-accent-color: var(--gold);
-          --rdp-background-color: var(--gold);
+          --rdp-cell-size: 36px;
+          --rdp-accent-color: #C9A84C;
+          --rdp-background-color: #C9A84C;
+          margin: 0;
+        }
+        .custom-calendar .rdp-months {
+          justify-content: flex-start;
         }
         .custom-calendar .rdp-day_selected, 
         .custom-calendar .rdp-day_selected:focus, 
         .custom-calendar .rdp-day_selected:hover {
-          background-color: var(--gold);
-          color: var(--background);
+          background-color: #C9A84C;
+          color: #0A0E1A;
         }
         .custom-calendar .rdp-day:hover:not(.rdp-day_selected) {
           background-color: rgba(var(--gold-rgb), 0.1);

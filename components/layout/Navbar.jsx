@@ -49,8 +49,8 @@ export default function Navbar() {
         width: isScrolled ? 'calc(100% - 40px)' : '100%',
         maxWidth: isScrolled ? '1400px' : '100%',
         zIndex: 1000,
-        backgroundColor: '#EBE9E4',
-        borderBottom: isScrolled ? 'none' : '1px solid rgba(0,0,0,0.05)',
+        backgroundColor: 'var(--navy-deep)',
+        borderBottom: isScrolled ? 'none' : '1px solid var(--border-subtle)',
         borderRadius: isScrolled ? '9999px' : '0',
         padding: isScrolled ? '8px 0' : '16px 0',
         boxShadow: isScrolled ? '0 10px 40px rgba(0, 0, 0, 0.1)' : 'none',
@@ -70,7 +70,7 @@ export default function Navbar() {
               fontSize: 'clamp(1.1rem, 2vw, 1.5rem)',
               fontWeight: 700,
               letterSpacing: '0.35em',
-              color: '#0F1117',
+              color: 'var(--text-primary)',
               lineHeight: 1,
               transition: 'color 300ms ease',
             }}
@@ -79,7 +79,7 @@ export default function Navbar() {
             EYELOVEYOU
           </motion.span>
           <div className="hidden sm:flex items-center gap-2 mt-1.5">
-            <span className="h-px w-4" style={{ backgroundColor: '#A68A3B' }} />
+            <span className="h-px w-4" style={{ backgroundColor: 'var(--gold)' }} />
             <span
               style={{
                 fontFamily: 'var(--font-inter)',
@@ -87,7 +87,7 @@ export default function Navbar() {
                 fontWeight: 500,
                 letterSpacing: '0.30em',
                 textTransform: 'uppercase',
-                color: '#A68A3B',
+                color: 'var(--gold)',
                 opacity: 0.9,
               }}
             >
@@ -97,7 +97,7 @@ export default function Navbar() {
           {/* Logo gold glow on hover */}
           <div
             className="absolute -inset-4 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-            style={{ background: 'rgba(166,138,59,0.1)', filter: 'blur(16px)' }}
+            style={{ background: 'rgba(var(--gold-rgb), 0.1)', filter: 'blur(16px)' }}
           />
         </Link>
 
@@ -110,7 +110,7 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 className={`nav-link text-sm uppercase tracking-widest font-medium ${isActive ? 'active' : ''}`}
-                style={{ fontFamily: 'var(--font-inter)', color: '#0F1117' }}
+                style={{ fontFamily: 'var(--font-inter)', color: 'var(--text-primary)' }}
               >
                 {link.name}
               </Link>

@@ -25,12 +25,12 @@ export default function BrandMarquee() {
             fontWeight: 700,
             letterSpacing: '0.3em',
             textTransform: 'uppercase',
-            color: '#111111',
+            color: 'var(--text-primary)',
           }}
         >
           Official Stockist
         </span>
-        <div style={{ height: '1px', flex: 1, background: 'linear-gradient(90deg, rgba(17,17,17,0.3), transparent)' }} />
+        <div style={{ height: '1px', flex: 1, background: 'linear-gradient(90deg, var(--border-subtle), transparent)' }} />
       </div>
 
       {/* Dual marquee with fade mask */}
@@ -46,7 +46,7 @@ export default function BrandMarquee() {
                   letterSpacing: '0.15em',
                   textTransform: 'uppercase',
                   fontWeight: 600,
-                  color: '#111111',
+                  color: 'var(--text-primary)',
                   cursor: 'default',
                   transition: 'color 300ms ease, transform 300ms ease',
                   opacity: 1,
@@ -57,7 +57,7 @@ export default function BrandMarquee() {
                   e.currentTarget.style.transform = 'scale(1.05)';
                 }}
                 onMouseLeave={(e) => { 
-                  e.currentTarget.style.color = '#111111';
+                  e.currentTarget.style.color = 'var(--text-primary)';
                   e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
@@ -86,7 +86,7 @@ export default function BrandMarquee() {
                   transition: 'color 300ms ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#111111';
+                  e.currentTarget.style.color = 'var(--text-primary)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.color = '#C9A84C';
@@ -94,7 +94,7 @@ export default function BrandMarquee() {
               >
                 {brand}
               </span>
-              <span style={{ margin: '0 32px', color: '#111111', opacity: 0.3, fontSize: '8px' }}>◆</span>
+              <span style={{ margin: '0 32px', color: 'var(--text-tertiary)', opacity: 0.3, fontSize: '8px' }}>◆</span>
             </div>
           ))}
         </div>
