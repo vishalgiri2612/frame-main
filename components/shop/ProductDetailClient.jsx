@@ -4,7 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight, Shield, Zap, RefreshCw, Layers } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ChevronRight, Shield, Zap, RefreshCw, Layers, ShoppingBag, X, ChevronLeft } from 'lucide-react';
+import { useCart } from '@/components/providers/CartProvider';
 
 const SimilarProductCard = ({ p, i }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -144,19 +146,57 @@ const SimilarProductCard = ({ p, i }) => {
 };
 
 export default function ProductDetailClient({ product, similarProducts }) {
-  const [activeImageIdx, setActiveImageIdx] = useState(0);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
+  const { addToCart } = useCart();
+  const router = useRouter();
   const images = useMemo(() => {
     const list = Array.isArray(product.images) && product.images.length > 0
       ? product.images
       : [product.image].filter(Boolean);
     return [...new Set(list)].slice(0, 5);
   }, [product.image, product.images]);
+
+  const [activeImageIdx, setActiveImageIdx] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  const openLightbox = (index) => {
+    setLightboxIndex(index);
+    setIsLightboxOpen(true);
+    if (typeof window !== 'undefined') {
+      document.body.style.overflow = 'hidden';
+    }
+  };
+
+  const closeLightbox = () => {
+    setIsLightboxOpen(false);
+    if (typeof window !== 'undefined') {
+      document.body.style.overflow = 'auto';
+    }
+  };
+
+  const nextImage = () => {
+    setLightboxIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevImage = () => {
+    setLightboxIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const handleBuyNow = () => {
+    addToCart(product);
+    router.push('/shop/checkout');
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!isLightboxOpen) return;
+      if (e.key === 'ArrowRight') nextImage();
+      if (e.key === 'ArrowLeft') prevImage();
+      if (e.key === 'Escape') closeLightbox();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLightboxOpen, images.length]); // Added images.length to dependencies
 
   const cleanId = `${product.id?.substring(0, 15)}...`;
 
@@ -183,7 +223,7 @@ export default function ProductDetailClient({ product, similarProducts }) {
               {/* Row 1: Full Width Hero */}
               <div
                 className="relative aspect-[4/3] bg-[var(--navy-deep)] overflow-hidden group w-full cursor-pointer"
-                onClick={() => setActiveImageIdx(0)}
+                onClick={() => openLightbox(activeImageIdx)}
               >
                 {images[activeImageIdx] || images[0] ? (
                   <Image
@@ -214,7 +254,7 @@ export default function ProductDetailClient({ product, similarProducts }) {
                       <div
                         key={i}
                         className="relative aspect-square bg-[var(--navy-deep)] overflow-hidden group cursor-pointer"
-                        onClick={() => setActiveImageIdx(i + 1)}
+                        onClick={() => openLightbox(i + 1)}
                       >
                         <Image
                           src={img}
@@ -239,7 +279,7 @@ export default function ProductDetailClient({ product, similarProducts }) {
                       <div
                         key={i}
                         className="relative aspect-square bg-[var(--navy-deep)] overflow-hidden group cursor-pointer"
-                        onClick={() => setActiveImageIdx(i + 3)}
+                        onClick={() => openLightbox(i + 3)}
                       >
                         <Image
                           src={img}
@@ -308,20 +348,35 @@ export default function ProductDetailClient({ product, similarProducts }) {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full"
               >
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-48 mt-8">
-                  <div className="flex flex-col">
+                <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-8 mt-12 w-full">
+                  <div className="flex flex-col min-w-[160px]">
                     {product.oldPrice > 0 && (
                       <span className="text-sm text-gold/30 line-through tracking-widest mb-1">₹{product.oldPrice?.toLocaleString('en-IN')}</span>
                     )}
                     <span className="text-4xl md:text-5xl font-light tracking-tight text-cream">₹{product.price?.toLocaleString('en-IN')}</span>
                   </div>
 
-                  <button className="relative overflow-hidden group/btn px-16 py-4 bg-[#E6D5B8] border border-gold/20 rounded-full transition-all active:scale-95 shadow-[0_15px_40px_rgba(212,175,55,0.15)] hover:bg-[#F3E2B5] hover:shadow-[0_20px_50px_rgba(212,175,55,0.25)]">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                    <span className="relative z-10 font-mono text-[11px] font-black tracking-[0.4em] text-[#0F1117] uppercase whitespace-nowrap">
-                      Buy Now
-                    </span>
-                  </button>
+                  <div className="flex flex-col sm:flex-row gap-3 flex-1 w-full max-w-[420px]">
+                    <button 
+                      onClick={() => addToCart(product)}
+                      className="flex-1 relative overflow-hidden group/btn px-6 py-3.5 bg-[#E6D5B8] border border-gold/20 rounded-full transition-all active:scale-95 shadow-[0_10px_30px_rgba(212,175,55,0.1)] hover:bg-[#F3E2B5] hover:shadow-[0_15px_40px_rgba(212,175,55,0.2)]"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
+                      <span className="relative z-10 font-mono text-[10px] font-black tracking-[0.3em] text-[#0F1117] uppercase whitespace-nowrap">
+                        Add to Cart
+                      </span>
+                    </button>
+
+                    <button 
+                      onClick={handleBuyNow}
+                      className="flex-1 relative overflow-hidden group/btn px-6 py-3.5 bg-[#E6D5B8] border border-gold/20 rounded-full transition-all active:scale-95 shadow-[0_10px_30px_rgba(212,175,55,0.1)] hover:bg-[#F3E2B5] hover:shadow-[0_15px_40px_rgba(212,175,55,0.2)]"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
+                      <span className="relative z-10 font-mono text-[10px] font-black tracking-[0.3em] text-[#0F1117] uppercase whitespace-nowrap">
+                        Buy Now
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             </header>
@@ -447,6 +502,102 @@ export default function ProductDetailClient({ product, similarProducts }) {
           </div>
         </section>
       </main>
+
+      {/* LIGHTBOX OVERLAY */}
+      <AnimatePresence>
+        {isLightboxOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[999] bg-[#050505]/fb backdrop-blur-3xl flex items-center justify-center"
+            onClick={closeLightbox}
+          >
+            {/* Background Content Container */}
+            <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+              <motion.div
+                key={lightboxIndex}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                transition={{ duration: 0.4 }}
+                className="relative w-full h-full max-w-[90vw] max-h-[80vh] flex items-center justify-center p-4 md:p-12"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Image
+                  src={images[lightboxIndex]}
+                  alt="Full view"
+                  fill
+                  className="object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+                  priority
+                />
+              </motion.div>
+            </div>
+
+            {/* UI CONTROLS - Positioned on Top */}
+            <div className="absolute inset-0 pointer-events-none z-[1000]">
+              {/* Close */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeLightbox();
+                }}
+                className="absolute top-14 right-10 md:top-24 md:right-24 flex items-center gap-4 group pointer-events-auto"
+              >
+                <span className="font-mono text-[10px] tracking-[0.5em] text-white/40 group-hover:text-gold transition-colors font-bold">CLOSE ARCHIVE</span>
+                <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center bg-black/60 backdrop-blur-md group-hover:border-gold transition-all">
+                  <X size={20} className="text-white group-hover:text-gold" />
+                </div>
+              </button>
+
+              {/* Navigation Arrows */}
+              <div className="absolute inset-x-8 top-1/2 -translate-y-1/2 flex justify-between">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    prevImage();
+                  }}
+                  className="w-16 h-16 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white pointer-events-auto hover:border-gold hover:text-gold transition-all shadow-2xl"
+                >
+                  <ChevronLeft size={36} strokeWidth={1} />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    nextImage();
+                  }}
+                  className="w-16 h-16 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white pointer-events-auto hover:border-gold hover:text-gold transition-all shadow-2xl"
+                >
+                  <ChevronRight size={36} strokeWidth={1} />
+                </button>
+              </div>
+
+              {/* Bottom Info & Thumbnails */}
+              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-8 w-full pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center gap-6">
+                  <div className="h-px w-8 bg-gold/30" />
+                  <span className="font-mono text-[11px] tracking-[0.6em] text-gold uppercase font-black">
+                    {String(lightboxIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
+                  </span>
+                  <div className="h-px w-8 bg-gold/30" />
+                </div>
+
+                <div className="flex gap-3 p-2 bg-black/40 backdrop-blur-md border border-white/5 rounded-xl">
+                  {images.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setLightboxIndex(idx)}
+                      className={`relative w-16 h-12 rounded-lg overflow-hidden transition-all duration-500 ${idx === lightboxIndex ? 'ring-2 ring-gold scale-110 shadow-lg' : 'opacity-30 hover:opacity-100'}`}
+                    >
+                      <Image src={img} alt="thumb" fill className="object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

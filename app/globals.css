@@ -7,9 +7,9 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 :root {
   /* Backgrounds */
-  --navy: #FCFAF7;
-  --navy-deep: #F5F2ED;
-  --navy-surface: #EBE7E0;
+  --navy: #FFFFFF;
+  --navy-deep: #F9F9F9;
+  --navy-surface: #F5F5F5;
 
   /* Text — WCAG AA compliant */
   --text-primary: #0F1117;
@@ -41,8 +41,8 @@
   --cream: #0F1117;
   --cream-warm: #3A3530;
   --foreground: #0F1117;
-  --background: #FCFAF7;
-  --navy-rgb: 252, 250, 247;
+  --background: #FFFFFF;
+  --navy-rgb: 255, 255, 255;
   --gold-rgb: 166, 138, 59;
   --cream-rgb: 15, 17, 23;
   --teal-rgb: 46, 116, 112;

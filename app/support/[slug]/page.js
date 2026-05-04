@@ -455,7 +455,7 @@ export default function SupportPage() {
   };
 
   return (
-    <main style={{ background: '#FCFAF7', minHeight: '100vh' }}>
+    <main style={{ background: 'var(--navy)', minHeight: '100vh' }}>
       <Navbar />
       
       <div className="pt-40 pb-20 px-6 container mx-auto">
@@ -597,7 +597,7 @@ export default function SupportPage() {
                   <div className="pt-32" style={{ borderTop: '1px solid rgba(166,138,59,0.1)' }}>
                     <div className="text-center space-y-12">
                       <h2 style={{ fontFamily: 'var(--font-cormorant)', fontSize: '32px', color: '#0F1117' }}>Anatomy of the Frame</h2>
-                      <div className="py-12 bg-[#FCFAF7] rounded-sm border border-rgba(166,138,59,0.1)">
+                      <div className="py-12 bg-[var(--navy)] rounded-sm border border-rgba(166,138,59,0.1)">
                         <FrameAnatomyDiagram isLight={true} />
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -659,7 +659,7 @@ export default function SupportPage() {
                     <p>
                       Should you require further assistance regarding {pageData.title.toLowerCase()}, our dedicated concierge team is available to assist you personally.
                     </p>
-                    <div className="mt-8 p-8" style={{ border: '1px solid rgba(166,138,59,0.2)', background: '#FCFAF7' }}>
+                    <div className="mt-8 p-8" style={{ border: '1px solid rgba(166,138,59,0.2)', background: 'var(--navy)' }}>
                       <p style={{ fontSize: '12px', color: '#6B6259', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Support Hotline</p>
                       <p style={{ color: '#0F1117', fontSize: '20px', fontWeight: 600 }}>+92 (300) 123-4567</p>
                     </div>

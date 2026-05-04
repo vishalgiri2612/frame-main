@@ -34,10 +34,10 @@ export default function BookingSection() {
   };
 
   return (
-    <section id="booking" className="py-24 bg-navy text-cream overflow-hidden">
+    <section id="booking" className="pt-12 pb-24 bg-navy text-cream overflow-hidden">
       <div className="container mx-auto px-6 max-w-6xl">
-        <div className="flex flex-col mb-16 text-center">
-          <span className="text-teal uppercase tracking-[0.5em] text-[10px] font-bold mb-4">Precision Care</span>
+        <div className="flex flex-col mb-10 text-center">
+          <span className="text-teal uppercase tracking-[0.5em] text-[10px] font-bold mb-3">Precision Care</span>
           <h2 className="text-5xl md:text-7xl font-serif tracking-tight italic">Secure Your Experience</h2>
         </div>
 
