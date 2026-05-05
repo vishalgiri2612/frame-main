@@ -86,7 +86,7 @@ export default function BrandShowcase() {
           </div>
 
           <Link
-            href="/collections"
+            href="/brands"
             className="group flex items-center gap-3 text-cream/50 hover:text-gold transition-colors"
           >
             <span className="text-[10px] uppercase tracking-[0.4em] font-bold">All Brands</span>
