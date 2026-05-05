@@ -1,7 +1,8 @@
 const { MongoClient } = require('mongodb');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
-// Update this URI if you are not using Atlas
-const uri = "mongodb://db_user_frame:db_user_frame@ac-owwcm40-shard-00-00.h17tqbc.mongodb.net:27017,ac-owwcm40-shard-00-01.h17tqbc.mongodb.net:27017,ac-owwcm40-shard-00-02.h17tqbc.mongodb.net:27017/frame?ssl=true&replicaSet=atlas-e17yqe-shard-0&authSource=admin&retryWrites=true&w=majority";
+const uri = process.env.DATABASE_URL;
 
 async function seed() {
   console.log("Connecting to MongoDB...");
@@ -338,6 +339,38 @@ async function seed() {
         description: "ROUND METAL FLAT LENSES\nModel Code: RB3447N 919931\n\nFRAME DESCRIPTION\nFrame Shape: Round\nFrame material: Metal\nEye Size: 50\n\nLENS INFORMATION\nLens Color: G-15 Green\nTreatment: Flat Crystal Lenses\nPolarized: No\nLens height: 47.0 mm\n\nPRODUCT DIMENSIONS\nBridge Width: 21 mm\nTemple Length: 145 mm\n\nFITTING\nFace coverage: Narrow / Petite\nBridge & nosepads: Adjustable Nosepads\n\nIncluded in your order:\nCase, Cleaning cloth",
         featured: false,
         tags: ["Round Metal", "Ray-Ban"],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        name: "Ray-Ban CLUBMASTER CLASSIC Black/Green",
+        sku: "RB3016-W0365-51",
+        price: 13990,
+        brand: "Ray-Ban",
+        category: "SUNGLASSES",
+        stock: 50,
+        status: "ACTIVE",
+        image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb3016_w0365_030a.png",
+        images: ["https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb3016_w0365_030a.png"],
+        description: "CLUBMASTER CLASSIC\nModel Code: RB3016 W0365\n\nFRAME DESCRIPTION\nFrame Shape: Square\nFrame material: Acetate/Metal\nEye Size: 51\n\nLENS INFORMATION\nLens Color: G-15 Green\nPolarized: No\n\nPRODUCT DIMENSIONS\nBridge Width: 21 mm\nTemple Length: 145 mm\n\nIncluded in your order:\nCase, Cleaning cloth",
+        featured: true,
+        tags: ["Clubmaster", "Classic", "Ray-Ban"],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        name: "Ray-Ban JUSTIN CLASSIC Black/Grey",
+        sku: "RB4165-6018G-55",
+        price: 10990,
+        brand: "Ray-Ban",
+        category: "SUNGLASSES",
+        stock: 50,
+        status: "ACTIVE",
+        image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb4165_601_8g_030a.png",
+        images: ["https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb4165_601_8g_030a.png"],
+        description: "JUSTIN CLASSIC\nModel Code: RB4165 601/8G\n\nFRAME DESCRIPTION\nFrame Shape: Rectangle\nFrame material: Nylon\nEye Size: 55\n\nLENS INFORMATION\nLens Color: Grey Gradient\nPolarized: No\n\nPRODUCT DIMENSIONS\nBridge Width: 16 mm\nTemple Length: 145 mm\n\nIncluded in your order:\nCase, Cleaning cloth",
+        featured: true,
+        tags: ["Justin", "Classic", "Ray-Ban"],
         createdAt: new Date(),
         updatedAt: new Date()
       }

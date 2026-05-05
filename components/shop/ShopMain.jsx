@@ -25,9 +25,13 @@ function ProductCard({ product, index }) {
   const [imageIdx, setImageIdx] = useState(0);
   const router = useRouter();
 
-  const images = Array.isArray(product.images) && product.images.length > 0
-    ? product.images
-    : [product.image].filter(Boolean);
+  const images = useMemo(() => {
+    const list = [
+      product.image,
+      ...(Array.isArray(product.images) ? product.images : [])
+    ].filter(Boolean);
+    return [...new Set(list)];
+  }, [product.image, product.images]);
 
   useEffect(() => {
     let timer;
@@ -46,7 +50,11 @@ function ProductCard({ product, index }) {
     e.stopPropagation();
     addToCart(product);
     setAdded(true);
-    toast.success(`${product.name} added to bag`, {
+    const shortName = (() => {
+      const nameWithoutBrand = product.name.replace(new RegExp('^' + product.brand + '\\s*', 'i'), '');
+      return nameWithoutBrand.split(' ').slice(0, 2).join(' ');
+    })();
+    toast.success(`${product.brand} ${shortName} added to bag`, {
       icon: '🛒',
       style: {
         borderRadius: '0px',
@@ -138,49 +146,37 @@ function ProductCard({ product, index }) {
 
       </div>
 
-      <div className="mt-4 space-y-3 transition-transform duration-500 group-hover:translate-x-5" style={{ willChange: 'transform' }}>
+      <div className="mt-4 space-y-2 transition-transform duration-500 group-hover:translate-x-5" style={{ willChange: 'transform' }}>
         <div className="flex justify-between items-end">
-          <span
+          <h2
             style={{
-              fontFamily: 'var(--font-inter)',
-              fontSize: '10px',
-              fontWeight: 500,
-              letterSpacing: '0.20em',
+              fontFamily: 'var(--font-cormorant)',
+              fontSize: 'clamp(1.6rem, 2.5vw, 2rem)',
+              fontWeight: 400,
+              color: 'var(--text-primary)',
+              letterSpacing: '0.02em',
               textTransform: 'uppercase',
-              color: 'var(--text-tertiary)',
+              lineHeight: 1.1,
             }}
           >
             {product.brand}
-          </span>
+          </h2>
         </div>
         <h3
           style={{
-            fontFamily: 'var(--font-cormorant)',
-            fontSize: 'clamp(1.4rem, 2.5vw, 1.8rem)',
-            fontWeight: 400,
-            color: 'var(--text-primary)',
-            letterSpacing: '0.02em',
+            fontFamily: 'var(--font-inter)',
+            fontSize: '14px',
+            fontWeight: 600,
+            letterSpacing: '0.15em',
             textTransform: 'uppercase',
-            lineHeight: 1.1,
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '0.3em'
+            color: 'var(--text-tertiary)',
           }}
         >
           {(() => {
-            const words = product.name.split(' ');
-            if (words.length <= 1) return <em style={{ fontStyle: 'italic' }}>{product.name}<span style={{ color: 'var(--gold)', fontStyle: 'normal', marginLeft: '2px' }}>.</span></em>;
-            const firstPart = words.slice(0, -1).join(' ');
-            const lastWord = words[words.length - 1];
-            return (
-              <>
-                <span>{firstPart}</span>
-                <em style={{ fontStyle: 'italic', fontWeight: 300 }}>
-                  {lastWord}
-                  <span style={{ color: 'var(--gold)', fontStyle: 'normal', marginLeft: '2px' }}>.</span>
-                </em>
-              </>
-            );
+            // Remove brand from name if it exists at the start, then take first 2 words
+            const nameWithoutBrand = product.name.replace(new RegExp('^' + product.brand + '\\s*', 'i'), '');
+            const words = nameWithoutBrand.split(' ');
+            return words.slice(0, 2).join(' ');
           })()}
         </h3>
         <div className="flex items-center gap-3">
@@ -338,7 +334,7 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
                 {filtered.length} PIECES DETECTED
               </span>
             </div>
-            
+
             <button
               onClick={() => setFilterOpen(true)}
               className="flex items-center gap-4 px-10 py-4 border rounded-full transition-all duration-500 group hover:border-gold hover:shadow-[0_10px_30px_rgba(201,168,76,0.1)]"
@@ -431,8 +427,8 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
                   <h2 className="text-3xl font-light tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-cormorant)' }}>Archive Filter</h2>
                   <p className="text-[9px] tracking-[0.2em] uppercase text-gold/60 font-medium">Bespoke Collection</p>
                 </div>
-                <button 
-                  onClick={() => setFilterOpen(false)} 
+                <button
+                  onClick={() => setFilterOpen(false)}
                   className="p-2 hover:bg-gold/10 rounded-full transition-all duration-500 hover:rotate-90"
                 >
                   <X size={18} className="text-[var(--text-primary)]" />
@@ -453,7 +449,7 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
                           className="group py-3.5 flex items-center gap-4 text-left transition-all duration-500"
                         >
                           <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 shrink-0 ${isActive ? 'bg-gold scale-100' : 'bg-transparent scale-0 group-hover:bg-gold/30 group-hover:scale-100'}`} />
-                          <span 
+                          <span
                             className={`text-[11px] tracking-[0.15em] uppercase transition-all duration-500 ${isActive ? 'text-[var(--text-primary)] font-bold translate-x-0' : 'text-[var(--text-tertiary)] group-hover:text-[var(--text-primary)] font-medium translate-x-[-10px] group-hover:translate-x-0'}`}
                             style={{ fontFamily: 'var(--font-inter)' }}
                           >
@@ -478,7 +474,7 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
                           onClick={() => { setBrand(name); setFilterOpen(false); }}
                           className="group py-3 flex items-center justify-between transition-all duration-500"
                         >
-                          <span 
+                          <span
                             className={`text-[11px] tracking-[0.15em] uppercase transition-all duration-500 ${isActive ? 'text-[var(--text-primary)] font-bold' : 'text-[var(--text-tertiary)] group-hover:text-[var(--text-primary)] font-medium'}`}
                             style={{ fontFamily: 'var(--font-inter)' }}
                           >
@@ -502,7 +498,7 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
                     Reset Archive
                   </span>
                 </button>
-                
+
                 <div className="flex justify-between items-center px-1 mt-8 opacity-20">
                   <span className="text-[7px] tracking-[0.3em] text-[var(--text-tertiary)] uppercase font-medium">Punjab Optical</span>
                   <span className="text-[7px] tracking-[0.3em] text-[var(--text-tertiary)] uppercase font-medium">V2.0</span>

@@ -13,9 +13,10 @@ const SimilarProductCard = ({ p, i }) => {
   const [imageIdx, setImageIdx] = useState(0);
 
   const cardImages = useMemo(() => {
-    const list = Array.isArray(p.images) && p.images.length > 0
-      ? p.images
-      : [p.image].filter(Boolean);
+    const list = [
+      p.image,
+      ...(Array.isArray(p.images) ? p.images : [])
+    ].filter(Boolean);
     return [...new Set(list)].slice(0, 5);
   }, [p.image, p.images]);
 
@@ -84,47 +85,34 @@ const SimilarProductCard = ({ p, i }) => {
       {/* Info */}
       <div className="space-y-2 transition-transform duration-500 group-hover:translate-x-5" style={{ willChange: 'transform' }}>
         <div className="flex justify-between items-end mb-1">
-          <span
+          <h2
             style={{
-              fontFamily: 'var(--font-inter)',
-              fontSize: '9px',
-              fontWeight: 500,
-              letterSpacing: '0.20em',
+              fontFamily: 'var(--font-cormorant)',
+              fontSize: 'clamp(1.6rem, 2.5vw, 2rem)',
+              fontWeight: 400,
+              color: 'var(--text-primary)',
+              letterSpacing: '0.02em',
               textTransform: 'uppercase',
-              color: 'var(--text-tertiary)',
+              lineHeight: 1.1,
             }}
           >
             {p.brand}
-          </span>
+          </h2>
         </div>
         <h3
           style={{
-            fontFamily: 'var(--font-cormorant)',
-            fontSize: 'clamp(1.2rem, 1.8vw, 1.4rem)',
-            fontWeight: 400,
-            color: 'var(--text-primary)',
-            letterSpacing: '0.02em',
+            fontFamily: 'var(--font-inter)',
+            fontSize: '14px',
+            fontWeight: 600,
+            letterSpacing: '0.15em',
             textTransform: 'uppercase',
-            lineHeight: 1.1,
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '0.2em'
+            color: 'var(--text-tertiary)',
           }}
         >
           {(() => {
-            const words = p.name.split(' ');
-            if (words.length <= 1) return <em style={{ fontStyle: 'italic' }}>{p.name}<span style={{ color: 'var(--gold)', fontStyle: 'normal', marginLeft: '2px' }}>.</span></em>;
-            const firstPart = words.slice(0, -1).join(' ');
-            const lastWord = words[words.length - 1];
-            return (
-              <>
-                <span>{firstPart}</span>
-                <em style={{ fontStyle: 'italic', fontWeight: 300 }}>
-                  {lastWord}
-                  <span style={{ color: 'var(--gold)', fontStyle: 'normal', marginLeft: '2px' }}>.</span>
-                </em>
-              </>
-            );
+            const nameWithoutBrand = p.name.replace(new RegExp('^' + p.brand + '\\s*', 'i'), '');
+            const words = nameWithoutBrand.split(' ');
+            return words.slice(0, 2).join(' ');
           })()}
         </h3>
         <span
@@ -327,7 +315,10 @@ export default function ProductDetailClient({ product, similarProducts }) {
                   >
                     <span className="block text-6xl md:text-7xl lg:text-8xl font-normal" style={{ fontFamily: 'var(--font-cormorant)' }}>{product.brand}</span>
                     <span className="block text-5xl md:text-6xl lg:text-7xl italic font-light text-gold/90 mt-2" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                      {product.name?.replace(product.brand, '').trim() || 'Signature Piece'}
+                      {(() => {
+                        const nameWithoutBrand = product.name?.replace(new RegExp('^' + product.brand + '\\s*', 'i'), '') || '';
+                        return nameWithoutBrand.split(' ').slice(0, 2).join(' ');
+                      })() || 'Signature Piece'}
                       <span style={{ fontStyle: 'normal' }}>.</span>
                     </span>
                   </motion.h1>
@@ -357,7 +348,7 @@ export default function ProductDetailClient({ product, similarProducts }) {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 flex-1 w-full max-w-[420px]">
-                    <button 
+                    <button
                       onClick={() => addToCart(product)}
                       className="flex-1 relative overflow-hidden group/btn px-6 py-3.5 bg-[#E6D5B8] border border-gold/20 rounded-full transition-all active:scale-95 shadow-[0_10px_30px_rgba(212,175,55,0.1)] hover:bg-[#F3E2B5] hover:shadow-[0_15px_40px_rgba(212,175,55,0.2)]"
                     >
@@ -367,7 +358,7 @@ export default function ProductDetailClient({ product, similarProducts }) {
                       </span>
                     </button>
 
-                    <button 
+                    <button
                       onClick={handleBuyNow}
                       className="flex-1 relative overflow-hidden group/btn px-6 py-3.5 bg-[#E6D5B8] border border-gold/20 rounded-full transition-all active:scale-95 shadow-[0_10px_30px_rgba(212,175,55,0.1)] hover:bg-[#F3E2B5] hover:shadow-[0_15px_40px_rgba(212,175,55,0.2)]"
                     >
@@ -495,7 +486,7 @@ export default function ProductDetailClient({ product, similarProducts }) {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 px-2">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 px-2">
             {similarProducts.map((p, i) => (
               <SimilarProductCard key={p.id} p={p} i={i} />
             ))}

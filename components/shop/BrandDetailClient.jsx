@@ -1,10 +1,142 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import Image from 'next/image';
+
+const BrandProductCard = ({ product, index }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [imageIdx, setImageIdx] = useState(0);
+
+  const images = useMemo(() => {
+    const list = [
+      product.image,
+      ...(Array.isArray(product.images) ? product.images : [])
+    ].filter(Boolean);
+    return [...new Set(list)];
+  }, [product.image, product.images]);
+
+  useEffect(() => {
+    let timer;
+    if (isHovered && images.length > 1) {
+      timer = setInterval(() => {
+        setImageIdx((prev) => (prev + 1) % images.length);
+      }, 800);
+    } else {
+      setImageIdx(0);
+    }
+    return () => clearInterval(timer);
+  }, [isHovered, images.length]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -10 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ 
+        delay: index * 0.05, 
+        duration: 0.6, 
+        ease: [0.16, 1, 0.3, 1],
+        y: { duration: 0.3, ease: "easeOut" }
+      }}
+      className="product-card group cursor-pointer"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={() => window.location.href = `/shop/${product.id}`}
+    >
+      <div
+        className="card-image relative aspect-[4/3] overflow-hidden flex items-center justify-center"
+        style={{
+          background: 'var(--navy-surface)',
+          border: '1px solid var(--border-subtle)',
+        }}
+      >
+        {images.length > 0 ? (
+          <Image
+            src={images[imageIdx]}
+            alt={product.name}
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            className="next-image object-contain p-4 md:p-8 transition-transform duration-700 group-hover:scale-[1.04]"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-cream/20 font-mono text-[10px] tracking-[0.35em]">
+            {product.id}
+          </div>
+        )}
+
+        <div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col gap-2 items-center justify-end pb-5"
+          style={{ background: 'transparent' }}
+        >
+          <span
+            style={{
+              fontFamily: 'var(--font-inter)',
+              fontSize: '9px',
+              fontWeight: 500,
+              letterSpacing: '0.20em',
+              textTransform: 'uppercase',
+              color: 'var(--gold)',
+            }}
+          >
+            View Frame
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-4 space-y-2 transition-transform duration-500 group-hover:translate-x-5" style={{ willChange: 'transform' }}>
+        <div className="flex justify-between items-end">
+          <h2
+            style={{
+              fontFamily: 'var(--font-cormorant)',
+              fontSize: 'clamp(1.6rem, 2.5vw, 2rem)',
+              fontWeight: 400,
+              color: 'var(--text-primary)',
+              letterSpacing: '0.02em',
+              textTransform: 'uppercase',
+              lineHeight: 1.1,
+            }}
+          >
+            {product.brand}
+          </h2>
+        </div>
+        <h3
+          style={{
+            fontFamily: 'var(--font-inter)',
+            fontSize: '14px',
+            fontWeight: 600,
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            color: 'var(--text-tertiary)',
+          }}
+        >
+          {(() => {
+            const nameWithoutBrand = product.name?.replace(new RegExp('^' + product.brand + '\\s*', 'i'), '') || '';
+            const words = nameWithoutBrand.split(' ');
+            return words.slice(0, 2).join(' ');
+          })()}
+        </h3>
+        <div className="flex items-center gap-3">
+          <span
+            style={{
+              fontFamily: 'var(--font-inter)',
+              fontSize: '14px',
+              fontWeight: 600,
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              color: 'var(--gold)',
+            }}
+          >
+            ₹{product.price?.toLocaleString('en-IN')}
+          </span>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 export default function BrandDetailClient({ collection, products }) {
   const [visionStage, setVisionStage] = useState(0);
@@ -69,44 +201,14 @@ export default function BrandDetailClient({ collection, products }) {
               </div>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
               {!products.length && (
-                <div className="md:col-span-3 border border-gold/10 bg-navy-surface p-8 text-center text-cream/50 font-mono text-[10px] tracking-[0.3em] uppercase">
+                <div className="lg:col-span-3 border border-gold/10 bg-navy-surface p-8 text-center text-cream/50 font-mono text-[10px] tracking-[0.3em] uppercase">
                   No products matched this archive yet.
                 </div>
               )}
               {products.map((product, index) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.08 }}
-                  className="group bg-navy-surface border border-white/5 rounded-[40px] p-8 hover:border-gold/30 transition-all cursor-pointer overflow-hidden relative"
-                >
-                  <Link href={`/shop/${product.id}`} className="block">
-                    <div className="aspect-[4/3] bg-navy-deep rounded-3xl mb-8 overflow-hidden relative">
-                      {product.image ? (
-                        <Image src={product.image} alt={product.name} fill className="object-contain p-6 transition-transform duration-1000 group-hover:scale-110" />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-cream/20 font-mono text-[10px] tracking-[0.35em]">{product.id}</div>
-                      )}
-                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="border border-gold text-gold px-5 py-2 text-[10px] tracking-[0.3em] uppercase font-mono">View Piece</span>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      <span className="border border-gold/20 px-2 py-1 text-[8px] font-mono tracking-[0.2em] uppercase text-gold">{product.brand}</span>
-                      <span className="border border-cream/10 px-2 py-1 text-[8px] font-mono tracking-[0.2em] uppercase text-cream/60">{product.category}</span>
-                    </div>
-                    <div className="flex justify-between items-start relative z-10">
-                      <div>
-                        <h3 className="text-2xl font-serif italic tracking-tight mb-1">{product.name}</h3>
-                        <p className="text-[10px] text-teal uppercase tracking-widest">{product.details}</p>
-                      </div>
-                      <span className="font-inter text-[11px] font-black tracking-widest text-gold uppercase">₹{product.price?.toLocaleString('en-IN')}</span>
-                    </div>
-                  </Link>
-                </motion.div>
+                <BrandProductCard key={product.id} product={product} index={index} />
               ))}
             </div>
           </div>

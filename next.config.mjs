@@ -10,6 +10,10 @@ const nextConfig = {
 				protocol: 'https',
 				hostname: 'india.ray-ban.com',
 			},
+			{
+				protocol: 'https',
+				hostname: 'images.clothes.com',
+			},
 		],
 	},
 };

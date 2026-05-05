@@ -96,7 +96,13 @@ export default function CartDrawer() {
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
                         <div className="flex justify-between items-start">
-                          <h3 className="text-cream font-serif text-lg leading-tight">{item.name}</h3>
+                          <h3 className="text-cream font-serif text-lg leading-tight">
+                            {(() => {
+                              const nameWithoutBrand = item.name.replace(new RegExp('^' + item.brand + '\\s*', 'i'), '');
+                              const words = nameWithoutBrand.split(' ');
+                              return words.slice(0, 2).join(' ');
+                            })()}
+                          </h3>
                           <button 
                             onClick={() => removeFromCart(item.id)}
                             className="text-cream/20 hover:text-red-400 transition-colors"

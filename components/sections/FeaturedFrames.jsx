@@ -1,7 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import TryOnModal from '@/components/ui/TryOnModal';
 import { useCart } from '@/components/providers/CartProvider';
 import { useWishlist } from '@/components/providers/WishlistProvider';
@@ -14,9 +14,13 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
   const [imageIdx, setImageIdx] = useState(0);
   const router = useRouter();
 
-  const images = Array.isArray(product.images) && product.images.length > 0
-    ? product.images
-    : [product.image].filter(Boolean);
+  const images = useMemo(() => {
+    const list = [
+      product.image,
+      ...(Array.isArray(product.images) ? product.images : [])
+    ].filter(Boolean);
+    return [...new Set(list)];
+  }, [product.image, product.images]);
 
   useEffect(() => {
     let timer;
@@ -113,47 +117,35 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
 
       <div className="mt-4 space-y-3 transition-transform duration-500 group-hover:translate-x-5" style={{ willChange: 'transform' }}>
         <div className="flex justify-between items-end">
-          <span
+          <h2
             style={{
-              fontFamily: 'var(--font-inter)',
-              fontSize: '10px',
-              fontWeight: 500,
-              letterSpacing: '0.20em',
+              fontFamily: 'var(--font-cormorant)',
+              fontSize: 'clamp(1.6rem, 2.5vw, 2rem)',
+              fontWeight: 400,
+              color: 'var(--text-primary)',
+              letterSpacing: '0.02em',
               textTransform: 'uppercase',
-              color: 'var(--text-tertiary)',
+              lineHeight: 1.1,
             }}
           >
             {product.brand}
-          </span>
+          </h2>
         </div>
         <h3
           style={{
-            fontFamily: 'var(--font-cormorant)',
-            fontSize: 'clamp(1.4rem, 2.5vw, 1.8rem)',
-            fontWeight: 400,
-            color: 'var(--text-primary)',
-            letterSpacing: '0.02em',
+            fontFamily: 'var(--font-inter)',
+            fontSize: '14px',
+            fontWeight: 600,
+            letterSpacing: '0.15em',
             textTransform: 'uppercase',
-            lineHeight: 1.1,
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '0.3em'
+            color: 'var(--text-tertiary)',
           }}
         >
           {(() => {
-            const words = product.name.split(' ');
-            if (words.length <= 1) return <em style={{ fontStyle: 'italic' }}>{product.name}<span style={{ color: 'var(--gold)', fontStyle: 'normal', marginLeft: '2px' }}>.</span></em>;
-            const firstPart = words.slice(0, -1).join(' ');
-            const lastWord = words[words.length - 1];
-            return (
-              <>
-                <span>{firstPart}</span>
-                <em style={{ fontStyle: 'italic', fontWeight: 300 }}>
-                  {lastWord}
-                  <span style={{ color: 'var(--gold)', fontStyle: 'normal', marginLeft: '2px' }}>.</span>
-                </em>
-              </>
-            );
+            // Remove brand from name if it exists at the start, then take first 2 words
+            const nameWithoutBrand = product.name.replace(new RegExp('^' + product.brand + '\\s*', 'i'), '');
+            const words = nameWithoutBrand.split(' ');
+            return words.slice(0, 2).join(' ');
           })()}
         </h3>
         <div className="flex items-center gap-3">
