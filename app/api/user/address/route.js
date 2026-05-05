@@ -12,13 +12,19 @@ export async function GET(req) {
   const userId = session.user.id;
   const userEmail = session.user.email;
   
-  const user = await db.collection("users").findOne({
+  const query = {
     $or: [
-      { _id: userId },
-      { _id: new ObjectId(userId) },
       { email: userEmail }
     ]
-  });
+  };
+
+  if (ObjectId.isValid(userId)) {
+    query.$or.push({ _id: new ObjectId(userId) });
+  } else {
+    query.$or.push({ _id: userId });
+  }
+  
+  const user = await db.collection("users").findOne(query);
   
   return NextResponse.json(user?.addresses || []);
 }
@@ -38,11 +44,15 @@ export async function POST(req) {
     // Recovery logic: Search by ID or Email (handles stale session after DB clear)
     const query = {
       $or: [
-        { _id: userId },
-        { _id: new ObjectId(userId) },
         { email: userEmail }
       ]
     };
+
+    if (ObjectId.isValid(userId)) {
+      query.$or.push({ _id: new ObjectId(userId) });
+    } else {
+      query.$or.push({ _id: userId });
+    }
 
     const newAddress = {
       ...address,

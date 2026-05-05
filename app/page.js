@@ -11,22 +11,31 @@ import BookingSection from '@/components/sections/BookingSection';
 import TheRevealLoader from '@/components/ui/TheRevealLoader';
 
 export default async function Home() {
-  const products = await getProductsDB();
-  const featuredProducts = products.filter((p) => p.featured).slice(0, 6);
-  const displayProducts = featuredProducts.length > 0 ? featuredProducts : products.slice(0, 6);
+  try {
+    const products = await getProductsDB();
+    const featuredProducts = products.filter((p) => p.featured).slice(0, 6);
+    const displayProducts = featuredProducts.length > 0 ? featuredProducts : products.slice(0, 6);
 
-  return (
-    <main className="min-h-screen transition-colors duration-500" style={{ background: 'var(--navy)' }}>
-      <TheRevealLoader />
-      <Hero />
-      <BrandMarquee />
-      <BrandShowcase />
-      <FeaturedFrames initialProducts={displayProducts} />
-      <CollectionGallery />
-      <Magazine />
-      <BookingSection />
-      <AboutStrip />
-      <Footer />
-    </main>
-  );
+    return (
+      <main className="min-h-screen transition-colors duration-500" style={{ background: 'var(--navy)' }}>
+        <TheRevealLoader />
+        <Hero />
+        <BrandMarquee />
+        <BrandShowcase />
+        <FeaturedFrames initialProducts={displayProducts} />
+        <CollectionGallery />
+        <Magazine />
+        <BookingSection />
+        <AboutStrip />
+        <Footer />
+      </main>
+    );
+  } catch (error) {
+    console.error("HOME_PAGE_ERROR", error);
+    return (
+       <div className="min-h-screen bg-navy flex items-center justify-center text-gold font-mono uppercase tracking-widest text-[10px]">
+          Vault Connection Error. Please refresh.
+       </div>
+    );
+  }
 }

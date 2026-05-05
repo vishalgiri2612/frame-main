@@ -2,7 +2,7 @@
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, Loader2, Search, Shield } from 'lucide-react';
+import { AlertTriangle, Loader2, Search, Shield, User as UserIcon } from 'lucide-react';
 import { useAdminResource } from '@/hooks/useAdminResource';
 import { adminFetch, formatDate } from '@/lib/admin/client';
 
@@ -39,107 +39,132 @@ export default function UserManagement() {
 
   return (
     <AdminLayout>
-         <header className="mb-8 flex justify-between items-end">
+      <header className="mb-8 flex flex-wrap justify-between items-end gap-4">
         <div>
-          <h1 className="text-4xl font-light tracking-tighter">Citizen <span className="italic font-serif text-gold">Manifest.</span></h1>
-          <p className="font-mono text-[10px] tracking-[0.2em] text-cream/40 uppercase mt-2">Identity & Access Governance</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Customers</h1>
+          <p className="text-sm text-zinc-500 mt-1">Manage user identities and access permissions.</p>
         </div>
       </header>
 
-         <section className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-3">
-            <label className="md:col-span-3 relative flex-1 group">
-               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cream/20 group-focus-within:text-gold transition-colors" />
-               <input
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  type="text"
-                  placeholder="Search identities by name or email"
-                  className="w-full bg-navy-surface border border-gold/5 px-12 py-4 font-mono text-[10px] tracking-widest outline-none focus:border-gold/20 transition-all"
-               />
-            </label>
+      {/* Filters */}
+      <section className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="relative md:col-span-3">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-zinc-400" />
+          </div>
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            type="text"
+            placeholder="Search users by name or email"
+            className="block w-full pl-10 pr-3 py-2.5 border border-zinc-200 rounded-lg text-sm bg-white placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-colors shadow-sm"
+          />
+        </div>
+        <select
+          value={role}
+          onChange={(event) => setRole(event.target.value)}
+          className="block w-full pl-3 pr-10 py-2.5 border border-zinc-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-colors shadow-sm"
+        >
+          <option value="">All Roles</option>
+          <option value="ADMIN">Admin</option>
+          <option value="USER">User</option>
+        </select>
+      </section>
 
-            <select
-               value={role}
-               onChange={(event) => setRole(event.target.value)}
-               className="bg-navy-surface border border-gold/5 px-3 py-3 text-sm outline-none focus:border-gold/20"
-            >
-               <option value="">All roles</option>
-               <option value="ADMIN">Admin</option>
-               <option value="USER">User</option>
-            </select>
-         </section>
-
-         {error && (
-            <div className="mb-5 border border-red-500/20 bg-red-500/5 text-red-300 px-3 py-2 text-sm inline-flex items-center gap-2">
-               <AlertTriangle className="w-4 h-4" />
-               {error}
+      {error && (
+        <div className="mb-6 rounded-md bg-red-50 p-4 border border-red-200">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <AlertTriangle className="h-5 w-5 text-red-400" aria-hidden="true" />
             </div>
-         )}
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error</h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>{error}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <div className="bg-navy-surface border border-gold/5 overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b border-gold/10 font-mono text-[8px] tracking-[0.3em] text-cream/30 uppercase">
-                     <th className="p-6 font-normal">ID</th>
-                     <th className="p-6 font-normal">Identity</th>
-              <th className="p-6 font-normal">Clearance</th>
-              <th className="p-6 font-normal">Enrollment Date</th>
-                     <th className="p-6 font-normal text-right">Role Update</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gold/5">
-            {users.map((user, i) => (
-                     <motion.tr
-                key={user.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="group hover:bg-gold/[0.01] transition-colors"
-              >
-                <td className="p-6">
-                           <span className="text-xs font-mono tracking-widest text-gold">{user.id}</span>
-                </td>
-                <td className="p-6">
-                           <div className="flex flex-col">
-                              <span className="text-sm font-light text-cream">{user.name || '-'}</span>
-                              <span className="text-[10px] font-mono text-cream/30 lowercase">{user.email || '-'}</span>
-                           </div>
-                </td>
-                <td className="p-6">
-                           <div className="flex items-center gap-2">
-                              <Shield className={`w-3 h-3 ${user.role === 'ADMIN' ? 'text-gold' : 'text-cream/20'}`} />
-                              <span className={`text-[9px] font-mono tracking-widest uppercase ${user.role === 'ADMIN' ? 'text-gold' : 'text-cream/40'}`}>
-                                 {user.role || 'USER'}
-                              </span>
-                           </div>
-                </td>
-                        <td className="p-6 text-[10px] font-mono text-cream/20 uppercase tracking-widest">{formatDate(user.createdAt)}</td>
-                <td className="p-6 text-right">
-                           <select
-                              value={user.role || 'USER'}
-                              onChange={(event) => updateRole(user.id, event.target.value)}
-                              disabled={updatingId === user.id}
-                              className="bg-navy border border-gold/10 px-2 py-1 text-xs outline-none focus:border-gold/30 disabled:opacity-50"
-                           >
-                              <option value="USER">User</option>
-                              <option value="ADMIN">Admin</option>
-                           </select>
-                           {updatingId === user.id && <Loader2 className="w-3 h-3 animate-spin inline-block ml-2 text-gold" />}
-                </td>
-              </motion.tr>
-            ))}
+      {/* Users Table */}
+      <div className="bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left whitespace-nowrap">
+            <thead>
+              <tr className="border-b border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                <th className="px-6 py-4">User ID</th>
+                <th className="px-6 py-4">Identity</th>
+                <th className="px-6 py-4">Role</th>
+                <th className="px-6 py-4">Joined</th>
+                <th className="px-6 py-4 text-right">Access Control</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-200">
+              {users.map((user, i) => (
+                <motion.tr
+                  key={user.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: i * 0.03 }}
+                  className="hover:bg-zinc-50/80 transition-colors"
+                >
+                  <td className="px-6 py-4 text-xs font-mono font-medium text-zinc-500">{user.id}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center border border-zinc-200">
+                        <UserIcon className="w-4 h-4 text-zinc-400" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-zinc-900">{user.name || '-'}</div>
+                        <div className="text-xs text-zinc-500 mt-0.5">{user.email || '-'}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
+                      user.role === 'ADMIN' ? 'text-indigo-700 border-indigo-200 bg-indigo-50' : 'text-zinc-600 border-zinc-200 bg-zinc-100'
+                    }`}>
+                      <Shield className="w-3 h-3" />
+                      {user.role || 'USER'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-zinc-500">{formatDate(user.createdAt)}</td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <select
+                        value={user.role || 'USER'}
+                        onChange={(event) => updateRole(user.id, event.target.value)}
+                        disabled={updatingId === user.id}
+                        className="block bg-white border border-zinc-300 rounded-md py-1.5 pl-3 pr-8 text-xs font-medium text-zinc-700 focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 disabled:opacity-50 shadow-sm"
+                      >
+                        <option value="USER">User</option>
+                        <option value="ADMIN">Admin</option>
+                      </select>
+                      {updatingId === user.id && <Loader2 className="w-4 h-4 animate-spin text-zinc-500" />}
+                    </div>
+                  </td>
+                </motion.tr>
+              ))}
 
-                  {!isLoading && !users.length && (
-                     <tr>
-                        <td colSpan={5} className="p-6 text-sm text-cream/40">No users found for this filter.</td>
-                     </tr>
-                  )}
-          </tbody>
-        </table>
+              {!isLoading && !users.length && (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <UserIcon className="w-8 h-8 text-zinc-300 mb-3" />
+                      <p className="text-sm font-medium text-zinc-900">No users found</p>
+                      <p className="text-sm text-zinc-500 mt-1">Try adjusting your search or filters.</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-         <footer className="mt-6 text-xs text-cream/40 font-mono tracking-wider">
-            {isLoading ? 'Synchronizing user directory...' : `Loaded ${users.length} users`}
+      <footer className="mt-6 text-sm text-zinc-500 flex items-center justify-between">
+        <span>{isLoading ? 'Synchronizing...' : `Loaded ${users.length} users`}</span>
       </footer>
     </AdminLayout>
   );

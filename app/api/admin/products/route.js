@@ -20,7 +20,7 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const pagination = parsePagination(searchParams);
-    const sort = parseSort(searchParams, "createdAt", "desc");
+    const sort = parseSort(searchParams, ["createdAt", "name", "price", "stock", "status"], { createdAt: -1 });
     
     const db = await getDb();
     const query = {};
@@ -51,7 +51,7 @@ export async function GET(request) {
     ]);
     
     return NextResponse.json({
-      items,
+      items: serializeList(items),
       pagination: {
         page: pagination.page,
         limit: pagination.limit,
@@ -94,6 +94,7 @@ export async function POST(request) {
       stock: Number(payload.stock),
       status: payload.status,
       image: payload.image?.trim() || "",
+      images: payload.image?.trim() ? [payload.image.trim()] : [],
       description: payload.description?.trim() || "",
       featured: Boolean(payload.featured),
       tags: Array.isArray(payload.tags)
@@ -101,7 +102,7 @@ export async function POST(request) {
         : [],
       createdAt: asDate(payload.createdAt) || now,
       updatedAt: now,
-      createdBy: auth.session.user.id,
+      createdBy: auth.session?.user?.id || null,
     };
 
     const existingSku = await db.collection("products").findOne({ sku: normalized.sku });

@@ -7,7 +7,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useCart } from '@/components/providers/CartProvider';
 import { useWishlist } from '@/components/providers/WishlistProvider';
 import SearchOverlay from '@/components/ui/SearchOverlay';
-import { Search, ShoppingCart, User, Menu, X, Heart, LogOut } from 'lucide-react';
+import { Search, ShoppingBag, User, Menu, X, Heart, LogOut } from 'lucide-react';
 
 const navLinks = [
   { name: 'Shop', href: '/shop' },
@@ -184,9 +184,9 @@ export default function Navbar() {
             className="relative hover:scale-110 transition-transform"
             onClick={() => setIsCartOpen(true)}
             style={iconStyle}
-            aria-label="Cart"
+            aria-label="Bag"
           >
-            <ShoppingCart className="w-5 h-5 stroke-[2px]" />
+            <ShoppingBag className="w-5 h-5 stroke-[2px]" />
             {cartCount > 0 && (
               <span
                 className="absolute -top-2 -right-2 text-[9px] font-bold w-[16px] h-[16px] rounded-full flex items-center justify-center"

@@ -45,7 +45,7 @@ function ProductCard({ product, index }) {
     return () => clearInterval(timer);
   }, [isHovered, images.length]);
 
-  const handleAddToCart = (e) => {
+  const handleAddToBag = (e) => {
     e.preventDefault();
     e.stopPropagation();
     addToCart(product);
@@ -55,7 +55,7 @@ function ProductCard({ product, index }) {
       return nameWithoutBrand.split(' ').slice(0, 2).join(' ');
     })();
     toast.success(`${product.brand} ${shortName} added to bag`, {
-      icon: '🛒',
+      icon: '🛍️',
       style: {
         borderRadius: '0px',
         background: 'var(--navy-deep)',

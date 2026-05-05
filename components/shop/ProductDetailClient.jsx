@@ -354,7 +354,7 @@ export default function ProductDetailClient({ product, similarProducts }) {
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
                       <span className="relative z-10 font-mono text-[10px] font-black tracking-[0.3em] text-[#0F1117] uppercase whitespace-nowrap">
-                        Add to Cart
+                        Add to Bag
                       </span>
                     </button>
 

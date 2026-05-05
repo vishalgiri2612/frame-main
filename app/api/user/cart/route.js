@@ -13,7 +13,15 @@ export async function GET() {
 
     const client = await clientPromise;
     const db = client.db();
-    const user = await db.collection('users').findOne({ _id: new ObjectId(session.user.id) });
+    
+    const query = {};
+    if (ObjectId.isValid(session.user.id)) {
+      query._id = new ObjectId(session.user.id);
+    } else {
+      query._id = session.user.id;
+    }
+
+    const user = await db.collection('users').findOne(query);
 
     return NextResponse.json({ cart: user?.cart || [] });
   } catch (error) {
@@ -29,9 +37,16 @@ export async function POST(req) {
     const { cart } = await req.json();
     const client = await clientPromise;
     const db = client.db();
+    
+    const query = {};
+    if (ObjectId.isValid(session.user.id)) {
+      query._id = new ObjectId(session.user.id);
+    } else {
+      query._id = session.user.id;
+    }
 
     await db.collection('users').updateOne(
-      { _id: new ObjectId(session.user.id) },
+      query,
       { $set: { cart: cart } }
     );
 

@@ -2,7 +2,7 @@
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertTriangle, Loader2, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { AlertTriangle, Loader2, Package, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { useAdminResource } from '@/hooks/useAdminResource';
 import { adminFetch, formatCurrency } from '@/lib/admin/client';
 
@@ -29,9 +29,37 @@ export default function ProductManagement() {
   const [form, setForm] = useState(DEFAULT_FORM);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setError('');
+    
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      
+      setForm(prev => ({ ...prev, image: data.url }));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const { data, isLoading, refetch } = useAdminResource('/api/admin/products', {
-    q: query,
+    search: query,
     brand,
     category,
     status,
@@ -134,10 +162,10 @@ export default function ProductManagement() {
     <AdminLayout>
       <header className="mb-8 flex flex-wrap justify-between items-end gap-4">
         <div>
-          <h1 className="text-4xl font-light tracking-tighter">Inventory <span className="italic font-serif text-gold">Vault.</span></h1>
-          <p className="font-mono text-[10px] tracking-[0.2em] text-cream/40 uppercase mt-2">Live Inventory Operations</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Products</h1>
+          <p className="text-sm text-zinc-500 mt-1">Manage your inventory, pricing, and availability.</p>
           {isMock && (
-            <p className="mt-2 inline-flex items-center border border-gold/20 bg-gold/5 px-3 py-1 text-[10px] font-mono tracking-[0.2em] uppercase text-gold">
+            <p className="mt-2 inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
               Demo feed active
             </p>
           )}
@@ -146,163 +174,181 @@ export default function ProductManagement() {
         <button
           onClick={openCreate}
           disabled={isMock}
-          className="px-8 py-4 bg-gold text-navy font-mono text-[10px] font-bold tracking-[0.3em] uppercase hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] transition-all flex items-center gap-3"
+          className="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 transition-colors disabled:opacity-50"
         >
           <Plus className="w-4 h-4" />
-          Create Product
+          Add Product
         </button>
       </header>
 
-      <section className="mb-8 grid grid-cols-1 lg:grid-cols-4 gap-3">
-        <label className="lg:col-span-2 relative block">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cream/40" />
+      {/* Filters */}
+      <section className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="relative md:col-span-2">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-zinc-400" />
+          </div>
           <input
+            type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search by name or SKU"
-            className="w-full bg-navy-surface border border-gold/10 pl-10 pr-3 py-3 text-sm outline-none focus:border-gold/30"
+            placeholder="Search products..."
+            className="block w-full pl-10 pr-3 py-2.5 border border-zinc-200 rounded-lg text-sm bg-white placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-colors shadow-sm"
           />
-        </label>
+        </div>
 
         <select
           value={status}
           onChange={(event) => setStatus(event.target.value)}
-          className="bg-navy-surface border border-gold/10 px-3 py-3 text-sm outline-none focus:border-gold/30"
+          className="block w-full pl-3 pr-10 py-2.5 border border-zinc-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-colors shadow-sm"
         >
-          <option value="">All statuses</option>
+          <option value="">All Statuses</option>
           <option value="ACTIVE">Active</option>
           <option value="DRAFT">Draft</option>
           <option value="ARCHIVED">Archived</option>
         </select>
 
         <select
-          value={brand}
-          onChange={(event) => setBrand(event.target.value)}
-          className="bg-navy-surface border border-gold/10 px-3 py-3 text-sm outline-none focus:border-gold/30"
-        >
-          <option value="">All brands</option>
-          {[...new Set(products.map((product) => product.brand).filter(Boolean))].map((item) => (
-            <option key={item} value={item}>{item}</option>
-          ))}
-        </select>
-
-        <select
           value={category}
           onChange={(event) => setCategory(event.target.value)}
-          className="bg-navy-surface border border-gold/10 px-3 py-3 text-sm outline-none focus:border-gold/30"
+          className="block w-full pl-3 pr-10 py-2.5 border border-zinc-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-colors shadow-sm"
         >
-          <option value="">All categories</option>
+          <option value="">All Categories</option>
           {[...new Set(products.map((product) => product.category).filter(Boolean))].map((item) => (
             <option key={item} value={item}>{item}</option>
           ))}
         </select>
-
-        <div className="border border-gold/10 bg-navy-surface px-4 py-3 text-xs text-cream/70 flex items-center justify-between">
-          <span>Loaded</span>
-          <span className="text-gold font-mono">{isLoading ? '--' : products.length}</span>
-        </div>
       </section>
 
       {error && (
-        <div className="mb-6 flex items-center gap-2 text-sm text-red-300 border border-red-500/20 bg-red-500/5 px-3 py-2">
-          <AlertTriangle className="w-4 h-4" />
-          {error}
+        <div className="mb-6 rounded-md bg-red-50 p-4 border border-red-200">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <AlertTriangle className="h-5 w-5 text-red-400" aria-hidden="true" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error</h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>{error}</p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-      <section className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+      {/* Summary Stats */}
+      <section className="mb-6 flex gap-4 text-sm overflow-x-auto pb-2">
+        <div className="bg-white border border-zinc-200 rounded-lg px-4 py-2 shadow-sm flex items-center gap-3">
+          <span className="text-zinc-500 font-medium">All</span>
+          <span className="text-zinc-900 font-semibold">{isLoading ? '--' : products.length}</span>
+        </div>
         {['ACTIVE', 'DRAFT', 'ARCHIVED'].map((item) => (
-          <div key={item} className="border border-gold/10 bg-navy-surface px-3 py-2 flex items-center justify-between">
-            <span className="text-cream/70">{item}</span>
-            <span className="text-gold font-mono">{statusSummary[item] || 0}</span>
+          <div key={item} className="bg-white border border-zinc-200 rounded-lg px-4 py-2 shadow-sm flex items-center gap-3">
+            <span className="text-zinc-500 font-medium capitalize">{item.toLowerCase()}</span>
+            <span className="text-zinc-900 font-semibold">{statusSummary[item] || 0}</span>
           </div>
         ))}
       </section>
 
-      <div className="bg-navy-surface border border-gold/5 overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b border-gold/10 font-mono text-[10px] tracking-[0.2em] text-cream/60 uppercase bg-navy/40">
-              <th className="p-6 font-normal">Asset</th>
-              <th className="p-6 font-normal">Status</th>
-              <th className="p-6 font-normal">Price</th>
-              <th className="p-6 font-normal">Stock</th>
-              <th className="p-6 font-normal text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gold/5">
-            {products.map((product, i) => {
-              const productId = product.id || product._id;
-              return (
-                <motion.tr
-                  key={productId}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: i * 0.02 }}
-                  className="group hover:bg-gold/[0.02] transition-colors"
-                >
-                  <td className="p-6">
-                    <div className="flex items-center gap-4">
-                      {product.image && (
-                        <div className="w-10 h-10 border border-gold/10 p-1 flex-shrink-0">
-                          <img src={product.image} className="w-full h-full object-contain" alt="" />
-                        </div>
-                      )}
-                      <div>
-                        <div className="text-[10px] font-mono tracking-[0.3em] text-gold font-medium uppercase">{product.category}</div>
-                        <div className="text-base text-cream font-semibold tracking-tight mt-1">{product.name}</div>
-                        <div className="text-[11px] text-cream/60 font-mono mt-1.5">{product.sku}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-6">
-                    <span className={`inline-flex items-center px-4 py-1 rounded-full text-[9px] font-mono font-bold tracking-[0.1em] uppercase border ${
-                      product.status === 'ACTIVE' 
-                        ? 'text-teal border-teal/30 bg-teal/5' 
-                        : 'text-cream/50 border-gold/10 bg-gold/5'
-                    }`}>
-                      {product.status}
-                    </span>
-                  </td>
-                  <td className="p-6 text-sm font-serif italic text-gold font-medium">
-                    {formatCurrency(product.price)}
-                  </td>
-                  <td className="p-6">
-                    <span className={`text-xs font-mono font-medium ${product.stock <= 5 ? 'text-red-400' : 'text-cream/80'}`}>
-                      {product.stock ?? 0}
-                    </span>
-                  </td>
-                  <td className="p-6 text-right">
-                    <div className="flex justify-end gap-2">
-                       <button 
-                         onClick={() => openEdit(product)} 
-                         disabled={isMock}
-                         className="p-2 border border-gold/10 text-gold/60 hover:text-gold hover:bg-gold/5 transition-all disabled:opacity-30"
-                       >
-                         <Pencil size={14} />
-                       </button>
-                       <button 
-                         onClick={() => deleteProduct(productId)} 
-                         disabled={isMock}
-                         className="p-2 border border-gold/10 text-cream/20 hover:text-red-400 hover:bg-red-950/20 transition-all disabled:opacity-30"
-                       >
-                         <Trash2 size={14} />
-                       </button>
-                    </div>
-                  </td>
-                </motion.tr>
-              );
-            })}
-            
-            {!isLoading && !products.length && (
-              <tr>
-                <td colSpan={5} className="p-12 text-center text-cream/20 font-mono text-[10px] tracking-widest uppercase">
-                  No assets found in vault
-                </td>
+      {/* Products Table */}
+      <div className="bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left whitespace-nowrap">
+            <thead>
+              <tr className="border-b border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                <th className="px-6 py-4">Product</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4">Price</th>
+                <th className="px-6 py-4">Inventory</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-zinc-200">
+              {products.map((product, i) => {
+                const productId = product.id || product._id;
+                return (
+                  <motion.tr
+                    key={productId}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: i * 0.02 }}
+                    className="hover:bg-zinc-50/80 transition-colors"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4">
+                        {product.image ? (
+                          <div className="w-12 h-12 rounded-lg bg-zinc-50 border border-zinc-200 flex-shrink-0 flex items-center justify-center overflow-hidden p-1">
+                            <img src={product.image} className="w-full h-full object-contain" alt="" />
+                          </div>
+                        ) : (
+                          <div className="w-12 h-12 rounded-lg bg-zinc-50 border border-zinc-200 flex-shrink-0 flex items-center justify-center text-zinc-400">
+                            <Package className="w-5 h-5" />
+                          </div>
+                        )}
+                        <div>
+                          <div className="text-sm font-semibold text-zinc-900">{product.name}</div>
+                          <div className="text-xs text-zinc-500 mt-0.5">{product.sku}</div>
+                          <div className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mt-1">{product.category}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
+                        product.status === 'ACTIVE' 
+                          ? 'text-green-700 border-green-200 bg-green-50' 
+                          : product.status === 'DRAFT'
+                          ? 'text-amber-700 border-amber-200 bg-amber-50'
+                          : 'text-zinc-600 border-zinc-200 bg-zinc-100'
+                      }`}>
+                        {product.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm font-medium text-zinc-900">
+                      {formatCurrency(product.price)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${product.stock > 10 ? 'bg-green-500' : product.stock > 0 ? 'bg-amber-500' : 'bg-red-500'}`} />
+                        <span className={`text-sm font-medium ${product.stock <= 5 ? 'text-red-600' : 'text-zinc-700'}`}>
+                          {product.stock ?? 0} in stock
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                         <button 
+                           onClick={() => openEdit(product)} 
+                           disabled={isMock}
+                           className="p-2 rounded-md text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors disabled:opacity-30"
+                         >
+                           <Pencil className="w-4 h-4" />
+                         </button>
+                         <button 
+                           onClick={() => deleteProduct(productId)} 
+                           disabled={isMock}
+                           className="p-2 rounded-md text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-30"
+                         >
+                           <Trash2 className="w-4 h-4" />
+                         </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                );
+              })}
+              
+              {!isLoading && !products.length && (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <Package className="w-8 h-8 text-zinc-300 mb-3" />
+                      <p className="text-sm font-medium text-zinc-900">No products found</p>
+                      <p className="text-sm text-zinc-500 mt-1">Try adjusting your search or filters.</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -311,107 +357,152 @@ export default function ProductManagement() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-navy/95 backdrop-blur-xl flex items-center justify-center p-6"
+            className="fixed inset-0 z-50 bg-zinc-900/40 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6"
           >
             <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="w-full max-w-2xl bg-navy-surface border border-gold/20 p-12 shadow-2xl relative"
+              initial={{ scale: 0.95, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              className="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden max-h-[90vh] flex flex-col"
             >
-              <button
-                onClick={closeModal}
-                className="absolute top-8 right-8 text-gold hover:text-cream transition-colors font-mono text-[10px] tracking-widest px-4 py-2 border border-gold/10"
-              >
-                CLOSE [×]
-              </button>
+              <div className="px-6 py-4 border-b border-zinc-200 flex items-center justify-between sticky top-0 bg-white z-10">
+                <div>
+                  <h2 className="text-lg font-semibold text-zinc-900">{editingProduct ? 'Edit Product' : 'Add Product'}</h2>
+                  <p className="text-sm text-zinc-500">Provide details for the item below.</p>
+                </div>
+                <button
+                  onClick={closeModal}
+                  className="text-zinc-400 hover:text-zinc-600 bg-zinc-100 hover:bg-zinc-200 rounded-full p-2 transition-colors"
+                >
+                  <span className="sr-only">Close</span>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
 
-              <header className="mb-12">
-                <h2 className="text-3xl font-light tracking-tighter">{editingProduct ? 'Update' : 'Initialize'} <span className="italic font-serif text-gold">Asset.</span></h2>
-                <p className="font-mono text-[8px] tracking-[0.2em] text-cream/40 uppercase mt-2">Inventory Mutation Pipeline</p>
-              </header>
+              <div className="p-6 overflow-y-auto">
+                {error && (
+                  <div className="mb-6 rounded-md bg-red-50 p-4 border border-red-200 text-sm text-red-700">
+                    {error}
+                  </div>
+                )}
 
-              {error && (
-                <div className="mb-4 text-sm text-red-300 border border-red-500/20 bg-red-500/5 p-3">{error}</div>
-              )}
+                <form id="product-form" className="space-y-6" onSubmit={onSubmit}>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-1.5">
+                         <label className="text-sm font-medium text-zinc-700">Product Name *</label>
+                         <input type="text" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="Classic Aviator" required />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-zinc-700">SKU *</label>
+                        <input type="text" value={form.sku} onChange={(event) => setForm({ ...form, sku: event.target.value.toUpperCase() })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm font-mono" placeholder="AV-100-GLD" required />
+                      </div>
+                   </div>
 
-              <form className="space-y-8" onSubmit={onSubmit}>
-                 <div className="grid grid-cols-2 gap-8">
-                    <div className="space-y-2">
-                       <label className="font-mono text-[8px] tracking-[0.3em] text-gold uppercase">Asset Name</label>
-                       <input type="text" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="w-full bg-navy border border-gold/10 p-4 font-mono text-[10px] tracking-widest outline-none focus:border-gold/40 transition-all text-cream" placeholder="E.G. THE ARCHITECT" required />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="font-mono text-[8px] tracking-[0.3em] text-gold uppercase">SKU</label>
-                      <input type="text" value={form.sku} onChange={(event) => setForm({ ...form, sku: event.target.value.toUpperCase() })} className="w-full bg-navy border border-gold/10 p-4 font-mono text-[10px] tracking-widest outline-none focus:border-gold/40 transition-all text-cream" placeholder="VIS-999" required />
-                    </div>
-                 </div>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-zinc-700">Brand *</label>
+                        <input type="text" value={form.brand} onChange={(event) => setForm({ ...form, brand: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="Ray-Ban" required />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-zinc-700">Category *</label>
+                        <input type="text" value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value.toUpperCase() })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm uppercase" placeholder="SUNGLASSES" required />
+                      </div>
+                   </div>
 
-                 <div className="grid grid-cols-2 gap-8">
-                    <div className="space-y-2">
-                      <label className="font-mono text-[8px] tracking-[0.3em] text-gold uppercase">Brand</label>
-                      <input type="text" value={form.brand} onChange={(event) => setForm({ ...form, brand: event.target.value })} className="w-full bg-navy border border-gold/10 p-4 font-mono text-[10px] tracking-widest outline-none focus:border-gold/40 transition-all text-cream" placeholder="FRAME HOUSE" required />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="font-mono text-[8px] tracking-[0.3em] text-gold uppercase">Category</label>
-                      <input type="text" value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value.toUpperCase() })} className="w-full bg-navy border border-gold/10 p-4 font-mono text-[10px] tracking-widest outline-none focus:border-gold/40 transition-all text-cream" placeholder="TITANIUM" required />
-                    </div>
-                 </div>
+                   <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-zinc-700">Status</label>
+                        <select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm bg-white">
+                          <option value="ACTIVE">Active</option>
+                          <option value="DRAFT">Draft</option>
+                          <option value="ARCHIVED">Archived</option>
+                        </select>
+                   </div>
 
-                 <div className="grid grid-cols-2 gap-8">
-                    <div className="space-y-2">
-                      <label className="font-mono text-[8px] tracking-[0.3em] text-gold uppercase">Status</label>
-                      <select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })} className="w-full bg-navy border border-gold/10 p-4 font-mono text-[10px] tracking-widest outline-none focus:border-gold/40 transition-all text-cream uppercase appearance-none cursor-pointer">
-                        <option value="ACTIVE">Active</option>
-                        <option value="DRAFT">Draft</option>
-                        <option value="ARCHIVED">Archived</option>
-                      </select>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="font-mono text-[8px] tracking-[0.3em] text-gold uppercase">Identity Token</label>
-                      <input value={`${form.brand || 'brand'} / ${form.category || 'category'} / ${form.sku || 'sku'}`} readOnly className="w-full bg-navy border border-gold/10 p-4 font-mono text-[10px] tracking-widest outline-none text-cream/50" />
-                    </div>
-                 </div>
+                   <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-zinc-700">Product Image *</label>
+                        <div className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-lg transition-colors relative overflow-hidden group ${form.image ? 'border-zinc-200 bg-white' : 'border-zinc-300 bg-zinc-50 hover:border-zinc-400'}`}>
+                          {form.image ? (
+                            <div className="absolute inset-0 w-full h-full p-2">
+                               <img src={form.image} alt="Preview" className="w-full h-full object-contain mix-blend-multiply" />
+                               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                  <span className="text-white text-xs font-semibold">Change Image</span>
+                               </div>
+                               <input type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploading} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed" />
+                            </div>
+                          ) : (
+                            <div className="space-y-1 text-center relative z-10">
+                              {isUploading ? (
+                                <Loader2 className="mx-auto h-8 w-8 text-zinc-400 animate-spin" />
+                              ) : (
+                                <svg className="mx-auto h-8 w-8 text-zinc-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                              )}
+                              <div className="flex text-sm text-zinc-600 justify-center">
+                                <label className="relative cursor-pointer rounded-md bg-transparent font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500">
+                                  <span>{isUploading ? 'Uploading...' : 'Upload a file'}</span>
+                                  <input type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploading} className="sr-only" />
+                                </label>
+                              </div>
+                              <p className="text-xs text-zinc-500">PNG, JPG, WEBP up to 5MB</p>
+                            </div>
+                          )}
+                        </div>
+                   </div>
 
-                 <div className="space-y-2">
-                    <label className="font-mono text-[8px] tracking-[0.3em] text-gold uppercase">Description / Provenance</label>
-                    <textarea value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} className="w-full bg-navy border border-gold/10 p-4 font-mono text-[10px] tracking-widest outline-none focus:border-gold/40 transition-all text-cream min-h-[100px]" placeholder="SYSTEM LOG DATA..." />
-                 </div>
+                   <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-zinc-700">Description</label>
+                      <textarea value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} rows={4} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="Write a short description..." />
+                   </div>
 
-                 <div className="grid grid-cols-3 gap-8">
-                    <div className="space-y-2">
-                        <label className="font-mono text-[8px] tracking-[0.3em] text-gold uppercase">Price (INR)</label>
-                        <input type="number" value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} className="w-full bg-navy border border-gold/10 p-4 font-mono text-[10px] tracking-widest outline-none focus:border-gold/40 transition-all text-cream" placeholder="12999" required min="0" />
-                    </div>
-                    <div className="space-y-2">
-                       <label className="font-mono text-[8px] tracking-[0.3em] text-gold uppercase">Initial Stock</label>
-                       <input type="number" value={form.stock} onChange={(event) => setForm({ ...form, stock: event.target.value })} className="w-full bg-navy border border-gold/10 p-4 font-mono text-[10px] tracking-widest outline-none focus:border-gold/40 transition-all text-cream" placeholder="24" required min="0" />
-                    </div>
-                    <div className="space-y-2">
-                       <label className="font-mono text-[8px] tracking-[0.3em] text-gold uppercase">Image Path</label>
-                       <input type="text" value={form.image} onChange={(event) => setForm({ ...form, image: event.target.value })} className="w-full bg-navy border border-gold/10 p-4 font-mono text-[10px] tracking-widest outline-none focus:border-gold/40 transition-all text-cream" placeholder="/products/item.png" />
-                    </div>
-                 </div>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-1.5">
+                          <label className="text-sm font-medium text-zinc-700">Price (INR) *</label>
+                          <div className="relative rounded-md shadow-sm">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                              <span className="text-zinc-500 sm:text-sm">₹</span>
+                            </div>
+                            <input type="number" value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} className="block w-full pl-7 pr-3 py-2 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="0.00" required min="0" />
+                          </div>
+                      </div>
+                      <div className="space-y-1.5">
+                         <label className="text-sm font-medium text-zinc-700">Inventory Stock *</label>
+                         <input type="number" value={form.stock} onChange={(event) => setForm({ ...form, stock: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="0" required min="0" />
+                      </div>
+                   </div>
 
-                 <label className="inline-flex items-center gap-3 text-xs text-cream/60">
-                   <input type="checkbox" checked={form.featured} onChange={(event) => setForm({ ...form, featured: event.target.checked })} />
-                   Mark as featured item
-                 </label>
+                   <div className="flex items-center gap-3 bg-zinc-50 p-4 rounded-lg border border-zinc-200">
+                     <div className="flex h-5 items-center">
+                       <input id="featured" type="checkbox" checked={form.featured} onChange={(event) => setForm({ ...form, featured: event.target.checked })} className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900" />
+                     </div>
+                     <div className="text-sm">
+                       <label htmlFor="featured" className="font-medium text-zinc-700">Featured Product</label>
+                       <p className="text-zinc-500">Highlight this item on the homepage showcase.</p>
+                     </div>
+                   </div>
+                </form>
+              </div>
 
-                 <div className="pt-8 flex gap-4">
-                    <button type="submit" disabled={isSubmitting || isMock} className="flex-1 bg-gold text-navy py-5 font-mono text-[10px] font-bold tracking-[0.3em] uppercase hover:shadow-[0_0_40px_rgba(212,175,55,0.4)] transition-all disabled:opacity-60 inline-flex items-center justify-center gap-2">
-                      {isSubmitting && <Loader2 className="w-3 h-3 animate-spin" />}
-                      {editingProduct ? 'Update Product' : 'Create Product'}
-                    </button>
-                    <button
-                       type="button"
-                       onClick={closeModal}
-                       className="flex-1 border border-gold/10 text-cream/40 py-5 font-mono text-[10px] tracking-[0.3em] uppercase hover:bg-gold/5 transition-all"
-                    >
-                      Cancel
-                    </button>
-                 </div>
-              </form>
+              <div className="px-6 py-4 border-t border-zinc-200 bg-zinc-50 flex items-center justify-end gap-3 sticky bottom-0">
+                  <button
+                     type="button"
+                     onClick={closeModal}
+                     className="px-4 py-2 border border-zinc-300 rounded-lg text-sm font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-colors shadow-sm"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    form="product-form"
+                    disabled={isSubmitting || isMock} 
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-zinc-900 text-sm font-medium text-white hover:bg-zinc-800 transition-colors shadow-sm disabled:opacity-60"
+                  >
+                    {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {editingProduct ? 'Save Changes' : 'Create Product'}
+                  </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

@@ -22,7 +22,7 @@ export async function PATCH(request, { params }) {
     }
 
     update.updatedAt = new Date();
-    update.updatedBy = auth.session.user.id;
+    update.updatedBy = auth.session?.user?.id || null;
 
     const db = await getDb();
     const result = await db.collection("products").updateOne({ _id: objectId }, { $set: update });
@@ -96,6 +96,7 @@ function buildUpdate(payload) {
 
   if (typeof payload.image === "string") {
     update.image = payload.image.trim();
+    update.images = update.image ? [update.image] : [];
   }
 
   if (typeof payload.status === "string" && VALID_STATUSES.includes(payload.status)) {
