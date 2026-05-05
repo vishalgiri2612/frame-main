@@ -18,6 +18,10 @@ export async function POST(req) {
       return NextResponse.json({ error: "User already exists" }, { status: 400 });
     }
 
+    // Check if this is the first user in the database
+    const userCount = await db.collection("users").countDocuments();
+    const role = userCount === 0 ? "ADMIN" : "user";
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -26,7 +30,7 @@ export async function POST(req) {
       name,
       email,
       password: hashedPassword,
-      role: "user",
+      role,
       createdAt: new Date(),
       updatedAt: new Date(),
       addresses: []
