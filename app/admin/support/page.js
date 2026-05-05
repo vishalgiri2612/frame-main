@@ -1,7 +1,7 @@
 'use client';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, Clock, MessageSquare, Search, Send, User } from 'lucide-react';
+import { AlertTriangle, Clock, Loader2, MessageSquare, Search, Send, User } from 'lucide-react';
 import { useAdminResource } from '@/hooks/useAdminResource';
 import { adminFetch, formatDate } from '@/lib/admin/client';
 
