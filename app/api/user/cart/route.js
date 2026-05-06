@@ -13,7 +13,7 @@ export async function GET() {
 
     const client = await clientPromise;
     const db = client.db();
-    
+
     const query = {};
     if (ObjectId.isValid(session.user.id)) {
       query._id = new ObjectId(session.user.id);
@@ -37,7 +37,7 @@ export async function POST(req) {
     const { cart } = await req.json();
     const client = await clientPromise;
     const db = client.db();
-    
+
     const query = {};
     if (ObjectId.isValid(session.user.id)) {
       query._id = new ObjectId(session.user.id);

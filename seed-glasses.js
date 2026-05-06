@@ -378,18 +378,18 @@ async function seed() {
 
     const slugify = (str) => str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     for (let p of products) {
-        p.brandSlug = slugify(p.brand);
-        p.categorySlug = slugify(p.category);
-        p.slug = slugify(`${p.brand}-${p.category}-${p.name}-${p.sku}`);
-        
-        // Ensure not duplicating
-        const exists = await db.collection("products").findOne({ sku: p.sku });
-        if (!exists) {
-           await db.collection("products").insertOne(p);
-           console.log(`Inserted ${p.sku}`);
-        } else {
-           console.log(`Skipped ${p.sku} (already exists)`);
-        }
+      p.brandSlug = slugify(p.brand);
+      p.categorySlug = slugify(p.category);
+      p.slug = slugify(`${p.brand}-${p.category}-${p.name}-${p.sku}`);
+
+      // Ensure not duplicating
+      const exists = await db.collection("products").findOne({ sku: p.sku });
+      if (!exists) {
+        await db.collection("products").insertOne(p);
+        console.log(`Inserted ${p.sku}`);
+      } else {
+        console.log(`Skipped ${p.sku} (already exists)`);
+      }
     }
 
     console.log("Seeding complete!");

@@ -1,6 +1,11 @@
 const { MongoClient } = require('mongodb');
 const bcrypt = require('bcryptjs');
 const path = require('path');
+const dns = require('dns');
+
+// Set custom DNS resolvers to fix SRV resolution issues in some networks
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const uri = process.env.DATABASE_URL;
