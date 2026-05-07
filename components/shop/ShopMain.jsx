@@ -212,6 +212,27 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
   const [sortBy, setSort] = useState('newest');
   const [isFilterOpen, setFilterOpen] = useState(false);
 
+  // Temporary states for filters
+  const [tempCategory, setTempCategory] = useState('ALL');
+  const [tempBrand, setTempBrand] = useState('ALL');
+  const [tempSort, setTempSort] = useState('newest');
+
+  // Initialize temp states when sidebar opens
+  useEffect(() => {
+    if (isFilterOpen) {
+      setTempCategory(activeCategory);
+      setTempBrand(activeBrand);
+      setTempSort(sortBy);
+    }
+  }, [isFilterOpen, activeCategory, activeBrand, sortBy]);
+
+  const applyFilters = useCallback(() => {
+    setCategory(tempCategory);
+    setBrand(tempBrand);
+    setSort(tempSort);
+    setFilterOpen(false);
+  }, [tempCategory, tempBrand, tempSort]);
+
   const filtered = useMemo(() => {
     let list = [...initialProducts];
 
@@ -249,6 +270,9 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
     setCategory('ALL');
     setBrand('ALL');
     setSort('newest');
+    setTempCategory('ALL');
+    setTempBrand('ALL');
+    setTempSort('newest');
   }, []);
 
   return (
@@ -310,7 +334,7 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
               return (
                 <button
                   key={name}
-                  onClick={() => setCategory(name)}
+                  onClick={() => { setCategory(name); setTempCategory(name); }}
                   className="px-8 py-3 text-[10px] uppercase transition-all duration-500 rounded-full border"
                   style={{
                     fontFamily: 'var(--font-inter)',
@@ -441,11 +465,11 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
                   <h3 className="text-[9px] tracking-[0.3em] text-[var(--text-tertiary)] uppercase font-bold border-b border-gold/10 pb-2">Sort By</h3>
                   <div className="flex flex-col">
                     {sortOptions.map(opt => {
-                      const isActive = sortBy === opt.value;
+                      const isActive = tempSort === opt.value;
                       return (
                         <button
                           key={opt.value}
-                          onClick={() => { setSort(opt.value); setFilterOpen(false); }}
+                          onClick={() => setTempSort(opt.value)}
                           className="group py-3.5 flex items-center gap-4 text-left transition-all duration-500"
                         >
                           <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 shrink-0 ${isActive ? 'bg-gold scale-100' : 'bg-transparent scale-0 group-hover:bg-gold/30 group-hover:scale-100'}`} />
@@ -467,11 +491,11 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
                   <div className="flex flex-col gap-1 py-2">
                     {brands.map(b => {
                       const name = typeof b === 'string' ? b : b.name;
-                      const isActive = activeBrand === name;
+                      const isActive = tempBrand === name;
                       return (
                         <button
                           key={name}
-                          onClick={() => { setBrand(name); setFilterOpen(false); }}
+                          onClick={() => setTempBrand(name)}
                           className="group py-3 flex items-center justify-between transition-all duration-500"
                         >
                           <span
@@ -490,13 +514,21 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
 
               <div className="mt-auto pt-10">
                 <button
-                  onClick={() => { resetFilters(); setFilterOpen(false); }}
-                  className="group relative w-full py-6 transition-all duration-700"
+                  onClick={applyFilters}
+                  className="group relative w-full py-6 transition-all duration-700 overflow-hidden"
                 >
-                  <div className="absolute inset-0 border border-gold/20 scale-100 group-hover:scale-[1.02] transition-transform duration-700" />
-                  <span className="relative z-10 text-gold text-[9px] tracking-[0.4em] uppercase font-bold group-hover:text-gold/60 transition-colors" style={{ fontFamily: 'var(--font-inter)' }}>
-                    Reset Archive
+                  <div className="absolute inset-0 bg-gold translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                  <div className="absolute inset-0 border border-gold scale-100 group-hover:scale-[1.02] transition-transform duration-700" />
+                  <span className="relative z-10 text-gold text-[9px] tracking-[0.4em] uppercase font-black group-hover:text-navy transition-colors duration-500" style={{ fontFamily: 'var(--font-inter)' }}>
+                    Apply Archive
                   </span>
+                </button>
+
+                <button
+                  onClick={() => { resetFilters(); setFilterOpen(false); }}
+                  className="w-full mt-4 py-2 text-[8px] tracking-[0.3em] uppercase text-gold/40 hover:text-gold transition-colors font-mono"
+                >
+                  Reset Archive
                 </button>
 
                 <div className="flex justify-between items-center px-1 mt-8 opacity-20">

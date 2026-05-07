@@ -322,6 +322,10 @@ export default function ProductDetailClient({ product, similarProducts }) {
                       <span style={{ fontStyle: 'normal' }}>.</span>
                     </span>
                   </motion.h1>
+                  <div className="flex items-center gap-2 mt-4 opacity-40">
+                    <span className="font-mono text-[9px] tracking-[0.4em] uppercase text-cream">Model No.</span>
+                    <span className="font-mono text-[9px] tracking-[0.4em] uppercase text-gold font-bold">{product.sku || 'N/A'}</span>
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap gap-3">
@@ -370,6 +374,22 @@ export default function ProductDetailClient({ product, similarProducts }) {
                   </div>
                 </div>
               </motion.div>
+
+              {product.description && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
+                  className="pt-12 border-t border-gold/10"
+                >
+                  <div className="space-y-4">
+                    <span className="font-mono text-[9px] tracking-[0.5em] text-gold uppercase opacity-60">The Narrative</span>
+                    <p className="font-serif text-xl md:text-2xl text-cream/80 leading-relaxed italic">
+                      {product.description}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
             </header>
 
             <motion.div
@@ -394,19 +414,19 @@ export default function ProductDetailClient({ product, similarProducts }) {
                   <ul className="grid grid-cols-2 gap-y-8 gap-x-16">
                     <li className="flex flex-col gap-2">
                       <span className="font-mono text-[10px] tracking-[0.4em] text-gold/70 uppercase font-bold">Architecture</span>
-                      <span className="text-2xl font-serif italic text-cream tracking-tight">Rectangular</span>
+                      <span className="text-2xl font-serif italic text-cream tracking-tight">{product.architecture || 'Rectangular'}</span>
                     </li>
                     <li className="flex flex-col gap-2">
                       <span className="font-mono text-[10px] tracking-[0.4em] text-gold/70 uppercase font-bold">Primary Material</span>
-                      <span className="text-2xl font-serif italic text-cream tracking-tight">High-Grade Alloy</span>
+                      <span className="text-2xl font-serif italic text-cream tracking-tight">{product.material || 'High-Grade Alloy'}</span>
                     </li>
                     <li className="flex flex-col gap-2">
                       <span className="font-mono text-[10px] tracking-[0.4em] text-gold/70 uppercase font-bold">Silhouette</span>
-                      <span className="text-2xl font-serif italic text-cream tracking-tight">Minimalist</span>
+                      <span className="text-2xl font-serif italic text-cream tracking-tight">{product.silhouette || 'Minimalist'}</span>
                     </li>
                     <li className="flex flex-col gap-2">
                       <span className="font-mono text-[10px] tracking-[0.4em] text-gold/70 uppercase font-bold">Finish</span>
-                      <span className="text-2xl font-serif italic text-cream tracking-tight">Matte / Polished</span>
+                      <span className="text-2xl font-serif italic text-cream tracking-tight">{product.finish || 'Matte / Polished'}</span>
                     </li>
                   </ul>
                 </div>
@@ -419,11 +439,11 @@ export default function ProductDetailClient({ product, similarProducts }) {
                   <ul className="grid grid-cols-2 gap-y-8 gap-x-16">
                     <li className="flex flex-col gap-2">
                       <span className="font-mono text-[10px] tracking-[0.4em] text-gold/70 uppercase font-bold">Silhouette</span>
-                      <span className="text-2xl font-serif italic text-cream tracking-tight">40mm Sweep</span>
+                      <span className="text-2xl font-serif italic text-cream tracking-tight">{product.lensSweep || '40mm Sweep'}</span>
                     </li>
                     <li className="flex flex-col gap-2">
                       <span className="font-mono text-[10px] tracking-[0.4em] text-gold/70 uppercase font-bold">Protection</span>
-                      <span className="text-2xl font-serif italic text-cream tracking-tight">UV400 Certified</span>
+                      <span className="text-2xl font-serif italic text-cream tracking-tight">{product.protection || 'UV400 Certified'}</span>
                     </li>
                   </ul>
                 </div>

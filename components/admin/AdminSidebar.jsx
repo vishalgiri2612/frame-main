@@ -8,7 +8,8 @@ import {
   Users, 
   MessageSquare, 
   LogOut,
-  Settings
+  Settings,
+  Ticket
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { signOut } from 'next-auth/react';
@@ -18,6 +19,7 @@ const menuItems = [
   { id: 'products', label: 'Products', icon: Package, href: '/admin/products' },
   { id: 'orders', label: 'Orders', icon: ShoppingCart, href: '/admin/orders' },
   { id: 'users', label: 'Customers', icon: Users, href: '/admin/users' },
+  { id: 'coupons', label: 'Coupons', icon: Ticket, href: '/admin/promotions' },
   { id: 'support', label: 'Support', icon: MessageSquare, href: '/admin/support' },
 ];
 

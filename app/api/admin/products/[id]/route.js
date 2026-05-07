@@ -94,7 +94,12 @@ function buildUpdate(payload) {
     update.description = payload.description.trim();
   }
 
-  if (typeof payload.image === "string") {
+  if (Array.isArray(payload.images)) {
+    update.images = payload.images.map(img => img.trim()).filter(Boolean);
+    if (update.images.length > 0) {
+      update.image = update.images[0];
+    }
+  } else if (typeof payload.image === "string") {
     update.image = payload.image.trim();
     update.images = update.image ? [update.image] : [];
   }
@@ -105,6 +110,45 @@ function buildUpdate(payload) {
 
   if (payload.featured !== undefined) {
     update.featured = Boolean(payload.featured);
+  }
+
+  if (typeof payload.colour === "string") {
+    update.colour = payload.colour.trim();
+  }
+
+  if (typeof payload.size === "string") {
+    update.size = payload.size.trim();
+  }
+
+  if (typeof payload.architecture === "string") {
+    update.architecture = payload.architecture.trim();
+  }
+
+  if (typeof payload.material === "string") {
+    update.material = payload.material.trim();
+  }
+
+  if (typeof payload.silhouette === "string") {
+    update.silhouette = payload.silhouette.trim();
+  }
+
+  if (typeof payload.finish === "string") {
+    update.finish = payload.finish.trim();
+  }
+
+  if (typeof payload.lensSweep === "string") {
+    update.lensSweep = payload.lensSweep.trim();
+  }
+
+  if (typeof payload.protection === "string") {
+    update.protection = payload.protection.trim();
+  }
+
+  if (payload.extraDisc !== undefined) {
+    const extraDisc = Number(payload.extraDisc);
+    if (Number.isFinite(extraDisc)) {
+      update.extraDisc = extraDisc;
+    }
   }
 
   if (payload.price !== undefined) {
