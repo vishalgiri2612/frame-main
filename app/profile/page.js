@@ -18,7 +18,10 @@ import {
   Bell,
   Heart,
   ShoppingBag,
-  ExternalLink
+  ExternalLink,
+  Edit2,
+  Check,
+  X
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useWishlist } from '@/components/providers/WishlistProvider';
@@ -53,6 +56,7 @@ export default function ProfilePage() {
     gender: ''
   });
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -83,7 +87,7 @@ export default function ProfilePage() {
   };
 
   const handleUpdateProfile = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setIsUpdating(true);
     try {
       const res = await fetch('/api/user/profile', {
@@ -93,7 +97,8 @@ export default function ProfilePage() {
       });
 
       if (res.ok) {
-        toast.success('Profile Updated');
+        toast.success('Profile Updated Successfully');
+        setIsEditing(false);
         router.refresh();
       } else {
         toast.error('Update failed');
@@ -225,77 +230,134 @@ export default function ProfilePage() {
                   className="space-y-10"
                 >
                   <div className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
-                     <div className="px-8 py-6 border-b border-zinc-100 bg-zinc-50/50">
-                        <h3 className="text-lg font-bold text-zinc-900">Basic Identity & Contact</h3>
-                        <p className="text-xs text-zinc-500 mt-0.5">Your essential information for communications and alerts.</p>
+                     <div className="px-8 py-6 border-b border-zinc-100 bg-zinc-50/50 flex justify-between items-center">
+                        <div>
+                           <h3 className="text-lg font-bold text-zinc-900">Basic Identity & Contact</h3>
+                           <p className="text-xs text-zinc-500 mt-0.5">Your essential information for communications and alerts.</p>
+                        </div>
+                        {!isEditing ? (
+                           <button 
+                              onClick={() => setIsEditing(true)}
+                              className="flex items-center gap-2 px-4 py-2 border border-zinc-200 rounded-lg text-xs font-bold text-zinc-600 hover:bg-zinc-50 transition-all"
+                           >
+                              <Edit2 size={14} /> Edit Profile
+                           </button>
+                        ) : (
+                           <button 
+                              onClick={() => setIsEditing(false)}
+                              className="flex items-center gap-2 px-4 py-2 border border-red-100 rounded-lg text-xs font-bold text-red-600 hover:bg-red-50 transition-all"
+                           >
+                              <X size={14} /> Cancel
+                           </button>
+                        )}
                      </div>
-                     <form onSubmit={handleUpdateProfile} className="p-8 space-y-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                           <div className="space-y-2">
+                     
+                     <div className="p-8 space-y-10">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-10">
+                           {/* Full Name */}
+                           <div className="space-y-3">
                               <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Full Name</label>
-                              <input 
-                                 type="text"
-                                 value={profileData.name}
-                                 onChange={e => setProfileData({...profileData, name: e.target.value})}
-                                 className="block w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm bg-zinc-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-900 transition-all"
-                              />
+                              {isEditing ? (
+                                 <input 
+                                    type="text"
+                                    value={profileData.name}
+                                    onChange={e => setProfileData({...profileData, name: e.target.value})}
+                                    className="block w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm bg-zinc-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-900 transition-all"
+                                 />
+                              ) : (
+                                 <p className="text-sm font-semibold text-zinc-900 py-1 border-b border-transparent">{profileData.name || 'Not Provided'}</p>
+                              )}
                            </div>
-                           <div className="space-y-2">
+
+                           {/* Email */}
+                           <div className="space-y-3">
                               <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Email Address</label>
-                              <input 
-                                 type="email"
-                                 readOnly
-                                 value={profileData.email}
-                                 className="block w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm bg-zinc-100 text-zinc-500 cursor-not-allowed outline-none"
-                              />
+                              <p className="text-sm font-semibold text-zinc-500 py-1 flex items-center gap-2">
+                                 {profileData.email}
+                                 <span className="text-[9px] bg-zinc-100 text-zinc-500 px-1.5 py-0.5 rounded border border-zinc-200 font-bold uppercase">Locked</span>
+                              </p>
                            </div>
-                           <div className="space-y-2">
+
+                           {/* Mobile */}
+                           <div className="space-y-3">
                               <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Mobile Number</label>
-                              <input 
-                                 type="tel"
-                                 placeholder="+91 00000 00000"
-                                 value={profileData.phone}
-                                 onChange={e => setProfileData({...profileData, phone: e.target.value})}
-                                 className="block w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm bg-zinc-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-900 transition-all"
-                              />
-                              <p className="text-[10px] text-zinc-400 italic">Used for order SMS / WhatsApp alerts</p>
+                              {isEditing ? (
+                                 <div className="space-y-2">
+                                    <input 
+                                       type="tel"
+                                       placeholder="+91 00000 00000"
+                                       value={profileData.phone}
+                                       onChange={e => setProfileData({...profileData, phone: e.target.value})}
+                                       className="block w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm bg-zinc-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-900 transition-all"
+                                    />
+                                    <p className="text-[10px] text-zinc-400 italic">Used for order SMS / WhatsApp alerts</p>
+                                 </div>
+                              ) : (
+                                 <p className="text-sm font-semibold text-zinc-900 py-1">{profileData.phone || 'Not Provided'}</p>
+                              )}
                            </div>
-                           <div className="space-y-2">
+
+                           {/* DOB */}
+                           <div className="space-y-3">
                               <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Date of Birth</label>
-                              <input 
-                                 type="date"
-                                 value={profileData.dob}
-                                 onChange={e => setProfileData({...profileData, dob: e.target.value})}
-                                 className="block w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm bg-zinc-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-900 transition-all"
-                              />
-                              <p className="text-[10px] text-zinc-400 italic">We share special treats on your birthday</p>
+                              {isEditing ? (
+                                 <div className="space-y-2">
+                                    <input 
+                                       type="date"
+                                       value={profileData.dob}
+                                       onChange={e => setProfileData({...profileData, dob: e.target.value})}
+                                       className="block w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm bg-zinc-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-900 transition-all"
+                                    />
+                                    <p className="text-[10px] text-zinc-400 italic">We share special treats on your birthday</p>
+                                 </div>
+                              ) : (
+                                 <p className="text-sm font-semibold text-zinc-900 py-1">
+                                    {profileData.dob ? new Date(profileData.dob).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Not Provided'}
+                                 </p>
+                              )}
                            </div>
-                           <div className="space-y-2">
+
+                           {/* Gender */}
+                           <div className="space-y-3">
                               <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Gender</label>
-                              <select 
-                                 value={profileData.gender}
-                                 onChange={e => setProfileData({...profileData, gender: e.target.value})}
-                                 className="block w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm bg-zinc-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-900 transition-all appearance-none"
-                              >
-                                 <option value="">Select Gender</option>
-                                 <option value="male">Male</option>
-                                 <option value="female">Female</option>
-                                 <option value="other">Other</option>
-                                 <option value="prefer_not_to_say">Prefer not to say</option>
-                              </select>
+                              {isEditing ? (
+                                 <select 
+                                    value={profileData.gender}
+                                    onChange={e => setProfileData({...profileData, gender: e.target.value})}
+                                    className="block w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm bg-zinc-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-900 transition-all appearance-none"
+                                 >
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                    <option value="prefer_not_to_say">Prefer not to say</option>
+                                 </select>
+                              ) : (
+                                 <p className="text-sm font-semibold text-zinc-900 py-1 capitalize">{profileData.gender?.replace(/_/g, ' ') || 'Not Provided'}</p>
+                              )}
                            </div>
                         </div>
 
-                        <div className="pt-4 border-t border-zinc-100 flex justify-end">
-                           <button 
-                              type="submit"
-                              disabled={isUpdating}
-                              className="px-8 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-bold hover:bg-zinc-800 transition-all disabled:opacity-50"
-                           >
-                              {isUpdating ? 'Saving...' : 'Update Identity'}
-                           </button>
-                        </div>
-                     </form>
+                        {isEditing && (
+                           <div className="pt-8 border-t border-zinc-100 flex justify-end gap-4">
+                              <button 
+                                 type="button"
+                                 onClick={() => setIsEditing(false)}
+                                 className="px-6 py-2.5 border border-zinc-200 rounded-lg text-sm font-bold text-zinc-500 hover:bg-zinc-50 transition-all"
+                              >
+                                 Discard
+                              </button>
+                              <button 
+                                 type="button"
+                                 onClick={handleUpdateProfile}
+                                 disabled={isUpdating}
+                                 className="flex items-center gap-2 px-8 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-bold hover:bg-zinc-800 transition-all disabled:opacity-50 shadow-lg"
+                              >
+                                 {isUpdating ? 'Saving...' : <><Check size={16} /> Save Changes</>}
+                              </button>
+                           </div>
+                        )}
+                     </div>
                   </div>
                 </motion.div>
               )}
