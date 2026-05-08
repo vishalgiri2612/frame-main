@@ -9,6 +9,7 @@ import { ChevronRight, Shield, Zap, RefreshCw, Layers, ShoppingBag, X, ChevronLe
 import { useCart } from '@/components/providers/CartProvider';
 
 const SimilarProductCard = ({ p, i }) => {
+  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [imageIdx, setImageIdx] = useState(0);
 
@@ -41,7 +42,7 @@ const SimilarProductCard = ({ p, i }) => {
       className="group cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => window.location.href = `/shop/${p.id}`}
+      onClick={() => router.push(`/shop/${p.id}`)}
     >
       {/* Image */}
       <div

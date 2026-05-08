@@ -1,4 +1,4 @@
-import { getProductByIdDB, getProductsDB } from '@/lib/feed';
+import { getProductByIdDB, getSimilarProductsDB } from '@/lib/feed';
 import ProductDetailClient from '@/components/shop/ProductDetailClient';
 import { notFound } from 'next/navigation';
 
@@ -18,10 +18,7 @@ export default async function ProductPage({ params }) {
   }
 
   // Fetch similar products (maybe just first 4 for now)
-  const allProducts = await getProductsDB();
-  const similarProducts = allProducts
-    .filter(p => p.id !== product.id && (p.category === product.category || p.brand === product.brand))
-    .slice(0, 4);
+  const similarProducts = await getSimilarProductsDB(product, 4);
 
   return <ProductDetailClient product={product} similarProducts={similarProducts} />;
 }

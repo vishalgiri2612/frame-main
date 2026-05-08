@@ -1,4 +1,4 @@
-import { getProductsDB } from '@/lib/feed';
+import { getProductsDB, getFeaturedProductsDB } from '@/lib/feed';
 import Footer from '@/components/layout/Footer';
 import Hero from '@/components/sections/Hero';
 import BrandMarquee from '@/components/sections/BrandMarquee';
@@ -12,9 +12,7 @@ import TheRevealLoader from '@/components/ui/TheRevealLoader';
 
 export default async function Home() {
   try {
-    const products = await getProductsDB();
-    const featuredProducts = products.filter((p) => p.featured).slice(0, 6);
-    const displayProducts = featuredProducts.length > 0 ? featuredProducts : products.slice(0, 6);
+    const displayProducts = await getFeaturedProductsDB(6);
 
     return (
       <main className="min-h-screen transition-colors duration-500" style={{ background: 'var(--navy)' }}>
