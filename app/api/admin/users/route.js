@@ -17,7 +17,9 @@ export async function GET(request) {
 
     const role = searchParams.get("role");
     const query = {
-      ...(role && VALID_ROLES.includes(role) ? { role } : {}),
+      ...(role ? { 
+        role: { $regex: new RegExp(`^${role}$`, 'i') } 
+      } : {}),
     };
 
     const term = searchParams.get("q");
@@ -25,18 +27,54 @@ export async function GET(request) {
       query.$or = [containsFilter("name", term), containsFilter("email", term)];
     }
 
+    // Aggregation pipeline to get users with stats
+    const pipeline = [
+      { $match: query },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      // Join with orders
+      {
+        $lookup: {
+          from: "orders",
+          let: { userId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    { $eq: ["$userId", { $toString: "$$userId" }] },
+                    { $eq: ["$userId", "$$userId" ] }
+                  ]
+                }
+              }
+            }
+          ],
+          as: "userOrders"
+        }
+      },
+      // Calculate stats
+      {
+        $addFields: {
+          stats: {
+            cartCount: { $size: { $ifNull: ["$cart", []] } },
+            wishlistCount: { $size: { $ifNull: ["$wishlist", []] } },
+            orderCount: { $size: "$userOrders" },
+            totalSpent: { $sum: "$userOrders.total" }
+          }
+        }
+      },
+      {
+        $project: {
+          password: 0,
+          emailVerified: 0,
+          userOrders: 0
+        }
+      }
+    ];
+
     const [items, total] = await Promise.all([
-      db.collection("users")
-        .find(query, {
-          projection: {
-            password: 0,
-            emailVerified: 0,
-          },
-        })
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .toArray(),
+      db.collection("users").aggregate(pipeline).toArray(),
       db.collection("users").countDocuments(query),
     ]);
 

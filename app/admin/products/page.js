@@ -27,6 +27,8 @@ const DEFAULT_FORM = {
   finish: '',
   lensSweep: '',
   protection: '',
+  topSelling: false,
+  gender: 'UNISEX',
 };
 
 export default function ProductManagement() {
@@ -151,6 +153,8 @@ export default function ProductManagement() {
       finish: product.finish || '',
       lensSweep: product.lensSweep || '',
       protection: product.protection || '',
+      topSelling: Boolean(product.topSelling),
+      gender: product.gender || 'UNISEX',
     });
     setError('');
     setIsModalOpen(true);
@@ -349,7 +353,14 @@ export default function ProductManagement() {
                             </div>
                           )}
                           <div>
-                            <div className="text-sm font-semibold text-zinc-900">{product.name}</div>
+                            <div className="flex items-center gap-2">
+                              <div className="text-sm font-semibold text-zinc-900">{product.name}</div>
+                              {product.topSelling && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-gold/10 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-tighter text-gold ring-1 ring-inset ring-gold/20">
+                                  Top 5
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -487,13 +498,24 @@ export default function ProductManagement() {
                        </div>
                     </div>
 
-                   <div className="space-y-1.5">
-                        <label className="text-sm font-medium text-zinc-700">Status</label>
-                        <select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm bg-white">
-                          <option value="ACTIVE">Active</option>
-                          <option value="DRAFT">Draft</option>
-                          <option value="ARCHIVED">Archived</option>
-                        </select>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-1.5">
+                           <label className="text-sm font-medium text-zinc-700">Status</label>
+                           <select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm bg-white">
+                             <option value="ACTIVE">Active</option>
+                             <option value="DRAFT">Draft</option>
+                             <option value="ARCHIVED">Archived</option>
+                           </select>
+                      </div>
+                      <div className="space-y-1.5">
+                           <label className="text-sm font-medium text-zinc-700">Target Gender</label>
+                           <select value={form.gender} onChange={(event) => setForm({ ...form, gender: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm bg-white">
+                             <option value="UNISEX">Unisex</option>
+                             <option value="MALE">Male</option>
+                             <option value="FEMALE">Female</option>
+                             <option value="CHILD">Child</option>
+                           </select>
+                      </div>
                    </div>
 
                    <div className="space-y-3">
@@ -588,13 +610,25 @@ export default function ProductManagement() {
                        </div>
                     </div>
 
-                   <div className="flex items-center gap-3 bg-zinc-50 p-4 rounded-lg border border-zinc-200">
-                     <div className="flex h-5 items-center">
-                       <input id="featured" type="checkbox" checked={form.featured} onChange={(event) => setForm({ ...form, featured: event.target.checked })} className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900" />
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                     <div className="flex items-center gap-3 bg-zinc-50 p-4 rounded-lg border border-zinc-200">
+                       <div className="flex h-5 items-center">
+                         <input id="featured" type="checkbox" checked={form.featured} onChange={(event) => setForm({ ...form, featured: event.target.checked })} className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900" />
+                       </div>
+                       <div className="text-sm">
+                         <label htmlFor="featured" className="font-medium text-zinc-700">Featured Product</label>
+                         <p className="text-[10px] text-zinc-500">Show in main frames section.</p>
+                       </div>
                      </div>
-                     <div className="text-sm">
-                       <label htmlFor="featured" className="font-medium text-zinc-700">Featured Product</label>
-                       <p className="text-zinc-500">Highlight this item on the homepage showcase.</p>
+
+                     <div className="flex items-center gap-3 bg-gold/5 p-4 rounded-lg border border-gold/10">
+                       <div className="flex h-5 items-center">
+                         <input id="topSelling" type="checkbox" checked={form.topSelling} onChange={(event) => setForm({ ...form, topSelling: event.target.checked })} className="h-4 w-4 rounded border-gold/30 text-gold focus:ring-gold" />
+                       </div>
+                       <div className="text-sm">
+                         <label htmlFor="topSelling" className="font-medium text-zinc-900">Top 5 Selling</label>
+                         <p className="text-[10px] text-zinc-500">Feature in premium top-5 list.</p>
+                       </div>
                      </div>
                    </div>
                 </form>

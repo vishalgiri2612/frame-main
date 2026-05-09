@@ -2,73 +2,8 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
-const brands = [
-  {
-    slug: "ray-ban",
-    name: "Ray-Ban",
-    // origin: "Milan, Italy",
-    year: "1937",
-    count: 142,
-    image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb3025_001_58_030a_new.png",
-    accent: "#FF3333",
-  },
-  {
-    slug: "oakley",
-    name: "Oakley",
-    // origin: "California, USA",
-    year: "1975",
-    count: 89,
-    image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__684532__p21__shad__al2_1.png",
-    accent: "#FF7700",
-  },
-  {
-    slug: "gucci",
-    name: "Gucci",
-    // origin: "Florence, Italy",
-    year: "1921",
-    count: 112,
-    image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb3447_919631_030a.png",
-    accent: "#00FF87",
-  },
-  {
-    slug: "prada",
-    name: "Prada",
-    // origin: "Milan, Italy",
-    year: "1913",
-    count: 76,
-    image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb2224__901_32__p21__shad__al2.png",
-    accent: "#C9A84C",
-  },
-  {
-    slug: "versace",
-    name: "Versace",
-    // origin: "Reggio Calabria, Italy",
-    year: "1978",
-    count: 94,
-    image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb3025_001_58_030a_new.png",
-    accent: "#FFD700",
-  },
-  {
-    slug: "tom-ford",
-    name: "Tom Ford",
-    // origin: "Austin, USA",
-    year: "2005",
-    count: 65,
-    image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb0832s__684532__p21__shad__al2_1.png",
-    accent: "#FF007F",
-  },
-  {
-    slug: "carrera",
-    name: "Carrera",
-    // origin: "Verona, Italy",
-    year: "1956",
-    count: 54,
-    image: "https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rb3447_919631_030a.png",
-    accent: "#00d2ff",
-  },
-];
-
-export default function BrandShowcase() {
+export default function BrandShowcase({ brands = [] }) {
+  if (!brands || brands.length === 0) return null;
   return (
     <section className="pt-16 pb-8 md:pt-20 md:pb-10 bg-navy relative overflow-hidden">
       <div className="container mx-auto px-6 relative z-10">
@@ -101,30 +36,26 @@ export default function BrandShowcase() {
 
         {/* Bento Grid Layout */}
         <div className="grid grid-cols-2 md:grid-cols-12 gap-5 md:gap-6 auto-rows-[220px] sm:auto-rows-[260px] md:auto-rows-[300px]">
-          {/* Hero Card — Ray-Ban */}
-          <BrandCard
-            data={brands[0]}
-            className="col-span-2 row-span-2 md:col-span-7 md:row-span-2"
-            isHero
-          />
+          {brands.map((brand, index) => {
+            let layoutClass = "col-span-1 md:col-span-3";
+            let isHero = false;
 
-          {/* Oakley */}
-          <BrandCard
-            data={brands[1]}
-            className="col-span-1 md:col-span-5"
-          />
+            if (index === 0) {
+               layoutClass = "col-span-2 row-span-2 md:col-span-7 md:row-span-2";
+               isHero = true;
+            } else if (index === 1 || index === 2) {
+               layoutClass = "col-span-1 md:col-span-5";
+            }
 
-          {/* Gucci */}
-          <BrandCard
-            data={brands[2]}
-            className="col-span-1 md:col-span-5"
-          />
-
-          {/* Bottom Row — 4 equal cards */}
-          <BrandCard data={brands[3]} className="col-span-1 md:col-span-3" />
-          <BrandCard data={brands[4]} className="col-span-1 md:col-span-3" />
-          <BrandCard data={brands[5]} className="col-span-1 md:col-span-3" />
-          <BrandCard data={brands[6]} className="col-span-1 md:col-span-3" />
+            return (
+              <BrandCard
+                key={brand._id || brand.slug}
+                data={brand}
+                className={layoutClass}
+                isHero={isHero}
+              />
+            );
+          })}
         </div>
       </div>
     </section>

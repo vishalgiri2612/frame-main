@@ -2,9 +2,11 @@
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, Loader2, Search, ShoppingBag } from 'lucide-react';
+import { AlertTriangle, Loader2, Search, ShoppingBag, Eye } from 'lucide-react';
 import { useAdminResource } from '@/hooks/useAdminResource';
 import { adminFetch, formatCurrency, formatDate } from '@/lib/admin/client';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const statusStyles = {
   confirmed: 'text-green-700 border-green-200 bg-green-50',
@@ -20,6 +22,7 @@ export default function OrderManagement() {
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const [updatingId, setUpdatingId] = useState('');
+  const router = useRouter();
 
   const { data, isLoading, refetch } = useAdminResource('/api/admin/orders', {
     q: query,
@@ -122,7 +125,8 @@ export default function OrderManagement() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.03 }}
-                  className="hover:bg-zinc-50/80 transition-colors"
+                  className="hover:bg-zinc-50/80 transition-colors cursor-pointer group/row"
+                  onClick={() => router.push(`/admin/orders/${order.id}`)}
                 >
                   <td className="px-6 py-4 text-xs font-mono font-medium text-zinc-900">{order.orderNumber || '-'}</td>
                   <td className="px-6 py-4">
@@ -138,10 +142,23 @@ export default function OrderManagement() {
                   </td>
                   <td className="px-6 py-4 text-sm text-zinc-500">{formatDate(order.createdAt)}</td>
                   <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end gap-3">
+                      <Link 
+                        href={`/admin/orders/${order.id}`}
+                        className="p-1.5 hover:bg-zinc-100 rounded-md transition-colors text-zinc-500 hover:text-zinc-900 group"
+                        title="View Details"
+                      >
+                        <Eye size={16} className="group-hover:scale-110 transition-transform" />
+                      </Link>
+                      <div className="h-4 w-px bg-zinc-200 mx-1" />
+                      <div className="flex items-center gap-2">
                       <select
                         value={order.status || 'PENDING'}
-                        onChange={(event) => updateOrderStatus(order.id, event.target.value)}
+                        onChange={(event) => {
+                          event.stopPropagation();
+                          updateOrderStatus(order.id, event.target.value);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
                         disabled={updatingId === order.id}
                         className="block bg-white border border-zinc-300 rounded-md py-1.5 pl-3 pr-8 text-xs font-medium text-zinc-700 focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 disabled:opacity-50 shadow-sm"
                       >
@@ -152,7 +169,8 @@ export default function OrderManagement() {
                         <option value="DELIVERED">Delivered</option>
                         <option value="CANCELLED">Cancelled</option>
                       </select>
-                      {updatingId === order.id && <Loader2 className="w-4 h-4 animate-spin text-zinc-500" />}
+                        {updatingId === order.id && <Loader2 className="w-4 h-4 animate-spin text-zinc-500" />}
+                      </div>
                     </div>
                   </td>
                 </motion.tr>

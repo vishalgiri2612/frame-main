@@ -96,6 +96,8 @@ export default function UserManagement() {
                 <th className="px-6 py-4">User ID</th>
                 <th className="px-6 py-4">Identity</th>
                 <th className="px-6 py-4">Role</th>
+                <th className="px-6 py-4 text-center">Activity (Bag/Wish)</th>
+                <th className="px-6 py-4 text-center">Purchases</th>
                 <th className="px-6 py-4">Joined</th>
                 <th className="px-6 py-4 text-right">Access Control</th>
               </tr>
@@ -126,8 +128,29 @@ export default function UserManagement() {
                       user.role === 'ADMIN' ? 'text-indigo-700 border-indigo-200 bg-indigo-50' : 'text-zinc-600 border-zinc-200 bg-zinc-100'
                     }`}>
                       <Shield className="w-3 h-3" />
-                      {user.role || 'USER'}
+                      {user.role?.toUpperCase() || 'USER'}
                     </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col items-center gap-1">
+                      <div className="flex items-center gap-3">
+                         <div className="flex items-center gap-1.5" title="Items in Bag">
+                            <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                            <span className="text-xs font-bold text-zinc-700">{user.stats?.cartCount || 0}</span>
+                         </div>
+                         <div className="flex items-center gap-1.5" title="Items in Wishlist">
+                            <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+                            <span className="text-xs font-bold text-zinc-700">{user.stats?.wishlistCount || 0}</span>
+                         </div>
+                      </div>
+                      <span className="text-[10px] text-zinc-400 uppercase tracking-tighter font-mono">Bag / Wish</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col items-center text-center">
+                       <div className="text-sm font-bold text-zinc-900">{user.stats?.orderCount || 0}</div>
+                       <div className="text-[10px] text-emerald-600 font-mono font-bold">₹{(user.stats?.totalSpent || 0).toLocaleString()}</div>
+                    </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-zinc-500">{formatDate(user.createdAt)}</td>
                   <td className="px-6 py-4 text-right">

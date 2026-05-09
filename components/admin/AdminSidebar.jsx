@@ -9,7 +9,9 @@ import {
   MessageSquare, 
   LogOut,
   Settings,
-  Ticket
+  Ticket,
+  Component,
+  Monitor
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { signOut } from 'next-auth/react';
@@ -17,6 +19,8 @@ import { signOut } from 'next-auth/react';
 const menuItems = [
   { id: 'dashboard', label: 'Overview', icon: LayoutDashboard, href: '/admin' },
   { id: 'products', label: 'Products', icon: Package, href: '/admin/products' },
+  { id: 'brands', label: 'Brands', icon: Component, href: '/admin/brands' },
+  { id: 'hero', label: 'Hero Section', icon: Monitor, href: '/admin/hero' },
   { id: 'orders', label: 'Orders', icon: ShoppingCart, href: '/admin/orders' },
   { id: 'users', label: 'Customers', icon: Users, href: '/admin/users' },
   { id: 'coupons', label: 'Coupons', icon: Ticket, href: '/admin/promotions' },

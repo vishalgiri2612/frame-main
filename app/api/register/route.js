@@ -20,7 +20,7 @@ export async function POST(req) {
 
     // Check if this is the first user in the database
     const userCount = await db.collection("users").countDocuments();
-    const role = userCount === 0 ? "ADMIN" : "user";
+    const role = userCount === 0 ? "ADMIN" : "USER";
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);

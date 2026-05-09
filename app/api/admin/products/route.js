@@ -97,6 +97,7 @@ export async function POST(request) {
       images: Array.isArray(payload.images) ? payload.images.map(img => img.trim()).filter(Boolean) : (payload.image?.trim() ? [payload.image.trim()] : []),
       description: payload.description?.trim() || "",
       featured: Boolean(payload.featured),
+      topSelling: Boolean(payload.topSelling),
       colour: payload.colour?.trim() || "",
       size: payload.size?.trim() || "",
       extraDisc: Number(payload.extraDisc) || 0,
@@ -109,6 +110,7 @@ export async function POST(request) {
       tags: Array.isArray(payload.tags)
         ? payload.tags.map((tag) => String(tag).trim()).filter(Boolean)
         : [],
+      gender: payload.gender || "UNISEX",
       createdAt: asDate(payload.createdAt) || now,
       updatedAt: now,
       createdBy: auth.session?.user?.id || null,

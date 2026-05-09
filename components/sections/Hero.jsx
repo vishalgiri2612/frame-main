@@ -4,13 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default function Hero() {
+export default function Hero({ slides: propSlides = [] }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [progressRunning, setProgressRunning] = useState(true);
-
   const [miniFrameLoaded, setMiniFrameLoaded] = useState(false);
 
-  const slides = [
+  const fallbackSlides = [
     {
       src: "/m1.png",
       frameImg: "/image copy.png",
@@ -45,6 +44,8 @@ export default function Hero() {
       sub: "Sculpting the future of optics with sustainable materials and bold silhouettes. Elevate your everyday style with a vision for tomorrow."
     }
   ];
+
+  const slides = propSlides.length > 0 ? propSlides : fallbackSlides;
 
   const timerRef = useRef(null);
 
@@ -342,20 +343,18 @@ export default function Hero() {
           position: relative;
           width: 400px;
           height: 280px;
-          background: rgba(8, 11, 22, 0.88);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
-          border: 1px solid var(--slide-theme, rgba(212,175,55,0.35));
+          background: rgba(248, 248, 248, 0.94);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid var(--slide-theme, rgba(212,175,55,0.45));
           border-radius: 6px;
           box-shadow:
-            0 0 0 1px rgba(0,0,0,0.6),
-            0 16px 48px rgba(0,0,0,0.7),
-            inset 0 0 40px rgba(212,175,55,0.04),
-            0 0 28px var(--slide-theme-glow, rgba(212,175,55,0.12));
+            0 20px 50px rgba(0,0,0,0.3),
+            inset 0 0 40px rgba(212,175,55,0.05);
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: box-shadow 0.4s ease, border-color 0.4s ease, transform 0.3s ease;
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           overflow: hidden;
           cursor: pointer;
           text-decoration: none;
@@ -429,26 +428,34 @@ export default function Hero() {
 
         .mf-glasses-img {
           width: 100%;
-          height: 140px;
+          height: 100%;
           object-fit: contain;
           object-position: center;
-          /* removed mix-blend-mode: multiply to prevent color change */
-          filter: drop-shadow(0 4px 16px rgba(0,0,0,0.55));
+          mix-blend-mode: multiply;
+          transform: scale(1.45);
+          filter: contrast(1.05);
+          transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .mini-frame-card:hover .mf-glasses-img {
+          transform: scale(1.55);
         }
 
         .mf-glasses-name {
           font-family: var(--font-cormorant), serif;
-          font-size: 1.1rem;
-          font-weight: 400;
+          font-size: 1.15rem;
+          font-weight: 500;
           letter-spacing: 0.05em;
           text-transform: uppercase;
-          color: var(--gold);
+          color: #1a1a1a;
           white-space: nowrap;
           margin-top: 15px;
-          opacity: 0.9;
+          background: rgba(255,255,255,0.5);
+          padding: 4px 12px;
+          border-radius: 4px;
           display: flex;
           justify-content: center;
           gap: 0.3em;
+          z-index: 20;
         }
 
         .mf-glasses-name em {

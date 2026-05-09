@@ -112,6 +112,10 @@ function buildUpdate(payload) {
     update.featured = Boolean(payload.featured);
   }
 
+  if (payload.topSelling !== undefined) {
+    update.topSelling = Boolean(payload.topSelling);
+  }
+
   if (typeof payload.colour === "string") {
     update.colour = payload.colour.trim();
   }
@@ -142,6 +146,10 @@ function buildUpdate(payload) {
 
   if (typeof payload.protection === "string") {
     update.protection = payload.protection.trim();
+  }
+
+  if (typeof payload.gender === "string") {
+    update.gender = payload.gender;
   }
 
   if (payload.extraDisc !== undefined) {

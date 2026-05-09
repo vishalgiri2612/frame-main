@@ -54,6 +54,7 @@ export async function GET(request) {
       },
       {
         $project: {
+          _id: 1,
           orderNumber: { $ifNull: ["$orderNumber", { $concat: ["#", { $substr: [{ $toString: "$_id" }, 18, 6] }] }] },
           customerName: { $ifNull: ["$customerName", "$user.name", "Guest"] },
           customerEmail: { $ifNull: ["$customerEmail", "$user.email", "N/A"] },
