@@ -198,7 +198,7 @@ export default function HeroManagement() {
                       <h3 className="text-2xl font-serif text-zinc-900 mb-2">
                         {slide.titleTop} <span className="italic text-zinc-500">{slide.titleItalic}</span>
                       </h3>
-                      <p className="text-sm text-zinc-500 line-clamp-2 italic">"{slide.sub}"</p>
+                      <p className="text-sm text-zinc-500 line-clamp-2 italic">&quot;{slide.sub}&quot;</p>
                       <p className="text-xs text-zinc-400 mt-4 font-mono">Frame: {slide.frameName}</p>
                     </div>
 
