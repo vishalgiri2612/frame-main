@@ -11,7 +11,8 @@ import {
   Settings,
   Ticket,
   Component,
-  Monitor
+  Monitor,
+  BarChart3
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { signOut } from 'next-auth/react';
@@ -22,6 +23,7 @@ const menuItems = [
   { id: 'brands', label: 'Brands', icon: Component, href: '/admin/brands' },
   { id: 'hero', label: 'Hero Section', icon: Monitor, href: '/admin/hero' },
   { id: 'orders', label: 'Orders', icon: ShoppingCart, href: '/admin/orders' },
+  { id: 'inventory', label: 'Inventory', icon: BarChart3, href: '/admin/inventory' },
   { id: 'users', label: 'Customers', icon: Users, href: '/admin/users' },
   { id: 'coupons', label: 'Coupons', icon: Ticket, href: '/admin/promotions' },
   { id: 'support', label: 'Support', icon: MessageSquare, href: '/admin/support' },

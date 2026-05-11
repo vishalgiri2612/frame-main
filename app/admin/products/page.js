@@ -31,6 +31,19 @@ const DEFAULT_FORM = {
   gender: 'UNISEX',
 };
 
+const PRODUCT_CATEGORIES = [
+  'SUNGLASSES',
+  'EYEGLASSES',
+  'COMPUTER GLASSES',
+  'READING GLASSES',
+  'KIDS GLASSES',
+  'CONTACT LENSES',
+  'ACCESSORIES',
+  'PREMIUM FRAMES',
+  'LUXURY',
+  'SPORTS'
+];
+
 export default function ProductManagement() {
   const [query, setQuery] = useState('');
   const [brand, setBrand] = useState('');
@@ -109,6 +122,9 @@ export default function ProductManagement() {
     status,
     limit: 18,
   });
+
+  const { data: brandsData } = useAdminResource('/api/admin/brands');
+  const availableBrands = brandsData?.items || [];
 
   const products = useMemo(() => data?.items || [], [data]);
   const isMock = Boolean(data?.isMock);
@@ -477,14 +493,34 @@ export default function ProductManagement() {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                       <div className="space-y-1.5">
-                         <label className="text-sm font-medium text-zinc-700">Brand *</label>
-                         <input type="text" value={form.brand} onChange={(event) => setForm({ ...form, brand: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="Ray-Ban" required />
-                       </div>
-                       <div className="space-y-1.5">
-                         <label className="text-sm font-medium text-zinc-700">Category *</label>
-                         <input type="text" value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value.toUpperCase() })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm uppercase" placeholder="SUNGLASSES" required />
-                       </div>
+                        <div className="space-y-1.5">
+                          <label className="text-sm font-medium text-zinc-700">Brand *</label>
+                          <select 
+                            value={form.brand} 
+                            onChange={(event) => setForm({ ...form, brand: event.target.value })} 
+                            className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm bg-white"
+                            required
+                          >
+                            <option value="">Select a Brand</option>
+                            {availableBrands.map((b) => (
+                              <option key={b.id} value={b.name}>{b.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-sm font-medium text-zinc-700">Category *</label>
+                          <select 
+                            value={form.category} 
+                            onChange={(event) => setForm({ ...form, category: event.target.value })} 
+                            className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm bg-white"
+                            required
+                          >
+                            <option value="">Select a Category</option>
+                            {PRODUCT_CATEGORIES.map((cat) => (
+                              <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                          </select>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

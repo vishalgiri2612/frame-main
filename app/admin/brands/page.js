@@ -15,6 +15,7 @@ const DEFAULT_FORM = {
   origin: '',
   order: 0,
   status: 'ACTIVE',
+  showcase: false,
 };
 
 export default function BrandManagement() {
@@ -82,6 +83,7 @@ export default function BrandManagement() {
       origin: brand.origin || '',
       order: brand.order || 0,
       status: brand.status || 'ACTIVE',
+      showcase: brand.showcase || false,
     });
     setIsModalOpen(true);
   };
@@ -136,15 +138,25 @@ export default function BrandManagement() {
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-zinc-900">Brand Management</h1>
-            <p className="text-zinc-500 text-sm">Curate brands for the homepage showcase.</p>
+            <p className="text-zinc-500 text-sm">Manage all brands and select 7 for the homepage showcase.</p>
           </div>
-          <button
-            onClick={openAdd}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-colors shadow-sm"
-          >
-            <Plus className="w-4 h-4" />
-            Add New Brand
-          </button>
+          
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-2 px-3 py-1 bg-zinc-100 rounded-full border border-zinc-200">
+               <div className={`w-2 h-2 rounded-full ${brands.filter(b => b.showcase).length === 7 ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`} />
+               <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">
+                 {brands.filter(b => b.showcase).length} / 7 Homepage Slots
+               </span>
+            </div>
+
+            <button
+              onClick={openAdd}
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-colors shadow-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Add New Brand
+            </button>
+          </div>
         </header>
 
         <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-zinc-200 shadow-sm">
@@ -166,52 +178,100 @@ export default function BrandManagement() {
             <p className="text-zinc-400 text-sm animate-pulse">Loading brands...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredBrands.map((brand) => (
-              <motion.div
-                layout
-                key={brand.id}
-                className="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm hover:shadow-md transition-all group"
-              >
-                <div className="aspect-[16/9] relative bg-zinc-100 flex items-center justify-center p-8">
-                  {brand.image ? (
-                    <img src={brand.image} alt={brand.name} className="w-full h-full object-contain filter drop-shadow-lg" />
-                  ) : (
-                    <ImageIcon className="w-10 h-10 text-zinc-300" />
-                  )}
-                  <div className="absolute top-4 right-4 px-2 py-1 bg-white/80 backdrop-blur-md rounded-md border border-zinc-200 text-[10px] font-mono font-bold text-zinc-500">
-                    EST. {brand.year || 'N/A'}
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full shadow-sm" style={{ backgroundColor: brand.accent }} />
-                      <h3 className="font-bold text-zinc-900">{brand.name}</h3>
-                    </div>
-                    <span className="text-xs font-medium text-zinc-400">Order: {brand.order}</span>
-                  </div>
-                  <div className="flex items-center justify-between pt-4 border-t border-zinc-100">
-                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{brand.count || 0} Styles</span>
-                    <div className="flex items-center gap-2">
+        <div className="bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left whitespace-nowrap">
+              <thead>
+                <tr className="border-b border-zinc-200 bg-zinc-50/80 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                  <th className="px-6 py-4">SNO</th>
+                  <th className="px-6 py-4">Brand Details</th>
+                  <th className="px-6 py-4">Origin</th>
+                  <th className="px-6 py-4">Total Styles</th>
+                  <th className="px-6 py-4">Homepage Showcase</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-200">
+                {filteredBrands.map((brand, i) => (
+                  <motion.tr
+                    key={brand.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: i * 0.02 }}
+                    className="hover:bg-zinc-50/80 transition-colors"
+                  >
+                    <td className="px-6 py-4 text-xs font-mono font-bold text-zinc-400">
+                      {(i + 1).toString().padStart(2, '0')}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-center overflow-hidden p-1.5 shadow-sm">
+                          {brand.image ? <img src={brand.image} className="w-full h-full object-contain mix-blend-multiply" alt="" /> : <ImageIcon className="w-4 h-4 text-zinc-300" />}
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-zinc-900">{brand.name}</div>
+                          <div className="text-[10px] text-zinc-400 font-mono tracking-tighter uppercase">{brand.slug}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-[10px] font-bold text-zinc-500 bg-zinc-100 px-2 py-1 rounded-md uppercase tracking-widest border border-zinc-200">
+                        {brand.origin || 'Global'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-zinc-900">{brand.count || 0}</span>
+                        <span className="text-[10px] text-zinc-400 uppercase tracking-tighter font-medium">Items Active</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
                       <button
-                        onClick={() => openEdit(brand)}
-                        className="p-2 hover:bg-zinc-50 rounded-lg text-zinc-600 transition-colors"
+                        onClick={async () => {
+                          const nextShowcase = !brand.showcase;
+                          if (nextShowcase && brands.filter(b => b.showcase).length >= 7) {
+                            alert("You can only showcase max 7 brands on the homepage.");
+                            return;
+                          }
+                          await adminFetch(`/api/admin/brands/${brand.id}`, {
+                            method: 'PATCH',
+                            body: JSON.stringify({ showcase: nextShowcase })
+                          });
+                          await fetchBrands();
+                        }}
+                        className={`relative inline-flex h-5 w-10 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                          brand.showcase ? 'bg-zinc-900' : 'bg-zinc-200'
+                        }`}
                       >
-                        <Pencil className="w-4 h-4" />
+                        <span
+                          className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                            brand.showcase ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
                       </button>
-                      <button
-                        onClick={() => deleteBrand(brand.id)}
-                        className="p-2 hover:bg-red-50 rounded-lg text-red-600 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => openEdit(brand)}
+                          className="p-2 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-all"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => deleteBrand(brand.id)}
+                          className="p-2 rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-all"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+        </div>
         )}
 
         <AnimatePresence>
@@ -249,58 +309,50 @@ export default function BrandManagement() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Brand Name</label>
+                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Brand Name *</label>
                         <input
                           type="text"
-                          required
                           value={form.name}
-                          onChange={(e) => setForm({ ...form, name: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                          className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900/5 transition-all"
+                          onChange={(e) => setForm({ ...form, name: e.target.value })}
+                          className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900/5 transition-all text-sm"
+                          placeholder="e.g. Ray-Ban"
+                          required
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Slug (URL)</label>
+                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Brand Slug *</label>
                         <input
                           type="text"
-                          required
                           value={form.slug}
                           onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                          className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900/5 transition-all"
+                          className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900/5 transition-all text-sm font-mono"
+                          placeholder="e.g. ray-ban"
+                          required
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Founding Year</label>
+                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Establishment Year</label>
                         <input
                           type="text"
-                          placeholder="e.g. 1937"
                           value={form.year}
                           onChange={(e) => setForm({ ...form, year: e.target.value })}
-                          className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900/5 transition-all"
+                          className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900/5 transition-all text-sm"
+                          placeholder="e.g. 1937"
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Origin / Location</label>
+                        <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Country of Origin</label>
                         <input
                           type="text"
-                          placeholder="e.g. Milan, Italy"
                           value={form.origin}
                           onChange={(e) => setForm({ ...form, origin: e.target.value })}
-                          className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900/5 transition-all"
+                          className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900/5 transition-all text-sm"
+                          placeholder="e.g. Italy"
                         />
                       </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Display Order</label>
-                      <input
-                        type="number"
-                        value={form.order}
-                        onChange={(e) => setForm({ ...form, order: e.target.value })}
-                        className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900/5 transition-all"
-                      />
                     </div>
 
                     <div className="space-y-2">
@@ -321,6 +373,27 @@ export default function BrandManagement() {
                       </div>
                     </div>
 
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Showcase Selection</label>
+                      <div className="flex items-center gap-3 p-4 bg-zinc-50 rounded-xl border border-zinc-200">
+                        <input
+                          type="checkbox"
+                          id="showcase-toggle"
+                          checked={form.showcase}
+                          onChange={(e) => setForm({ ...form, showcase: e.target.checked })}
+                          className="w-5 h-5 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900"
+                        />
+                        <label htmlFor="showcase-toggle" className="text-sm font-medium text-zinc-700 cursor-pointer">
+                          Display in Homepage Bento Grid
+                        </label>
+                      </div>
+                      {form.showcase && brands.filter(b => b.showcase && b.id !== editingBrand?.id).length >= 7 && (
+                        <p className="text-[10px] text-amber-600 font-bold">
+                           ⚠️ You already have 7 brands selected. Please deselect another one for optimal layout.
+                        </p>
+                      )}
+                    </div>
+                    
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Brand Image / Logo</label>
                       <div className="flex items-center gap-4">

@@ -49,6 +49,7 @@ export async function POST(request) {
       origin: payload.origin?.trim() || "",
       order: Number(payload.order) || 0,
       status: payload.status || "ACTIVE",
+      showcase: Boolean(payload.showcase),
       createdAt: now,
       updatedAt: now,
     };

@@ -27,6 +27,7 @@ export async function PATCH(request, { params }) {
     if (payload.origin !== undefined) update.origin = payload.origin.trim();
     if (payload.order !== undefined) update.order = Number(payload.order);
     if (payload.status) update.status = payload.status;
+    if (payload.showcase !== undefined) update.showcase = Boolean(payload.showcase);
 
     const result = await db.collection("brands").updateOne(
       { _id: new ObjectId(id) },

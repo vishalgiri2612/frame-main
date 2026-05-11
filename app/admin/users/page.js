@@ -2,19 +2,33 @@
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, Loader2, Search, Shield, User as UserIcon } from 'lucide-react';
+import { 
+  AlertTriangle, 
+  Loader2, 
+  Search, 
+  Shield, 
+  User as UserIcon,
+  UserPlus,
+  Users,
+  Heart,
+  ShoppingBag
+} from 'lucide-react';
 import { useAdminResource } from '@/hooks/useAdminResource';
 import { adminFetch, formatDate } from '@/lib/admin/client';
 
 export default function UserManagement() {
    const [query, setQuery] = useState('');
    const [role, setRole] = useState('');
+   const [sortBy, setSortBy] = useState('createdAt');
+   const [order, setOrder] = useState('desc');
    const [updatingId, setUpdatingId] = useState('');
    const [error, setError] = useState('');
 
    const { data, isLoading, refetch } = useAdminResource('/api/admin/users', {
       q: query,
       role,
+      sort: sortBy,
+      order,
       limit: 30,
    });
 
@@ -46,6 +60,41 @@ export default function UserManagement() {
         </div>
       </header>
 
+      {/* Customer Insights */}
+      {!isLoading && data?.summary && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <InsightCard 
+            title="Total Customers" 
+            value={data.summary.total} 
+            icon={Users} 
+            color="text-blue-600" 
+            bg="bg-blue-50" 
+          />
+          <InsightCard 
+            title="New Today" 
+            value={data.summary.newToday} 
+            icon={UserPlus} 
+            color="text-emerald-600" 
+            bg="bg-emerald-50" 
+            trend="+New"
+          />
+          <InsightCard 
+            title="Avg Wishlist" 
+            value={data.summary.engagement.avgWishlist.toFixed(1)} 
+            icon={Heart} 
+            color="text-rose-600" 
+            bg="bg-rose-50" 
+          />
+          <InsightCard 
+            title="Avg Cart Size" 
+            value={data.summary.engagement.avgCart.toFixed(1)} 
+            icon={ShoppingBag} 
+            color="text-indigo-600" 
+            bg="bg-indigo-50" 
+          />
+        </div>
+      )}
+
       {/* Filters */}
       <section className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-3">
         <div className="relative md:col-span-3">
@@ -69,6 +118,26 @@ export default function UserManagement() {
           <option value="ADMIN">Admin</option>
           <option value="USER">User</option>
         </select>
+        
+        <div className="flex gap-2">
+          <select
+            value={sortBy}
+            onChange={(event) => setSortBy(event.target.value)}
+            className="block flex-1 pl-3 pr-10 py-2.5 border border-zinc-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-colors shadow-sm"
+          >
+            <option value="createdAt">Joined Date</option>
+            <option value="name">Customer Name</option>
+            <option value="totalSpent">Total Spent</option>
+            <option value="cartCount">Cart Size</option>
+            <option value="wishlistCount">Wishlist Size</option>
+          </select>
+          <button 
+            onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
+            className="px-3 py-2.5 border border-zinc-200 rounded-lg bg-white text-xs font-bold text-zinc-600 hover:bg-zinc-50 transition-colors shadow-sm uppercase"
+          >
+            {order === 'asc' ? 'ASC ↑' : 'DESC ↓'}
+          </button>
+        </div>
       </section>
 
       {error && (
@@ -190,5 +259,26 @@ export default function UserManagement() {
         <span>{isLoading ? 'Synchronizing...' : `Loaded ${users.length} users`}</span>
       </footer>
     </AdminLayout>
+  );
+}
+
+function InsightCard({ title, value, icon: Icon, color, bg, trend }) {
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white p-5 rounded-xl border border-zinc-200 shadow-sm flex items-center gap-4"
+    >
+      <div className={`p-3 rounded-lg ${bg}`}>
+        <Icon className={`w-5 h-5 ${color}`} />
+      </div>
+      <div>
+        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{title}</p>
+        <div className="flex items-baseline gap-2">
+           <p className="text-xl font-bold text-zinc-900">{value}</p>
+           {trend && <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded uppercase tracking-tighter">{trend}</span>}
+        </div>
+      </div>
+    </motion.div>
   );
 }

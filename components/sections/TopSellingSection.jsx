@@ -21,13 +21,7 @@ const TopProductCard = ({ product, index }) => {
       className="relative flex-shrink-0 w-[300px] md:w-[400px] group cursor-pointer"
     >
       <div className="relative aspect-[4/5] bg-zinc-50 overflow-hidden border border-zinc-100 rounded-2xl transition-all duration-700 group-hover:border-gold/30 shadow-xl group-hover:shadow-2xl">
-        {/* Rank Number */}
-        <div className="absolute top-6 left-6 z-10 flex items-baseline gap-1">
-          <span className="text-4xl md:text-6xl font-black italic text-zinc-200/50 group-hover:text-gold/20 transition-colors duration-500 font-serif">
-            0{index + 1}
-          </span>
-          {index === 0 && <Trophy className="w-4 h-4 text-gold animate-bounce" />}
-        </div>
+
 
         {/* Image */}
         <div className="absolute inset-0 flex items-center justify-center p-8 transition-transform duration-700 group-hover:scale-110">
