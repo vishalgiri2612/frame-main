@@ -144,12 +144,9 @@ export default function BrandDetailClient({ collection, products }) {
 
   useEffect(() => {
     setMounted(true);
-    const timers = [
-      setTimeout(() => setVisionStage(1), 800),
-      setTimeout(() => setVisionStage(2), 2400),
-      setTimeout(() => setVisionStage(3), 3800),
-    ];
-    return () => timers.forEach((timer) => clearTimeout(timer));
+    // Simplified 2-second brand name visibility as requested
+    const timer = setTimeout(() => setVisionStage(3), 1500);
+    return () => clearTimeout(timer);
   }, []);
 
   if (!mounted) return null;
@@ -160,29 +157,27 @@ export default function BrandDetailClient({ collection, products }) {
         {visionStage < 3 && (
           <motion.div
             key="optical-overlay"
-            exit={{ opacity: 0, scale: 1.5, filter: 'blur(40px)', transition: { duration: 1.2, ease: [0.7, 0, 0.3, 1] } }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ 
+              opacity: 0, 
+              scale: 1.1,
+              transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } 
+            }}
             className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-navy"
           >
-            <div className="relative flex items-center justify-center w-full">
-              <motion.h1
-                animate={{
-                  filter: visionStage === 0 ? 'blur(60px)' : visionStage === 1 ? 'blur(30px)' : 'blur(8px)',
-                  scale: visionStage === 0 ? 0.8 : visionStage === 1 ? 0.95 : 1.1,
-                  opacity: visionStage === 0 ? 0.05 : visionStage === 1 ? 0.15 : 0.3,
-                }}
-                transition={{ duration: 1.5, ease: 'easeInOut' }}
-                className="text-[20vw] font-serif italic tracking-tighter text-gold select-none uppercase"
-              >
-                {collection.name}
-              </motion.h1>
-            </div>
+            <motion.h1
+              className="text-[12vw] font-serif italic tracking-tighter text-gold select-none uppercase text-center px-6"
+            >
+              {collection.name}
+            </motion.h1>
           </motion.div>
         )}
       </AnimatePresence>
 
       <motion.div
-        animate={{ filter: visionStage < 3 ? 'blur(40px)' : 'blur(0px)', opacity: visionStage < 3 ? 0 : 1, scale: visionStage < 3 ? 1.1 : 1 }}
-        transition={{ duration: 1.5, ease: [0.7, 0, 0.3, 1] }}
+        animate={{ opacity: visionStage < 3 ? 0 : 1 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="min-h-screen"
       >
         <section className="pt-40 pb-24 px-6">

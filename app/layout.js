@@ -1,6 +1,5 @@
 import { Cormorant_Garamond, Inter, Playfair_Display } from 'next/font/google';
 import './globals.css';
-import CustomCursor from '@/components/ui/CustomCursor';
 import SmoothScroll from '@/components/layout/SmoothScroll';
 import NextAuthProvider from '@/components/providers/NextAuthProvider';
 import ScrollRevealProvider from '@/components/providers/ScrollRevealProvider';
@@ -39,6 +38,7 @@ import CartProvider from '@/components/providers/CartProvider';
 import CartDrawer from '@/components/ui/CartDrawer';
 import BackgroundGlow from '@/components/ui/BackgroundGlow';
 import WishlistProvider from '@/components/providers/WishlistProvider';
+import { Toaster } from 'react-hot-toast';
 
 export default function RootLayout({ children }) {
   return (
@@ -52,11 +52,11 @@ export default function RootLayout({ children }) {
           <NextAuthProvider>
             <CartProvider>
               <WishlistProvider>
-                <CustomCursor />
                 <ScrollRevealProvider />
                 <ThemeToggle />
                 <CartDrawer />
                 <Navbar />
+                <Toaster position="bottom-right" />
                 {children}
               </WishlistProvider>
             </CartProvider>

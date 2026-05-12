@@ -7,9 +7,12 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 
+import { Eye, EyeOff } from 'lucide-react';
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -24,7 +27,7 @@ export default function LoginPage() {
     });
 
     if (result.error) {
-      toast.error(result.error);
+      toast.error('Incorrect email or password');
       setLoading(false);
     } else {
       toast.success('Access Granted');
@@ -36,8 +39,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-navy flex items-center justify-center p-6 pt-32">
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(166,138,59,0.05)_0%,transparent_70%)] pointer-events-none" />
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-md space-y-12 relative z-10"
@@ -64,20 +67,29 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-navy-deep border border-gold/20 p-5 outline-none focus:border-gold/60 text-cream font-mono text-sm transition-all shadow-2xl placeholder:text-cream/20"
-                placeholder="email@example.com"
+                placeholder="Enter your email"
               />
             </div>
 
             <div className="space-y-2 group">
               <label className="block font-mono text-[9px] tracking-[0.3em] text-cream/60 uppercase group-focus-within:text-gold transition-colors">Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-navy-deep border border-gold/20 p-5 outline-none focus:border-gold/60 text-cream font-mono text-sm transition-all shadow-2xl placeholder:text-cream/20"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-navy-deep border border-gold/20 p-5 outline-none focus:border-gold/60 text-cream font-mono text-sm transition-all shadow-2xl placeholder:text-cream/20 pr-14"
+                  placeholder="Enter your password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-5 top-1/2 -translate-y-1/2 text-gold/50 hover:text-gold transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
           </div>
 

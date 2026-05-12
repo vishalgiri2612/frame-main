@@ -511,15 +511,7 @@ html.lenis {
   z-index: 2;
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CUSTOM CURSOR
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-body.custom-cursor-active,
-body.custom-cursor-active a,
-body.custom-cursor-active button,
-body.custom-cursor-active [role="button"] {
-  cursor: none !important;
-}
+
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    HERO SCRIM UTILITY

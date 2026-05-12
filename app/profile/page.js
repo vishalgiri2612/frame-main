@@ -57,6 +57,12 @@ export default function ProfilePage() {
   });
   const [isUpdating, setIsUpdating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -107,6 +113,43 @@ export default function ProfilePage() {
       toast.error('Server error');
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+    try {
+      const res = await fetch('/api/user/security', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success('Password Updated Successfully');
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        toast.error(data.error || 'Update failed');
+      }
+    } catch (e) {
+      toast.error('Server error');
+    } finally {
+      setIsUpdatingPassword(false);
     }
   };
 
@@ -554,6 +597,72 @@ export default function ProfilePage() {
                        ))
                      )}
                   </div>
+                </motion.div>
+              )}
+
+              {activeTab === 'security' && (
+                <motion.div
+                  key="security"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="space-y-10"
+                >
+                  <div className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
+                    <div className="px-8 py-6 border-b border-zinc-100 bg-zinc-50/50">
+                      <h3 className="text-lg font-bold text-zinc-900">Security Credentials</h3>
+                      <p className="text-xs text-zinc-500 mt-0.5">Manage your authentication methods and session security.</p>
+                    </div>
+                    
+                    <div className="p-8">
+                      <form onSubmit={handleUpdatePassword} className="max-w-md space-y-6">
+                        <div className="space-y-4">
+                           <div className="space-y-1.5">
+                              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Current Password</label>
+                              <input 
+                                 type="password"
+                                 required
+                                 value={passwordData.currentPassword}
+                                 onChange={e => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                                 className="block w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm bg-zinc-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-900 transition-all"
+                              />
+                           </div>
+
+                           <div className="space-y-1.5">
+                              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">New Password</label>
+                              <input 
+                                 type="password"
+                                 required
+                                 value={passwordData.newPassword}
+                                 onChange={e => setPasswordData({...passwordData, newPassword: e.target.value})}
+                                 className="block w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm bg-zinc-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-900 transition-all"
+                              />
+                              <p className="text-[9px] text-zinc-400">Minimum 6 characters required.</p>
+                           </div>
+
+                           <div className="space-y-1.5">
+                              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Confirm New Password</label>
+                              <input 
+                                 type="password"
+                                 required
+                                 value={passwordData.confirmPassword}
+                                 onChange={e => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                                 className="block w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm bg-zinc-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900/5 focus:border-zinc-900 transition-all"
+                              />
+                           </div>
+                        </div>
+
+                        <button 
+                           type="submit"
+                           disabled={isUpdatingPassword}
+                           className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-zinc-900 text-white rounded-lg text-sm font-bold hover:bg-zinc-800 transition-all disabled:opacity-50 shadow-lg"
+                        >
+                           {isUpdatingPassword ? 'Processing...' : <><ShieldCheck size={18} /> Update Security Key</>}
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+
                 </motion.div>
               )}
 

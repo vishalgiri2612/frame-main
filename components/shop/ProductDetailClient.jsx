@@ -336,9 +336,9 @@ export default function ProductDetailClient({ product, similarProducts }) {
                       <span style={{ fontStyle: 'normal' }}>.</span>
                     </span>
                   </motion.h1>
-                  <div className="flex items-center gap-2 mt-4 opacity-40">
-                    <span className="font-mono text-[9px] tracking-[0.4em] uppercase text-cream">Model No.</span>
-                    <span className="font-mono text-[9px] tracking-[0.4em] uppercase text-gold font-bold">{product.sku || 'N/A'}</span>
+                  <div className="flex items-center gap-2 mt-6">
+                    <span className={`font-mono text-[10px] tracking-[0.4em] uppercase ${product.category === 'CONTACT LENSES' ? 'text-zinc-400' : 'text-cream/60'}`}>Model No.</span>
+                    <span className={`font-mono text-[11px] tracking-[0.4em] uppercase ${product.category === 'CONTACT LENSES' ? 'text-zinc-900' : 'text-gold'} font-black`}>{product.sku || 'N/A'}</span>
                   </div>
                 </div>
 
