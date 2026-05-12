@@ -183,11 +183,11 @@ export default function BrandManagement() {
             <table className="w-full text-left whitespace-nowrap">
               <thead>
                 <tr className="border-b border-zinc-200 bg-zinc-50/80 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
-                  <th className="px-6 py-4">SNO</th>
+                  <th className="px-6 py-4 hidden sm:table-cell">SNO</th>
                   <th className="px-6 py-4">Brand Details</th>
-                  <th className="px-6 py-4">Origin</th>
-                  <th className="px-6 py-4">Total Styles</th>
-                  <th className="px-6 py-4">Homepage Showcase</th>
+                  <th className="px-6 py-4 hidden md:table-cell">Origin</th>
+                  <th className="px-6 py-4">Styles</th>
+                  <th className="px-6 py-4">Showcase</th>
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -200,21 +200,21 @@ export default function BrandManagement() {
                     transition={{ delay: i * 0.02 }}
                     className="hover:bg-zinc-50/80 transition-colors"
                   >
-                    <td className="px-6 py-4 text-xs font-mono font-bold text-zinc-400">
+                    <td className="px-6 py-4 text-xs font-mono font-bold text-zinc-400 hidden sm:table-cell">
                       {(i + 1).toString().padStart(2, '0')}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-center overflow-hidden p-1.5 shadow-sm">
+                        <div className="w-10 h-10 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-center overflow-hidden p-1.5 shadow-sm shrink-0">
                           {brand.image ? <img src={brand.image} className="w-full h-full object-contain mix-blend-multiply" alt="" /> : <ImageIcon className="w-4 h-4 text-zinc-300" />}
                         </div>
-                        <div>
-                          <div className="text-sm font-bold text-zinc-900">{brand.name}</div>
-                          <div className="text-[10px] text-zinc-400 font-mono tracking-tighter uppercase">{brand.slug}</div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-bold text-zinc-900 truncate">{brand.name}</div>
+                          <div className="text-[10px] text-zinc-400 font-mono truncate uppercase">{brand.slug}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 hidden md:table-cell">
                       <span className="text-[10px] font-bold text-zinc-500 bg-zinc-100 px-2 py-1 rounded-md uppercase tracking-widest border border-zinc-200">
                         {brand.origin || 'Global'}
                       </span>
@@ -222,7 +222,6 @@ export default function BrandManagement() {
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className="text-sm font-bold text-zinc-900">{brand.count || 0}</span>
-                        <span className="text-[10px] text-zinc-400 uppercase tracking-tighter font-medium">Items Active</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">

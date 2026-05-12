@@ -30,6 +30,7 @@ const TopProductCard = ({ product, index }) => {
               src={product.image}
               alt={product.name}
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
               className="object-contain p-12 mix-blend-multiply"
             />
           ) : (
@@ -109,36 +110,53 @@ export default function TopSellingSection({ products = [] }) {
           </motion.p>
         </header>
 
-        {/* Infinite Marquee Wrapper */}
-        <div className="relative mt-12 overflow-hidden">
-          <motion.div 
-            className="flex gap-10"
-            animate={{ x: [0, '-50%'] }}
-            transition={{ 
-              duration: 30, 
-              repeat: Infinity, 
-              ease: "linear" 
-            }}
-            style={{ width: 'fit-content', display: 'flex' }}
-          >
-            {/* Double the products for seamless loop */}
-            {[...products, ...products].map((product, idx) => (
-              <TopProductCard key={`${product.id || idx}-${idx}`} product={product} index={idx % products.length} />
-            ))}
-          </motion.div>
-        </div>
+        {/* Unified Hover Group for Marquee and Progress Bar */}
+        <div className="group-marquee mt-12">
+          {/* Infinite Marquee Wrapper */}
+          <div className="relative overflow-hidden">
+            <div 
+              className="flex gap-10 marquee-track"
+              style={{ 
+                width: 'max-content',
+                animation: 'marquee 30s linear infinite',
+              }}
+            >
+              {/* Double the products for seamless loop */}
+              {[...products, ...products].map((product, idx) => (
+                <TopProductCard key={`${product.id || idx}-${idx}`} product={product} index={idx % products.length} />
+              ))}
+            </div>
+          </div>
 
-        {/* Status Indicator Bar */}
-        <div className="mt-12 h-[1px] bg-zinc-100 w-full relative">
-          <motion.div 
-            className="absolute top-0 left-0 h-full bg-gold w-1/4"
-            animate={{ x: ['0%', '300%', '0%'] }}
-            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-          />
+          {/* Status Indicator Bar */}
+          <div className="mt-12 h-[1px] bg-zinc-100 w-full relative overflow-hidden">
+            <div 
+              className="absolute top-0 left-0 h-full bg-gold w-1/4 marquee-bar"
+              style={{
+                animation: 'marquee-bar 15s linear infinite',
+              }}
+            />
+          </div>
         </div>
       </div>
 
       <style jsx>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes marquee-bar {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(400%); }
+        }
+        .marquee-track {
+          display: flex;
+          will-change: transform;
+        }
+        .group-marquee:hover .marquee-track,
+        .group-marquee:hover .marquee-bar {
+          animation-play-state: paused !important;
+        }
         .hide-scrollbar::-webkit-scrollbar {
           display: none;
         }

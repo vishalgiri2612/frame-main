@@ -7,10 +7,18 @@ export async function GET(request) {
   if (!auth.ok) return auth.response;
 
   try {
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get("category");
+    const excludeCategory = searchParams.get("excludeCategory");
+    
     const db = await getDb();
     
-    // 1. Fetch all products for basic metrics
-    const products = await db.collection("products").find({}).toArray();
+    const query = {};
+    if (category) query.category = category;
+    if (excludeCategory) query.category = { $ne: excludeCategory };
+
+    // 1. Fetch products for basic metrics
+    const products = await db.collection("products").find(query).toArray();
     
     // 2. Calculate Valuation & Low Stock
     let totalValuation = 0;

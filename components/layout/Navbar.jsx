@@ -12,9 +12,10 @@ import { Search, ShoppingBag, User, Menu, X, Heart, LogOut } from 'lucide-react'
 const navLinks = [
   { name: 'Shop', href: '/shop' },
   { name: 'Categories', href: '/categories' },
+  { name: 'Contact Lenses', href: '/contact-lens' },
   { name: 'Magazine', href: '/magazine' },
   { name: 'About', href: '/about' },
-  { name: 'Contact', href: '/contact' },
+  { name: 'Support', href: '/support' },
 ];
 
 export default function Navbar() {
@@ -40,7 +41,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav
+    <nav className="print:hidden"
       style={{
         position: 'fixed',
         top: isScrolled ? '20px' : '0',
@@ -267,6 +268,29 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
+              
+              {/* Add Wishlist explicitly to mobile menu */}
+              <Link
+                href="/wishlist"
+                className="flex items-center gap-5 transition-colors"
+                style={{
+                  fontFamily: 'var(--font-cormorant)',
+                  fontSize: '2rem',
+                  fontWeight: 400,
+                  color: 'var(--text-secondary)',
+                }}
+                onClick={() => setIsMobileMenuOpen(false)}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+              >
+                <span className="w-5 h-px" style={{ background: 'var(--gold)', opacity: 0.4 }} />
+                Wishlist
+                {wishlist.length > 0 && (
+                  <span className="ml-auto text-xs bg-gold text-navy px-2 py-0.5 rounded-full font-mono font-bold">
+                    {wishlist.length}
+                  </span>
+                )}
+              </Link>
             </div>
           </motion.div>
         )}

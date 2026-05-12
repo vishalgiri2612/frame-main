@@ -10,7 +10,7 @@ const SORT_OPTIONS = [
   { label: 'Name A → Z', value: 'name_asc' },
 ];
 
-export default async function ShopPage() {
+export default async function ShopPage({ searchParams }) {
   const products = await getProductsDB();
   const brands = getBrands(products);
   const categories = getCategories(products);
@@ -19,12 +19,17 @@ export default async function ShopPage() {
   const uiBrands = [{ name: 'ALL', slug: 'all' }, ...brands];
   const uiCategories = [{ name: 'ALL', slug: 'all' }, ...categories];
 
+  const initialCategory = searchParams?.category || 'ALL';
+  const initialBrand = searchParams?.brand || 'ALL';
+
   return (
     <ShopMain 
       initialProducts={products} 
       brands={uiBrands} 
       categories={uiCategories}
       sortOptions={SORT_OPTIONS}
+      initialCategory={initialCategory}
+      initialBrand={initialBrand}
     />
   );
 }

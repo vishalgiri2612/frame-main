@@ -94,6 +94,7 @@ function ProductCard({ product, index }) {
             alt={product.name}
             fill
             loading="lazy"
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             className="next-image object-contain p-4 md:p-8 transition-transform duration-700 group-hover:scale-[1.04]"
           />
         ) : (
@@ -205,17 +206,46 @@ function ProductCard({ product, index }) {
   );
 }
 
-export default function ShopMain({ initialProducts = [], brands = [], categories = [], sortOptions = [] }) {
+export default function ShopMain({ 
+  initialProducts = [], 
+  brands = [], 
+  categories = [], 
+  sortOptions = [],
+  initialCategory = 'ALL',
+  initialBrand = 'ALL'
+}) {
+  // Helper for robust string comparison (handles slugs, casing, and special characters)
+  const isMatch = useCallback((val1, val2) => {
+    if (!val1 || !val2) return val1 === val2;
+    if (val1 === 'ALL' || val2 === 'ALL') return val1 === val2;
+    
+    const normalize = (s) => s.toString()
+      .toUpperCase()
+      .replace(/[-+_]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+      
+    return normalize(val1) === normalize(val2);
+  }, []);
+
   const [query, setQuery] = useState('');
-  const [activeCategory, setCategory] = useState('ALL');
-  const [activeBrand, setBrand] = useState('ALL');
+  const [activeCategory, setCategory] = useState(initialCategory);
+  const [activeBrand, setBrand] = useState(initialBrand);
   const [sortBy, setSort] = useState('newest');
   const [isFilterOpen, setFilterOpen] = useState(false);
 
   // Temporary states for filters
-  const [tempCategory, setTempCategory] = useState('ALL');
-  const [tempBrand, setTempBrand] = useState('ALL');
+  const [tempCategory, setTempCategory] = useState(initialCategory);
+  const [tempBrand, setTempBrand] = useState(initialBrand);
   const [tempSort, setTempSort] = useState('newest');
+
+  // Sync state with initial values (when searchParams change)
+  useEffect(() => {
+    setCategory(initialCategory);
+    setBrand(initialBrand);
+    setTempCategory(initialCategory);
+    setTempBrand(initialBrand);
+  }, [initialCategory, initialBrand]);
 
   // Initialize temp states when sidebar opens
   useEffect(() => {
@@ -246,11 +276,14 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
     }
 
     if (activeCategory !== 'ALL') {
-      list = list.filter((p) => p.category === activeCategory);
+      list = list.filter((p) => isMatch(p.category, activeCategory));
     }
 
     if (activeBrand !== 'ALL') {
-      list = list.filter((p) => (typeof p.brand === 'string' ? p.brand : p.brand?.name) === activeBrand);
+      list = list.filter((p) => {
+        const brandVal = (typeof p.brand === 'string' ? p.brand : p.brand?.name) || '';
+        return isMatch(brandVal, activeBrand);
+      });
     }
 
     // Sort Logic
@@ -263,7 +296,7 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
     }
 
     return list;
-  }, [initialProducts, query, activeCategory, activeBrand, sortBy]);
+  }, [initialProducts, query, activeCategory, activeBrand, sortBy, isMatch]);
 
   const resetFilters = useCallback(() => {
     setQuery('');
@@ -330,7 +363,7 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
           <div className="flex flex-wrap items-center gap-4">
             {categories.map(cat => {
               const name = typeof cat === 'string' ? cat : cat.name;
-              const isActive = activeCategory === name;
+              const isActive = isMatch(activeCategory, name);
               return (
                 <button
                   key={name}
@@ -491,7 +524,7 @@ export default function ShopMain({ initialProducts = [], brands = [], categories
                   <div className="flex flex-col gap-1 py-2">
                     {brands.map(b => {
                       const name = typeof b === 'string' ? b : b.name;
-                      const isActive = tempBrand === name;
+                      const isActive = isMatch(tempBrand, name);
                       return (
                         <button
                           key={name}

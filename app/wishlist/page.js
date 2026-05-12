@@ -54,6 +54,7 @@ const WishlistProductCard = ({ product, toggleWishlist, handleMoveToCart, index 
             src={images[imageIdx]}
             alt={product.name}
             fill
+            sizes="(max-width: 1024px) 50vw, 33vw"
             className="object-contain p-4 md:p-8 transition-transform duration-700 group-hover:scale-[1.04]"
           />
         ) : (
@@ -121,7 +122,7 @@ const WishlistProductCard = ({ product, toggleWishlist, handleMoveToCart, index 
 };
 
 export default function WishlistPage() {
-  const { wishlist, toggleWishlist } = useWishlist();
+  const { wishlist, toggleWishlist, setWishlist } = useWishlist();
   const { addToCart } = useCart();
   const router = useRouter();
 
@@ -129,7 +130,13 @@ export default function WishlistPage() {
     addToCart(product);
     toggleWishlist(product);
     toast.success('Moved to Bag');
-    // Open cart drawer automatically
+  };
+
+  const clearAll = () => {
+    if (window.confirm('Clear all items from your personal archive?')) {
+      setWishlist([]);
+      toast.success('Archive Cleared');
+    }
   };
 
   return (
@@ -152,25 +159,38 @@ export default function WishlistPage() {
       />
 
       <div className="container mx-auto px-4 sm:px-6 max-w-[1400px] relative z-10">
-        <header className="mb-16 sm:mb-24 space-y-6">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-4 text-[10px] tracking-[0.4em] uppercase text-gold/60"
-            style={{ fontFamily: 'var(--font-inter)' }}
-          >
-            <span className="w-12 h-px bg-gold" />
-            PERSONAL ARCHIVE
-          </motion.div>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.8 }}
-            className="text-6xl sm:text-8xl font-light tracking-tighter leading-none text-cream"
-            style={{ fontFamily: 'var(--font-cormorant)' }}
-          >
-            YOUR <span className="italic text-gold">WISHLIST.</span>
-          </motion.h1>
+        <header className="mb-16 sm:mb-24 flex flex-col md:flex-row justify-between items-end gap-8">
+          <div className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-4 text-[10px] tracking-[0.4em] uppercase text-gold/60"
+              style={{ fontFamily: 'var(--font-inter)' }}
+            >
+              <span className="w-12 h-px bg-gold" />
+              PERSONAL ARCHIVE
+            </motion.div>
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.8 }}
+              className="text-6xl sm:text-8xl font-light tracking-tighter leading-none text-cream"
+              style={{ fontFamily: 'var(--font-cormorant)' }}
+            >
+              YOUR <span className="italic text-gold">WISHLIST.</span>
+            </motion.h1>
+          </div>
+
+          {wishlist.length > 0 && (
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              onClick={clearAll}
+              className="text-[9px] tracking-[0.4em] uppercase text-gold/40 hover:text-gold transition-colors pb-2 border-b border-gold/10"
+            >
+              Clear Archive
+            </motion.button>
+          )}
         </header>
 
         {wishlist.length === 0 ? (
@@ -191,7 +211,7 @@ export default function WishlistPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 sm:gap-x-12 gap-y-10 sm:gap-y-20">
-            <AnimatePresence>
+            <AnimatePresence mode="popLayout">
               {wishlist.map((product, idx) => (
                 <WishlistProductCard 
                   key={product.id || product.sku} 

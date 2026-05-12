@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from 'react';
 
 export default function AdminLayout({ children }) {
   const { data: session } = useSession();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const profileRef = useRef(null);
@@ -24,16 +25,30 @@ export default function AdminLayout({ children }) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
   return (
     <div className="flex min-h-screen bg-zinc-50 text-zinc-900 font-sans selection:bg-zinc-200 selection:text-zinc-900">
-      <div className="print:hidden">
-        <AdminSidebar />
+      <div className={`print:hidden fixed inset-0 z-40 transition-opacity lg:relative lg:z-auto ${isSidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none lg:opacity-100 lg:pointer-events-auto'}`}>
+        {/* Mobile Overlay */}
+        <div 
+          className="absolute inset-0 bg-zinc-900/40 backdrop-blur-sm lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+        <div className={`transition-transform duration-300 transform lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <AdminSidebar onClose={() => setIsSidebarOpen(false)} />
+        </div>
       </div>
-      <main className="flex-1 flex flex-col min-h-screen">
+      
+      <main className="flex-1 flex flex-col min-h-screen min-w-0">
         {/* Top Navigation Bar */}
-        <header className="h-16 border-b border-zinc-200 bg-white/80 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between px-8 print:hidden">
-          <div className="flex-1 flex items-center">
-
+        <header className="h-16 border-b border-zinc-200 bg-white/80 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between px-4 sm:px-8 print:hidden">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2 -ml-2 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-md"
+            >
+              <Shield className="h-6 w-6" />
+            </button>
           </div>
           <div className="ml-4 flex items-center gap-4">
             {/* Notifications */}
@@ -113,7 +128,7 @@ export default function AdminLayout({ children }) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="flex-1 p-8 print:p-0 overflow-x-hidden"
+          className="flex-1 p-4 sm:p-8 print:p-0 overflow-x-hidden"
         >
           <div className="max-w-[1500px] mx-auto">
             {children}

@@ -12,7 +12,9 @@ import {
   Ticket,
   Component,
   Monitor,
-  BarChart3
+  BarChart3,
+  Eye,
+  X
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { signOut } from 'next-auth/react';
@@ -29,18 +31,24 @@ const menuItems = [
   { id: 'support', label: 'Support', icon: MessageSquare, href: '/admin/support' },
 ];
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ onClose }) {
   const pathname = usePathname();
 
   return (
     <aside className="w-64 bg-zinc-50/80 border-r border-zinc-200 h-screen sticky top-0 flex flex-col flex-shrink-0 z-20">
-      <div className="h-16 flex items-center px-6 border-b border-zinc-200 bg-white">
+      <div className="h-16 flex items-center justify-between px-6 border-b border-zinc-200 bg-white">
         <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
           <div className="w-7 h-7 bg-zinc-900 rounded-md flex items-center justify-center shadow-sm">
             <span className="text-white text-sm font-bold font-serif italic">F</span>
           </div>
           <span className="font-semibold text-zinc-900 tracking-tight">Frame Admin</span>
         </Link>
+        <button 
+          onClick={onClose}
+          className="lg:hidden p-2 text-zinc-400 hover:text-zinc-600 transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto py-6 px-4">
@@ -54,6 +62,7 @@ export default function AdminSidebar() {
               <Link 
                 key={item.id} 
                 href={item.href}
+                onClick={onClose}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors relative group ${
                   isActive ? 'text-zinc-900 bg-white shadow-sm ring-1 ring-zinc-200' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/80'
                 }`}

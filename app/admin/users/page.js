@@ -162,13 +162,13 @@ export default function UserManagement() {
           <table className="w-full text-left whitespace-nowrap">
             <thead>
               <tr className="border-b border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                <th className="px-6 py-4">User ID</th>
+                <th className="px-6 py-4 hidden lg:table-cell">User ID</th>
                 <th className="px-6 py-4">Identity</th>
                 <th className="px-6 py-4">Role</th>
-                <th className="px-6 py-4 text-center">Activity (Bag/Wish)</th>
+                <th className="px-6 py-4 text-center hidden md:table-cell">Activity</th>
                 <th className="px-6 py-4 text-center">Purchases</th>
-                <th className="px-6 py-4">Joined</th>
-                <th className="px-6 py-4 text-right">Access Control</th>
+                <th className="px-6 py-4 hidden lg:table-cell">Joined</th>
+                <th className="px-6 py-4 text-right">Access</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-200">
@@ -180,27 +180,26 @@ export default function UserManagement() {
                   transition={{ delay: i * 0.03 }}
                   className="hover:bg-zinc-50/80 transition-colors"
                 >
-                  <td className="px-6 py-4 text-xs font-mono font-medium text-zinc-500">{user.id}</td>
+                  <td className="px-6 py-4 text-xs font-mono font-medium text-zinc-500 hidden lg:table-cell">{user.id}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center border border-zinc-200">
+                      <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center border border-zinc-200 shrink-0">
                         <UserIcon className="w-4 h-4 text-zinc-400" />
                       </div>
-                      <div>
-                        <div className="text-sm font-medium text-zinc-900">{user.name || '-'}</div>
-                        <div className="text-xs text-zinc-500 mt-0.5">{user.email || '-'}</div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-zinc-900 truncate">{user.name || '-'}</div>
+                        <div className="text-[10px] text-zinc-500 truncate">{user.email || '-'}</div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${
                       user.role === 'ADMIN' ? 'text-indigo-700 border-indigo-200 bg-indigo-50' : 'text-zinc-600 border-zinc-200 bg-zinc-100'
                     }`}>
-                      <Shield className="w-3 h-3" />
                       {user.role?.toUpperCase() || 'USER'}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 hidden md:table-cell">
                     <div className="flex flex-col items-center gap-1">
                       <div className="flex items-center gap-3">
                          <div className="flex items-center gap-1.5" title="Items in Bag">
@@ -212,7 +211,6 @@ export default function UserManagement() {
                             <span className="text-xs font-bold text-zinc-700">{user.stats?.wishlistCount || 0}</span>
                          </div>
                       </div>
-                      <span className="text-[10px] text-zinc-400 uppercase tracking-tighter font-mono">Bag / Wish</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -221,7 +219,7 @@ export default function UserManagement() {
                        <div className="text-[10px] text-emerald-600 font-mono font-bold">₹{(user.stats?.totalSpent || 0).toLocaleString()}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-zinc-500">{formatDate(user.createdAt)}</td>
+                  <td className="px-6 py-4 text-sm text-zinc-500 hidden lg:table-cell">{formatDate(user.createdAt)}</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <select

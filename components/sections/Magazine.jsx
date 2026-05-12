@@ -45,13 +45,14 @@ export default function Magazine() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
           <div className="lg:col-span-5">
             <div className="relative aspect-[3/4] bg-gray-100 rounded-sm overflow-hidden shadow-2xl">
-              <Image
-                src="/magazine/cover.png"
-                alt="Journal Cover"
-                fill
-                className="object-cover"
-                priority
-              />
+                <Image
+                  src="/magazine/cover.png"
+                  alt="Journal Cover"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 500px"
+                  className="object-cover"
+                  priority
+                />
             </div>
             <div className="mt-8 text-center">
               <h3 className="font-serif text-2xl italic">Journal of Sight</h3>
@@ -67,6 +68,7 @@ export default function Magazine() {
                     src={article.image}
                     alt={article.title}
                     fill
+                    sizes="(max-width: 768px) 100vw, 256px"
                     className="object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                 </div>

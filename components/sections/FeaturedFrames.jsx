@@ -62,6 +62,7 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
             alt={product.name}
             fill
             loading="lazy"
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             className="next-image object-contain p-4 md:p-8 transition-transform duration-700 group-hover:scale-[1.04]"
             style={{ transform: 'translateZ(0)', willChange: 'transform' }}
           />

@@ -61,13 +61,13 @@ export default function CartProvider({ children }) {
 
     const newCart = [...cart];
     const existingItem = newCart.find((item) => item.id === product.id);
-    
+
     if (existingItem) {
       existingItem.quantity += 1;
     } else {
       newCart.push({ ...product, quantity: 1 });
     }
-    
+
     setCart(newCart);
     await syncCartWithDB(newCart);
     setIsCartOpen(true);

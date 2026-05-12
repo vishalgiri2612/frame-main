@@ -641,8 +641,8 @@ const OrderList = ({ status }) => {
                 <td className="px-6 py-4">
                   <div className="flex -space-x-2">
                     {order.items?.slice(0, 3).map((item, i) => (
-                      <div key={i} className="w-8 h-8 rounded-full bg-white border border-zinc-200 p-1 overflow-hidden ring-2 ring-white">
-                        <img src={item.image} className="w-full h-full object-contain" alt="" />
+                      <div key={i} className="relative w-8 h-8 rounded-full bg-white border border-zinc-200 p-1 overflow-hidden ring-2 ring-white">
+                        <Image src={item.image} fill sizes="32px" className="object-contain p-1" alt="" />
                       </div>
                     ))}
                     {order.items?.length > 3 && (

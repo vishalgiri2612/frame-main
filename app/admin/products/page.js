@@ -2,7 +2,7 @@
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useMemo, useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertTriangle, Loader2, Package, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
+import { AlertTriangle, Eye, Loader2, Package, Pencil, Plus, Search, Trash2, X, ChevronRight } from 'lucide-react';
 import { useAdminResource } from '@/hooks/useAdminResource';
 import { adminFetch, formatCurrency } from '@/lib/admin/client';
 
@@ -12,6 +12,7 @@ const DEFAULT_FORM = {
   brand: '',
   category: '',
   price: '',
+  mrp: '',
   stock: '',
   status: 'ACTIVE',
   image: '',
@@ -21,6 +22,21 @@ const DEFAULT_FORM = {
   size: '',
   extraDisc: '',
   images: [],
+  // Lens Specific
+  visionType: 'Spherical',
+  replacementSchedule: 'Daily disposable',
+  lensMaterial: 'Silicone hydrogel',
+  wearType: 'Daily wear',
+  waterContent: '',
+  oxygenTransmissibility: '',
+  uvBlocking: 'None',
+  availableBC: '',
+  availableDia: '',
+  lensesPerPack: '1',
+  eyeSide: 'One eye',
+  subscriptionDiscount: '0',
+  reorderFrequency: '30, 60, 90',
+  // Glass Specific
   architecture: '',
   material: '',
   silhouette: '',
@@ -28,7 +44,9 @@ const DEFAULT_FORM = {
   lensSweep: '',
   protection: '',
   topSelling: false,
+  showcaseLens: false,
   gender: 'UNISEX',
+  tags: '',
 };
 
 const PRODUCT_CATEGORIES = [
@@ -44,7 +62,14 @@ const PRODUCT_CATEGORIES = [
   'SPORTS'
 ];
 
+const LENS_BRANDS = [
+  'COOPER VISION',
+  'BAUSCH + LOMB',
+  'JOHNSON & JOHNSON'
+];
+
 export default function ProductManagement() {
+  const [activeTab, setActiveTab] = useState('EYEWEAR'); // 'EYEWEAR' or 'CONTACT_LENSES'
   const [query, setQuery] = useState('');
   const [brand, setBrand] = useState('');
   const [category, setCategory] = useState('');
@@ -55,9 +80,11 @@ export default function ProductManagement() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showTypeSelector, setShowTypeSelector] = useState(false);
+  const [productType, setProductType] = useState('GLASS'); // 'GLASS' or 'CONTACT_LENS'
 
   useEffect(() => {
-    if (isModalOpen) {
+    if (isModalOpen || showTypeSelector) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -65,7 +92,35 @@ export default function ProductManagement() {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isModalOpen]);
+  }, [isModalOpen, showTypeSelector]);
+
+  // Unified resource fetching
+  const resourceQuery = useMemo(() => ({
+    search: query,
+    brand,
+    category: activeTab === 'CONTACT_LENSES' ? 'CONTACT LENSES' : category,
+    excludeCategory: activeTab === 'EYEWEAR' ? 'CONTACT LENSES' : '',
+    status,
+    limit: 50,
+  }), [query, brand, activeTab, category, status]);
+
+  const { data, isLoading, refetch } = useAdminResource('/api/admin/products', resourceQuery);
+
+  const { data: brandsData } = useAdminResource('/api/admin/brands');
+  const availableBrands = brandsData?.items || [];
+
+  const products = useMemo(() => data?.items || [], [data]);
+  const isMock = Boolean(data?.isMock);
+
+  const statusSummary = useMemo(() => {
+    return products.reduce(
+      (acc, item) => {
+        acc[item.status] = (acc[item.status] || 0) + 1;
+        return acc;
+      },
+      { ACTIVE: 0, DRAFT: 0, ARCHIVED: 0 }
+    );
+  }, [products]);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -115,45 +170,37 @@ export default function ProductManagement() {
     });
   };
 
-  const { data, isLoading, refetch } = useAdminResource('/api/admin/products', {
-    search: query,
-    brand,
-    category,
-    status,
-    limit: 18,
-  });
-
-  const { data: brandsData } = useAdminResource('/api/admin/brands');
-  const availableBrands = brandsData?.items || [];
-
-  const products = useMemo(() => data?.items || [], [data]);
-  const isMock = Boolean(data?.isMock);
-
-  const statusSummary = useMemo(() => {
-    return products.reduce(
-      (acc, item) => {
-        acc[item.status] = (acc[item.status] || 0) + 1;
-        return acc;
-      },
-      { ACTIVE: 0, DRAFT: 0, ARCHIVED: 0 }
-    );
-  }, [products]);
-
   const openCreate = () => {
     setEditingProduct(null);
     setForm(DEFAULT_FORM);
     setError('');
+    setShowTypeSelector(true);
+  };
+
+  const handleTypeSelect = (type) => {
+    setProductType(type);
+    setForm(prev => ({
+      ...prev,
+      category: type === 'CONTACT_LENS' ? 'CONTACT LENSES' : 'EYEGLASSES'
+    }));
+    setShowTypeSelector(false);
     setIsModalOpen(true);
   };
 
   const openEdit = (product) => {
     setEditingProduct(product);
+    const meta = product.lensMetadata || {};
+    const type = product.category === 'CONTACT LENSES' ? 'CONTACT_LENS' : 'GLASS';
+    setProductType(type);
+    
     setForm({
+      ...DEFAULT_FORM,
       name: product.name || '',
       sku: product.sku || '',
       brand: product.brand || '',
       category: product.category || '',
       price: String(product.price ?? ''),
+      mrp: String(product.mrp ?? ''),
       stock: String(product.stock ?? ''),
       status: product.status || 'ACTIVE',
       image: product.image || '',
@@ -170,14 +217,30 @@ export default function ProductManagement() {
       lensSweep: product.lensSweep || '',
       protection: product.protection || '',
       topSelling: Boolean(product.topSelling),
+      showcaseLens: Boolean(product.showcaseLens),
       gender: product.gender || 'UNISEX',
+      tags: Array.isArray(product.tags) ? product.tags.join(', ') : '',
+      // Metadata
+      visionType: meta.visionType || 'Spherical',
+      replacementSchedule: meta.replacementSchedule || 'Daily disposable',
+      lensMaterial: meta.lensMaterial || 'Silicone hydrogel',
+      wearType: meta.wearType || 'Daily wear',
+      waterContent: meta.waterContent || '',
+      oxygenTransmissibility: meta.oxygenTransmissibility || '',
+      uvBlocking: meta.uvBlocking || 'None',
+      availableBC: Array.isArray(meta.availableBC) ? meta.availableBC.join(', ') : '',
+      availableDia: Array.isArray(meta.availableDia) ? meta.availableDia.join(', ') : '',
+      lensesPerPack: String(meta.lensesPerPack || '1'),
+      eyeSide: meta.eyeSide || 'One eye',
+      subscriptionDiscount: String(meta.subscriptionDiscount || '0'),
+      reorderFrequency: Array.isArray(meta.reorderFrequency) ? meta.reorderFrequency.join(', ') : '30, 60, 90',
     });
-    setError('');
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setShowTypeSelector(false);
     setEditingProduct(null);
     setForm(DEFAULT_FORM);
     setError('');
@@ -188,26 +251,42 @@ export default function ProductManagement() {
     setIsSubmitting(true);
     setError('');
 
+    const lensMetadata = productType === 'CONTACT_LENS' ? {
+      visionType: form.visionType,
+      replacementSchedule: form.replacementSchedule,
+      lensMaterial: form.lensMaterial,
+      wearType: form.wearType,
+      waterContent: form.waterContent,
+      oxygenTransmissibility: form.oxygenTransmissibility,
+      uvBlocking: form.uvBlocking,
+      availableBC: form.availableBC.split(',').map(s => s.trim()).filter(Boolean),
+      availableDia: form.availableDia.split(',').map(s => s.trim()).filter(Boolean),
+      lensesPerPack: Number(form.lensesPerPack),
+      eyeSide: form.eyeSide,
+      subscriptionDiscount: Number(form.subscriptionDiscount),
+      reorderFrequency: form.reorderFrequency.split(',').map(s => s.trim()).filter(Boolean),
+    } : null;
+
+    const payload = {
+      ...form,
+      price: Number(form.price),
+      mrp: Number(form.mrp),
+      stock: Number(form.stock),
+      extraDisc: Number(form.extraDisc),
+      tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
+      lensMetadata
+    };
+
     try {
       if (editingProduct) {
         await adminFetch(`/api/admin/products/${editingProduct.id}`, {
           method: 'PATCH',
-          body: JSON.stringify({
-            ...form,
-            price: Number(form.price),
-            stock: Number(form.stock),
-            extraDisc: Number(form.extraDisc),
-          }),
+          body: JSON.stringify(payload),
         });
       } else {
         await adminFetch('/api/admin/products', {
           method: 'POST',
-          body: JSON.stringify({
-            ...form,
-            price: Number(form.price),
-            stock: Number(form.stock),
-            extraDisc: Number(form.extraDisc),
-          }),
+          body: JSON.stringify(payload),
         });
       }
 
@@ -237,13 +316,8 @@ export default function ProductManagement() {
       <AdminLayout>
         <header className="mb-8 flex flex-wrap justify-between items-end gap-4">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Products</h1>
-            <p className="text-sm text-zinc-500 mt-1">Manage your inventory, pricing, and availability.</p>
-            {isMock && (
-              <p className="mt-2 inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
-                Demo feed active
-              </p>
-            )}
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">Products & Inventory</h1>
+            <p className="text-sm text-zinc-500 mt-1">Manage eyewear and contact lens stocks.</p>
           </div>
 
           <button
@@ -256,6 +330,24 @@ export default function ProductManagement() {
           </button>
         </header>
 
+        {/* Tab Switcher */}
+        <div className="flex p-1 bg-zinc-100 rounded-xl w-fit mb-8 border border-zinc-200">
+          <button
+            onClick={() => { setActiveTab('EYEWEAR'); setCategory(''); }}
+            className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'EYEWEAR' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
+          >
+            <Package className="w-4 h-4" />
+            Eyewear
+          </button>
+          <button
+            onClick={() => { setActiveTab('CONTACT_LENSES'); setCategory('CONTACT LENSES'); }}
+            className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'CONTACT_LENSES' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
+          >
+            <Eye className="w-4 h-4" />
+            Contact Lenses
+          </button>
+        </div>
+
         {/* Filters */}
         <section className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-3">
           <div className="relative md:col-span-2">
@@ -266,7 +358,7 @@ export default function ProductManagement() {
               type="text"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search products..."
+              placeholder={`Search ${activeTab.toLowerCase().replace('_', ' ')}...`}
               className="block w-full pl-10 pr-3 py-2.5 border border-zinc-200 rounded-lg text-sm bg-white placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-colors shadow-sm"
             />
           </div>
@@ -282,38 +374,33 @@ export default function ProductManagement() {
             <option value="ARCHIVED">Archived</option>
           </select>
 
-          <select
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-            className="block w-full pl-3 pr-10 py-2.5 border border-zinc-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-colors shadow-sm"
-          >
-            <option value="">All Categories</option>
-            {[...new Set(products.map((product) => product.category).filter(Boolean))].map((item) => (
-              <option key={item} value={item}>{item}</option>
-            ))}
-          </select>
+          {activeTab === 'EYEWEAR' ? (
+            <select
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+              className="block w-full pl-3 pr-10 py-2.5 border border-zinc-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-colors shadow-sm"
+            >
+              <option value="">All Categories</option>
+              {PRODUCT_CATEGORIES.filter(c => c !== 'CONTACT LENSES').map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          ) : (
+            <select
+              value={brand}
+              onChange={(event) => setBrand(event.target.value)}
+              className="block w-full pl-3 pr-10 py-2.5 border border-zinc-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900 transition-colors shadow-sm"
+            >
+              <option value="">All Brands</option>
+              {LENS_BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
+            </select>
+          )}
         </section>
-
-        {error && (
-          <div className="mb-6 rounded-md bg-red-50 p-4 border border-red-200">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <AlertTriangle className="h-5 w-5 text-red-400" aria-hidden="true" />
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">Error</h3>
-                <div className="mt-2 text-sm text-red-700">
-                  <p>{error}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Summary Stats */}
         <section className="mb-6 flex gap-4 text-sm overflow-x-auto pb-2">
           <div className="bg-white border border-zinc-200 rounded-lg px-4 py-2 shadow-sm flex items-center gap-3">
-            <span className="text-zinc-500 font-medium">All</span>
+            <span className="text-zinc-500 font-medium">Results</span>
             <span className="text-zinc-900 font-semibold">{isLoading ? '--' : products.length}</span>
           </div>
           {['ACTIVE', 'DRAFT', 'ARCHIVED'].map((item) => (
@@ -335,10 +422,8 @@ export default function ProductManagement() {
                   <th className="px-4 py-4">Brand</th>
                   <th className="px-4 py-4">Category</th>
                   <th className="px-4 py-4">Model No</th>
-                  <th className="px-4 py-4">Colour</th>
-                  <th className="px-4 py-4">Size</th>
                   <th className="px-4 py-4">Amount</th>
-                  <th className="px-4 py-4">Extra Disc</th>
+                  <th className="px-4 py-4">Stock</th>
                   <th className="px-4 py-4">Status</th>
                   <th className="px-4 py-4 text-right">Actions</th>
                 </tr>
@@ -346,6 +431,7 @@ export default function ProductManagement() {
               <tbody className="divide-y divide-zinc-200">
                 {products.map((product, i) => {
                   const productId = product.id || product._id;
+                  const meta = product.lensMetadata || {};
                   return (
                     <motion.tr
                       key={productId}
@@ -365,7 +451,7 @@ export default function ProductManagement() {
                             </div>
                           ) : (
                             <div className="w-10 h-10 rounded-lg bg-zinc-50 border border-zinc-200 flex-shrink-0 flex items-center justify-center text-zinc-400">
-                              <Package className="w-4 h-4" />
+                              {activeTab === 'EYEWEAR' ? <Package className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </div>
                           )}
                           <div>
@@ -376,22 +462,27 @@ export default function ProductManagement() {
                                   Top 5
                                 </span>
                               )}
+                              {product.showcaseLens && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-tighter text-blue-600 ring-1 ring-inset ring-blue-500/20">
+                                  Showcase
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-4 text-sm text-zinc-600">{product.brand}</td>
+                      <td className="px-4 py-4 text-sm text-zinc-600 font-bold">{product.brand}</td>
                       <td className="px-4 py-4">
-                        <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest bg-zinc-100 px-2 py-0.5 rounded">{product.category}</span>
+                        <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest bg-zinc-100 px-2 py-0.5 rounded">
+                           {product.category}
+                        </span>
                       </td>
                       <td className="px-4 py-4 text-sm font-mono text-zinc-500">{product.sku}</td>
-                      <td className="px-4 py-4 text-sm text-zinc-600">{product.colour || '--'}</td>
-                      <td className="px-4 py-4 text-sm text-zinc-600">{product.size || '--'}</td>
                       <td className="px-4 py-4 text-sm font-semibold text-zinc-900">
                         {formatCurrency(product.price)}
                       </td>
                       <td className="px-4 py-4 text-sm text-zinc-600">
-                        {product.extraDisc ? `${product.extraDisc}%` : '--'}
+                        {product.stock || '0'}
                       </td>
                       <td className="px-4 py-4">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${
@@ -425,18 +516,6 @@ export default function ProductManagement() {
                     </motion.tr>
                   );
                 })}
-                
-                {!isLoading && !products.length && (
-                  <tr>
-                    <td colSpan={11} className="py-12 text-center">
-                      <div className="flex flex-col items-center justify-center">
-                        <Package className="w-8 h-8 text-zinc-300 mb-3" />
-                        <p className="text-sm font-medium text-zinc-900">No products found</p>
-                        <p className="text-sm text-zinc-500 mt-1">Try adjusting your search or filters.</p>
-                      </div>
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
@@ -444,6 +523,62 @@ export default function ProductManagement() {
       </AdminLayout>
 
       <AnimatePresence>
+        {showTypeSelector && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] bg-zinc-900/60 backdrop-blur-md flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden p-8"
+            >
+              <h2 className="text-2xl font-bold text-zinc-900 mb-2 text-center uppercase tracking-tight">Select Category</h2>
+              <p className="text-zinc-500 text-center mb-8 text-sm">Choose the type of item you want to add.</p>
+
+              <div className="grid grid-cols-1 gap-4">
+                <button
+                  onClick={() => handleTypeSelect('GLASS')}
+                  className="flex items-center gap-4 p-6 rounded-2xl border-2 border-zinc-100 hover:border-zinc-900 hover:bg-zinc-50 transition-all group text-left"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-zinc-900 group-hover:text-white transition-colors">
+                    <Package className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-bold text-zinc-900">Eyewear</div>
+                    <div className="text-xs text-zinc-500">Sunglasses, Frames, Optical.</div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-zinc-300 group-hover:text-zinc-900" />
+                </button>
+
+                <button
+                  onClick={() => handleTypeSelect('CONTACT_LENS')}
+                  className="flex items-center gap-4 p-6 rounded-2xl border-2 border-zinc-100 hover:border-zinc-900 hover:bg-zinc-50 transition-all group text-left"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-zinc-100 flex items-center justify-center group-hover:bg-zinc-900 group-hover:text-white transition-colors">
+                    <Eye className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-bold text-zinc-900">Contact Lens</div>
+                    <div className="text-xs text-zinc-500">Daily, Monthly, Technical specs.</div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-zinc-300 group-hover:text-zinc-900" />
+                </button>
+              </div>
+
+              <button
+                onClick={() => setShowTypeSelector(false)}
+                className="mt-8 w-full py-3 text-xs font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors"
+              >
+                Go Back
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+
         {isModalOpen && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -455,238 +590,243 @@ export default function ProductManagement() {
               initial={{ scale: 0.95, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 10 }}
-              className="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden max-h-[90vh] flex flex-col relative z-[101]"
+              className={`w-full ${productType === 'CONTACT_LENS' ? 'max-w-4xl' : 'max-w-2xl'} bg-white rounded-2xl shadow-xl overflow-hidden max-h-[95vh] flex flex-col relative z-[101]`}
             >
+              {/* Modal Header */}
               <div className="px-6 py-4 border-b border-zinc-200 flex items-center justify-between bg-white z-10">
                 <div>
-                  <h2 className="text-lg font-semibold text-zinc-900">{editingProduct ? 'Edit Product' : 'Add Product'}</h2>
-                  <p className="text-sm text-zinc-500">Provide details for the item below.</p>
+                  <h2 className="text-lg font-bold text-zinc-900 uppercase tracking-tight">
+                    {editingProduct ? 'Update' : 'Launch'} {productType === 'CONTACT_LENS' ? 'Contact Lens' : 'Eyewear'}
+                  </h2>
+                  <p className="text-xs text-zinc-500">Configure product details and inventory.</p>
                 </div>
                 <button
                   onClick={closeModal}
                   className="text-zinc-400 hover:text-zinc-600 bg-zinc-100 hover:bg-zinc-200 rounded-full p-2 transition-colors"
                 >
-                  <span className="sr-only">Close</span>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
-              <div className="p-6 overflow-y-auto flex-1 min-h-0" data-lenis-prevent>
-                {error && (
-                  <div className="mb-6 rounded-md bg-red-50 p-4 border border-red-200 text-sm text-red-700">
-                    {error}
-                  </div>
-                )}
+              {/* Form Content */}
+              <div className="p-8 overflow-y-auto flex-1 min-h-0" data-lenis-prevent>
+                {error && <div className="mb-6 rounded-xl bg-red-50 p-4 border border-red-100 text-xs font-bold text-red-600">{error}</div>}
 
-                <form id="product-form" className="space-y-6" onSubmit={onSubmit}>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                       <div className="space-y-1.5">
-                          <label className="text-sm font-medium text-zinc-700">Product Name *</label>
-                          <input type="text" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="Classic Aviator" required />
-                       </div>
-                       <div className="space-y-1.5">
-                         <label className="text-sm font-medium text-zinc-700">Model No (SKU) *</label>
-                         <input type="text" value={form.sku} onChange={(event) => setForm({ ...form, sku: event.target.value.toUpperCase() })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm font-mono" placeholder="AV-100-GLD" required />
-                       </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="space-y-1.5">
-                          <label className="text-sm font-medium text-zinc-700">Brand *</label>
-                          <select 
-                            value={form.brand} 
-                            onChange={(event) => setForm({ ...form, brand: event.target.value })} 
-                            className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm bg-white"
-                            required
-                          >
-                            <option value="">Select a Brand</option>
-                            {availableBrands.map((b) => (
-                              <option key={b.id} value={b.name}>{b.name}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-sm font-medium text-zinc-700">Category *</label>
-                          <select 
-                            value={form.category} 
-                            onChange={(event) => setForm({ ...form, category: event.target.value })} 
-                            className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm bg-white"
-                            required
-                          >
-                            <option value="">Select a Category</option>
-                            {PRODUCT_CATEGORIES.map((cat) => (
-                              <option key={cat} value={cat}>{cat}</option>
-                            ))}
-                          </select>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                       <div className="space-y-1.5">
-                         <label className="text-sm font-medium text-zinc-700">Colour</label>
-                         <input type="text" value={form.colour} onChange={(event) => setForm({ ...form, colour: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="Gold / Black" />
-                       </div>
-                       <div className="space-y-1.5">
-                         <label className="text-sm font-medium text-zinc-700">Size</label>
-                         <input type="text" value={form.size} onChange={(event) => setForm({ ...form, size: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="58-14-140" />
-                       </div>
-                    </div>
-
-                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <form id="product-form" className="space-y-10" onSubmit={onSubmit}>
+                   {/* SHARED FIELDS */}
+                   <section>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-6 flex items-center gap-2">
+                      <span className="w-4 h-px bg-zinc-200" /> Basic Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-1.5">
-                           <label className="text-sm font-medium text-zinc-700">Status</label>
-                           <select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm bg-white">
-                             <option value="ACTIVE">Active</option>
-                             <option value="DRAFT">Draft</option>
-                             <option value="ARCHIVED">Archived</option>
-                           </select>
+                        <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Product Name *</label>
+                        <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder={productType === 'CONTACT_LENS' ? "e.g. Acuvue Oasys" : "e.g. Aviator Gold"} required />
                       </div>
                       <div className="space-y-1.5">
-                           <label className="text-sm font-medium text-zinc-700">Target Gender</label>
-                           <select value={form.gender} onChange={(event) => setForm({ ...form, gender: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm bg-white">
-                             <option value="UNISEX">Unisex</option>
-                             <option value="MALE">Male</option>
-                             <option value="FEMALE">Female</option>
-                             <option value="CHILD">Child</option>
-                           </select>
+                        <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Brand *</label>
+                        {productType === 'CONTACT_LENS' ? (
+                          <select value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" required>
+                             <option value="">Select Brand</option>
+                             {LENS_BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
+                          </select>
+                        ) : (
+                          <select value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" required>
+                             <option value="">Select Brand</option>
+                             {availableBrands.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+                          </select>
+                        )}
                       </div>
-                   </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Model No / SKU *</label>
+                        <input type="text" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value.toUpperCase() })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none font-mono" required />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Category *</label>
+                        {productType === 'CONTACT_LENS' ? (
+                          <input type="text" value="CONTACT LENSES" readOnly className="w-full px-4 py-2.5 bg-zinc-100 border border-zinc-200 rounded-xl outline-none text-zinc-500 cursor-not-allowed" />
+                        ) : (
+                          <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" required>
+                             <option value="">Select Category</option>
+                             {PRODUCT_CATEGORIES.filter(c => c !== 'CONTACT LENSES').map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        )}
+                      </div>
+                    </div>
+                  </section>
 
-                   <div className="space-y-3">
-                        <label className="text-sm font-medium text-zinc-700">Product Images (Up to 5) *</label>
-                        
-                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                          {form.images?.map((img, index) => (
-                            <div key={index} className="relative aspect-square rounded-lg border border-zinc-200 bg-zinc-50 overflow-hidden group">
-                              <img src={img} alt={`Product ${index + 1}`} className="w-full h-full object-contain mix-blend-multiply" />
-                              <button
-                                type="button"
-                                onClick={() => removeImage(index)}
-                                className="absolute top-1 right-1 p-1 bg-white/90 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 hover:text-red-600"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                              {index === 0 && (
-                                <div className="absolute bottom-0 inset-x-0 bg-zinc-900/10 text-[8px] font-bold text-zinc-900 text-center py-0.5 uppercase tracking-tighter">Main</div>
-                              )}
-                            </div>
-                          ))}
+                  {/* LENS SPECIFIC FIELDS */}
+                  {productType === 'CONTACT_LENS' && (
+                    <>
+                      <section>
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-6 flex items-center gap-2">
+                          <span className="w-4 h-px bg-zinc-200" /> Lens Specifications
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div className="space-y-1.5">
+                            <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Vision Type</label>
+                            <select value={form.visionType} onChange={(e) => setForm({ ...form, visionType: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none">
+                              <option value="Spherical">Spherical</option>
+                              <option value="Toric">Toric</option>
+                              <option value="Multifocal">Multifocal</option>
+                              <option value="Color">Color</option>
+                            </select>
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Replacement</label>
+                            <select value={form.replacementSchedule} onChange={(e) => setForm({ ...form, replacementSchedule: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none">
+                              <option value="Daily disposable">Daily</option>
+                              <option value="Bi-weekly disposable">Bi-weekly</option>
+                              <option value="Monthly disposable">Monthly</option>
+                              <option value="Yearly">Yearly</option>
+                            </select>
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Lenses per Pack</label>
+                            <input type="number" value={form.lensesPerPack} onChange={(e) => setForm({ ...form, lensesPerPack: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. 30" />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Lens Material</label>
+                            <input type="text" value={form.lensMaterial} onChange={(e) => setForm({ ...form, lensMaterial: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. Silicone Hydrogel" />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Water Content (%)</label>
+                            <input type="text" value={form.waterContent} onChange={(e) => setForm({ ...form, waterContent: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. 38%" />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">UV Blocking</label>
+                            <select value={form.uvBlocking} onChange={(e) => setForm({ ...form, uvBlocking: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none">
+                              <option value="None">None</option>
+                              <option value="Class 1">Class 1 (90% UVA, 99% UVB)</option>
+                              <option value="Class 2">Class 2 (70% UVA, 95% UVB)</option>
+                              <option value="Yes">General UV Protection</option>
+                            </select>
+                          </div>
+                        </div>
+                      </section>
 
-                          {(!form.images || form.images.length < 5) && (
-                            <div className={`relative aspect-square rounded-lg border-2 border-dashed transition-colors flex flex-col items-center justify-center gap-1 ${isUploading ? 'border-zinc-200 bg-zinc-50' : 'border-zinc-300 bg-zinc-50 hover:border-zinc-400 cursor-pointer'}`}>
-                              {isUploading ? (
-                                <Loader2 className="h-5 w-5 text-zinc-400 animate-spin" />
-                              ) : (
-                                <>
-                                  <Plus className="w-5 h-5 text-zinc-400" />
-                                  <span className="text-[10px] font-medium text-zinc-500">Add Photo</span>
-                                  <input type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploading} className="absolute inset-0 opacity-0 cursor-pointer" />
-                                </>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        <p className="text-xs text-zinc-500">First image will be used as the primary display image.</p>
-                   </div>
-
-                   <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-zinc-700">Description</label>
-                      <textarea value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} rows={4} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="Write a short description..." />
-                   </div>
-
-                   <div className="border-t border-zinc-100 pt-6">
-                     <h3 className="text-sm font-semibold text-zinc-900 mb-4 uppercase tracking-wider">Product Specifications</h3>
-                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="space-y-1.5">
-                          <label className="text-sm font-medium text-zinc-700">Architecture</label>
-                          <input type="text" value={form.architecture} onChange={(event) => setForm({ ...form, architecture: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="e.g. Rectangular" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-sm font-medium text-zinc-700">Primary Material</label>
-                          <input type="text" value={form.material} onChange={(event) => setForm({ ...form, material: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="e.g. High-Grade Alloy" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-sm font-medium text-zinc-700">Silhouette (Design)</label>
-                          <input type="text" value={form.silhouette} onChange={(event) => setForm({ ...form, silhouette: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="e.g. Minimalist" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-sm font-medium text-zinc-700">Finish</label>
-                          <input type="text" value={form.finish} onChange={(event) => setForm({ ...form, finish: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="e.g. Matte / Polished" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-sm font-medium text-zinc-700">Lens Sweep (Optic)</label>
-                          <input type="text" value={form.lensSweep} onChange={(event) => setForm({ ...form, lensSweep: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="e.g. 40mm Sweep" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-sm font-medium text-zinc-700">Protection</label>
-                          <input type="text" value={form.protection} onChange={(event) => setForm({ ...form, protection: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="e.g. UV400 Certified" />
-                        </div>
-                     </div>
-                   </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                       <div className="space-y-1.5">
-                           <label className="text-sm font-medium text-zinc-700">Amount (INR) *</label>
-                           <div className="relative rounded-md shadow-sm">
-                             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                               <span className="text-zinc-500 sm:text-sm">₹</span>
-                             </div>
-                             <input type="number" value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} className="block w-full pl-7 pr-3 py-2 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="0.00" required min="0" />
+                      <section>
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-6 flex items-center gap-2">
+                          <span className="w-4 h-px bg-zinc-200" /> Parameters & Availability
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                           <div className="space-y-1.5">
+                              <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Base Curves (Comma sep) *</label>
+                              <input type="text" value={form.availableBC} onChange={(e) => setForm({ ...form, availableBC: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="8.5, 8.6" required={productType === 'CONTACT_LENS'} />
                            </div>
-                       </div>
-                       <div className="space-y-1.5">
-                          <label className="text-sm font-medium text-zinc-700">Extra Disc (%)</label>
-                          <input type="number" value={form.extraDisc} onChange={(event) => setForm({ ...form, extraDisc: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="0" min="0" max="100" />
-                       </div>
-                       <div className="space-y-1.5">
-                          <label className="text-sm font-medium text-zinc-700">Stock *</label>
-                          <input type="number" value={form.stock} onChange={(event) => setForm({ ...form, stock: event.target.value })} className="block w-full px-3 py-2 border border-zinc-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-zinc-900 sm:text-sm" placeholder="0" required min="0" />
-                       </div>
+                           <div className="space-y-1.5">
+                              <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Diameters (Comma sep) *</label>
+                              <input type="text" value={form.availableDia} onChange={(e) => setForm({ ...form, availableDia: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="14.0, 14.2" required={productType === 'CONTACT_LENS'} />
+                           </div>
+                           <div className="space-y-1.5 md:col-span-2">
+                              <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Available Power Range (Text description)</label>
+                              <input type="text" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. -0.50 to -10.00 (in 0.25 steps), +0.50 to +6.00" />
+                              <p className="text-[10px] text-zinc-400 mt-1 italic">Note: Use this to inform customers about the range you stock.</p>
+                           </div>
+                        </div>
+                      </section>
+                    </>
+                  )}
+
+                  {/* EYEWEAR SPECIFIC FIELDS */}
+                  {productType === 'GLASS' && (
+                    <section>
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-6 flex items-center gap-2">
+                        <span className="w-4 h-px bg-zinc-200" /> Frame Specifications
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-1.5">
+                          <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Material</label>
+                          <input type="text" value={form.material} onChange={(e) => setForm({ ...form, material: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. Titanium" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Shape / Architecture</label>
+                          <input type="text" value={form.architecture} onChange={(e) => setForm({ ...form, architecture: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. Round" />
+                        </div>
+                      </div>
+                    </section>
+                  )}
+
+                  {/* PRICING & INVENTORY */}
+                  <section>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-6 flex items-center gap-2">
+                      <span className="w-4 h-px bg-zinc-200" /> Pricing & Inventory
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">MRP (₹)</label>
+                        <input type="number" value={form.mrp} onChange={(e) => setForm({ ...form, mrp: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Selling Price (₹) *</label>
+                        <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" required />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Stock Units *</label>
+                        <input type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" required />
+                      </div>
                     </div>
+                  </section>
 
-                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                     <div className="flex items-center gap-3 bg-zinc-50 p-4 rounded-lg border border-zinc-200">
-                       <div className="flex h-5 items-center">
-                         <input id="featured" type="checkbox" checked={form.featured} onChange={(event) => setForm({ ...form, featured: event.target.checked })} className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900" />
-                       </div>
-                       <div className="text-sm">
-                         <label htmlFor="featured" className="font-medium text-zinc-700">Featured Product</label>
-                         <p className="text-[10px] text-zinc-500">Show in main frames section.</p>
-                       </div>
-                     </div>
-
-                     <div className="flex items-center gap-3 bg-gold/5 p-4 rounded-lg border border-gold/10">
-                       <div className="flex h-5 items-center">
-                         <input id="topSelling" type="checkbox" checked={form.topSelling} onChange={(event) => setForm({ ...form, topSelling: event.target.checked })} className="h-4 w-4 rounded border-gold/30 text-gold focus:ring-gold" />
-                       </div>
-                       <div className="text-sm">
-                         <label htmlFor="topSelling" className="font-medium text-zinc-900">Top 5 Selling</label>
-                         <p className="text-[10px] text-zinc-500">Feature in premium top-5 list.</p>
-                       </div>
-                     </div>
-                   </div>
+                  {/* IMAGES */}
+                  <section>
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-6 flex items-center gap-2">
+                      <span className="w-4 h-px bg-zinc-200" /> Media & Visibility
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                       {productType === 'GLASS' && (
+                         <label className="flex items-center gap-3 p-4 bg-zinc-50 border border-zinc-200 rounded-2xl cursor-pointer hover:bg-zinc-100 transition-colors">
+                            <input type="checkbox" checked={form.topSelling} onChange={(e) => setForm({ ...form, topSelling: e.target.checked })} className="w-5 h-5 rounded-md border-zinc-300 text-zinc-900 focus:ring-zinc-900" />
+                            <div className="flex-1">
+                               <div className="text-[11px] font-bold text-zinc-900 uppercase">Top 5 Selling</div>
+                               <div className="text-[10px] text-zinc-500">Display on Home Page Top Selling scroll.</div>
+                            </div>
+                         </label>
+                       )}
+                       
+                       {productType === 'CONTACT_LENS' && (
+                         <label className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-100 rounded-2xl cursor-pointer hover:bg-blue-100 transition-colors">
+                            <input type="checkbox" checked={form.showcaseLens} onChange={(e) => setForm({ ...form, showcaseLens: e.target.checked })} className="w-5 h-5 rounded-md border-blue-300 text-blue-600 focus:ring-blue-600" />
+                            <div className="flex-1">
+                               <div className="text-[11px] font-bold text-blue-900 uppercase">Showcase on Lens Page</div>
+                               <div className="text-[10px] text-blue-500">Feature this lens in the Contact Lens shop section.</div>
+                            </div>
+                         </label>
+                       )}
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        {form.images?.map((img, index) => (
+                          <div key={index} className="relative aspect-square rounded-xl bg-zinc-50 border border-zinc-200 overflow-hidden group">
+                            <img src={img} className="w-full h-full object-contain" alt="" />
+                            <button type="button" onClick={() => removeImage(index)} className="absolute inset-0 bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        ))}
+                        {form.images.length < 5 && (
+                          <label className="aspect-square rounded-xl bg-zinc-50 border-2 border-dashed border-zinc-200 flex flex-col items-center justify-center cursor-pointer hover:border-zinc-900 transition-all gap-2 group/upload">
+                             {isUploading ? (
+                               <Loader2 className="w-5 h-5 animate-spin text-zinc-400" />
+                             ) : (
+                               <>
+                                 <Plus size={24} className="text-zinc-400 group-hover/upload:text-zinc-900 transition-colors" />
+                                 <span className="text-[9px] font-black uppercase tracking-[0.1em] text-zinc-400 group-hover/upload:text-zinc-900 transition-colors">Upload the photo</span>
+                               </>
+                             )}
+                             <input type="file" className="hidden" onChange={handleImageUpload} />
+                          </label>
+                        )}
+                    </div>
+                  </section>
                 </form>
               </div>
 
-              <div className="px-6 py-4 border-t border-zinc-200 bg-zinc-50 flex items-center justify-end gap-3 z-10">
-                  <button
-                     type="button"
-                     onClick={closeModal}
-                     className="px-4 py-2 border border-zinc-300 rounded-lg text-sm font-medium text-zinc-700 bg-white hover:bg-zinc-50 transition-colors shadow-sm"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit" 
-                    form="product-form"
-                    disabled={isSubmitting || isMock} 
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-zinc-900 text-sm font-medium text-white hover:bg-zinc-800 transition-colors shadow-sm disabled:opacity-60"
-                  >
-                    {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                    {editingProduct ? 'Save Changes' : 'Create Product'}
-                  </button>
+              {/* Modal Footer */}
+              <div className="px-8 py-6 border-t border-zinc-200 bg-white flex items-center justify-end gap-4 z-10">
+                <button type="button" onClick={closeModal} className="px-6 py-2.5 text-xs font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors">Cancel</button>
+                <button type="submit" form="product-form" disabled={isSubmitting || isMock} className="px-10 py-2.5 bg-zinc-900 text-white rounded-full text-xs font-black uppercase tracking-[0.2em] shadow-lg shadow-zinc-900/20 hover:bg-zinc-800 transition-all disabled:opacity-50">
+                  {isSubmitting ? 'Syncing...' : (editingProduct ? 'Save Changes' : 'Confirm & Launch')}
+                </button>
               </div>
             </motion.div>
           </motion.div>

@@ -72,7 +72,7 @@ export default function WishlistProvider({ children }) {
   const isInWishlist = (id) => wishlist.some(item => item.id === id);
 
   return (
-    <WishlistContext.Provider value={{ wishlist, toggleWishlist, isInWishlist }}>
+    <WishlistContext.Provider value={{ wishlist, toggleWishlist, isInWishlist, setWishlist }}>
       {children}
     </WishlistContext.Provider>
   );

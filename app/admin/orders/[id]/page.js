@@ -2,16 +2,16 @@
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  Package, 
-  Truck, 
-  CheckCircle2, 
-  XCircle, 
-  Clock, 
-  User, 
-  MapPin, 
-  CreditCard, 
+import {
+  ArrowLeft,
+  Package,
+  Truck,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  User,
+  MapPin,
+  CreditCard,
   ChevronRight,
   ExternalLink,
   Printer,
@@ -92,7 +92,7 @@ export default function OrderDetails() {
       <div className="max-w-5xl mx-auto">
         <header className="mb-8 flex items-center justify-between print:hidden">
           <div className="flex items-center gap-4">
-            <Link 
+            <Link
               href="/admin/orders"
               className="p-2 hover:bg-zinc-100 rounded-full transition-colors text-zinc-500"
             >
@@ -103,11 +103,10 @@ export default function OrderDetails() {
                 <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
                   Order {order.orderNumber || `#${order._id.substring(0, 8)}`}
                 </h1>
-                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-                  order.status === 'confirmed' ? 'bg-green-50 text-green-700 border-green-100' :
-                  order.status === 'CANCELLED' ? 'bg-red-50 text-red-700 border-red-100' :
-                  'bg-amber-50 text-amber-700 border-amber-100'
-                }`}>
+                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${order.status === 'confirmed' ? 'bg-green-50 text-green-700 border-green-100' :
+                    order.status === 'CANCELLED' ? 'bg-red-50 text-red-700 border-red-100' :
+                      'bg-amber-50 text-amber-700 border-amber-100'
+                  }`}>
                   {order.status}
                 </span>
               </div>
@@ -115,7 +114,7 @@ export default function OrderDetails() {
             </div>
           </div>
           <div className="flex items-center gap-2 print:hidden">
-            <button 
+            <button
               onClick={handlePrint}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
             >
@@ -230,11 +229,11 @@ export default function OrderDetails() {
                 {order.items?.map((item, idx) => (
                   <div key={idx} className="p-6 flex items-center gap-4 hover:bg-zinc-50/50 transition-colors">
                     <div className="w-16 h-16 bg-zinc-50 rounded-lg border border-zinc-100 flex items-center justify-center overflow-hidden shrink-0">
-                       {item.image ? (
-                         <img src={item.image} alt={item.name} className="w-full h-full object-contain p-2" />
-                       ) : (
-                         <Package size={24} className="text-zinc-200" />
-                       )}
+                      {item.image ? (
+                        <img src={item.image} alt={item.name} className="w-full h-full object-contain p-2" />
+                      ) : (
+                        <Package size={24} className="text-zinc-200" />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start">
@@ -243,8 +242,8 @@ export default function OrderDetails() {
                       </div>
                       <div className="text-xs text-zinc-500 mt-0.5">{item.name}</div>
                       <div className="flex items-center gap-4 mt-2">
-                         <span className="text-[10px] text-zinc-400 font-mono">Qty: {item.quantity}</span>
-                         <span className="text-[10px] text-zinc-400 font-mono">SKU: {item.sku || 'N/A'}</span>
+                        <span className="text-[10px] text-zinc-400 font-mono">Qty: {item.quantity}</span>
+                        <span className="text-[10px] text-zinc-400 font-mono">SKU: {item.sku || 'N/A'}</span>
                       </div>
                     </div>
                   </div>
@@ -278,11 +277,10 @@ export default function OrderDetails() {
                       key={step.value}
                       onClick={() => updateStatus(step.value)}
                       disabled={isUpdating}
-                      className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all ${
-                        isActive 
-                          ? `border-zinc-900 bg-zinc-900 text-white shadow-md` 
+                      className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all ${isActive
+                          ? `border-zinc-900 bg-zinc-900 text-white shadow-md`
                           : 'border-zinc-100 bg-white hover:border-zinc-300 text-zinc-500'
-                      }`}
+                        }`}
                     >
                       <Icon size={20} className={isActive ? 'text-white' : step.color} />
                       <span className="text-[10px] font-bold uppercase tracking-widest mt-2">{step.label}</span>
@@ -310,7 +308,7 @@ export default function OrderDetails() {
                       <div className="text-xs text-zinc-500">{order.customer.email}</div>
                     </div>
                   </div>
-                  <Link 
+                  <Link
                     href={`/admin/users?q=${order.customer.email}`}
                     className="flex items-center justify-between text-xs font-bold text-zinc-900 hover:text-gold transition-colors pt-2 border-t border-zinc-50"
                   >
@@ -325,22 +323,22 @@ export default function OrderDetails() {
 
             {/* Shipping Address */}
             <section className="bg-white rounded-xl border border-zinc-200 shadow-sm p-6">
-               <div className="flex items-center justify-between mb-4">
-                 <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-[0.2em]">Shipping</h2>
-                 <MapPin size={14} className="text-zinc-300" />
-               </div>
-               {order.address ? (
-                 <div className="space-y-1">
-                   <div className="text-sm font-bold text-zinc-900 uppercase tracking-tight">{order.address.name}</div>
-                   <div className="text-xs text-zinc-600 leading-relaxed">
-                     {order.address.addressLine}, {order.address.area}<br />
-                     {order.address.city}, {order.address.state} - {order.address.pincode}<br />
-                     <span className="block mt-2 font-mono font-bold text-zinc-900 tracking-tighter">PH: {order.address.phone}</span>
-                   </div>
-                 </div>
-               ) : (
-                 <p className="text-xs text-zinc-500 italic">Address data not found</p>
-               )}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-[0.2em]">Shipping</h2>
+                <MapPin size={14} className="text-zinc-300" />
+              </div>
+              {order.address ? (
+                <div className="space-y-1">
+                  <div className="text-sm font-bold text-zinc-900 uppercase tracking-tight">{order.address.name}</div>
+                  <div className="text-xs text-zinc-600 leading-relaxed">
+                    {order.address.addressLine}, {order.address.area}<br />
+                    {order.address.city}, {order.address.state} - {order.address.pincode}<br />
+                    <span className="block mt-2 font-mono font-bold text-zinc-900 tracking-tighter">PH: {order.address.phone}</span>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-zinc-500 italic">Address data not found</p>
+              )}
             </section>
 
             {/* Payment Details */}
@@ -354,8 +352,8 @@ export default function OrderDetails() {
                 <span className="px-2 py-0.5 bg-green-50 text-green-700 text-[10px] font-black uppercase rounded">Paid</span>
               </div>
               <div className="mt-4 pt-4 border-t border-zinc-50">
-                 <div className="text-[10px] text-zinc-400 uppercase tracking-widest mb-1">Transaction Ref</div>
-                 <div className="text-[10px] font-mono font-bold text-zinc-900 break-all">{order.paymentId || 'TXN_REF_ARCHIVE_5592'}</div>
+                <div className="text-[10px] text-zinc-400 uppercase tracking-widest mb-1">Transaction Ref</div>
+                <div className="text-[10px] font-mono font-bold text-zinc-900 break-all">{order.paymentId || 'TXN_REF_ARCHIVE_5592'}</div>
               </div>
             </section>
           </div>

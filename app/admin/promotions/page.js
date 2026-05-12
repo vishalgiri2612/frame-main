@@ -210,9 +210,9 @@ export default function CouponsPage() {
               <tr className="bg-zinc-50/50">
                 <th className="px-6 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Code</th>
                 <th className="px-6 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Discount</th>
-                <th className="px-6 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Usage</th>
+                <th className="px-6 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-wider hidden sm:table-cell">Usage</th>
                 <th className="px-6 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Expires</th>
+                <th className="px-6 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-wider hidden md:table-cell">Expires</th>
                 <th className="px-6 py-3 text-[10px] font-bold text-zinc-400 uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
@@ -240,12 +240,12 @@ export default function CouponsPage() {
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className="text-sm font-bold text-zinc-900">
-                          {coupon.discountType === 'PERCENTAGE' ? `${coupon.discountValue}% OFF` : `₹${coupon.discountValue} OFF`}
+                          {coupon.discountType === 'PERCENTAGE' ? `${coupon.discountValue}%` : `₹${coupon.discountValue}`}
                         </span>
-                        <span className="text-[10px] text-zinc-500">Min: ₹{coupon.minOrderValue}</span>
+                        <span className="text-[10px] text-zinc-500 sm:hidden">Min: ₹{coupon.minOrderValue}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 hidden sm:table-cell">
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-zinc-700">{coupon.usedCount} used</span>
                         <span className="text-[10px] text-zinc-400">Limit: {coupon.usageLimit || '∞'}</span>
@@ -258,7 +258,7 @@ export default function CouponsPage() {
                         {coupon.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-xs text-zinc-500 font-medium">
+                    <td className="px-6 py-4 text-xs text-zinc-500 font-medium hidden md:table-cell">
                       {coupon.expiryDate ? new Date(coupon.expiryDate).toLocaleDateString() : 'Never'}
                     </td>
                     <td className="px-6 py-4 text-right">

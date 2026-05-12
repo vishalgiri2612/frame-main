@@ -4,9 +4,11 @@ import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 
 export default function ThemeToggle() {
   const [isLight, setIsLight] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const controls = useAnimation();
 
   useEffect(() => {
+    setMounted(true);
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
       setIsLight(false);
@@ -16,6 +18,8 @@ export default function ThemeToggle() {
       document.body.classList.remove('dark-mode');
     }
   }, []);
+
+  if (!mounted) return null;
 
   const toggleTheme = async () => {
     await controls.start({

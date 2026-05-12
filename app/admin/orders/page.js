@@ -109,12 +109,12 @@ export default function OrderManagement() {
           <table className="w-full text-left whitespace-nowrap">
             <thead>
               <tr className="border-b border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                <th className="px-6 py-4">Order ID</th>
+                <th className="px-6 py-4 hidden lg:table-cell">Order ID</th>
                 <th className="px-6 py-4">Customer</th>
-                <th className="px-6 py-4">Items</th>
+                <th className="px-6 py-4 hidden sm:table-cell">Items</th>
                 <th className="px-6 py-4">Total</th>
                 <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Date</th>
+                <th className="px-6 py-4 hidden md:table-cell">Date</th>
                 <th className="px-6 py-4 text-right">Action</th>
               </tr>
             </thead>
@@ -128,19 +128,19 @@ export default function OrderManagement() {
                   className="hover:bg-zinc-50/80 transition-colors cursor-pointer group/row"
                   onClick={() => router.push(`/admin/orders/${order.id}`)}
                 >
-                  <td className="px-6 py-4 text-xs font-mono font-medium text-zinc-900">{order.orderNumber || '-'}</td>
+                  <td className="px-6 py-4 text-xs font-mono font-medium text-zinc-900 hidden lg:table-cell">{order.orderNumber || '-'}</td>
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-zinc-900">{order.customerName || '-'}</div>
-                    <div className="text-xs text-zinc-500 mt-0.5">{order.customerEmail || '-'}</div>
+                    <div className="text-[10px] text-zinc-500 mt-0.5 md:text-xs">{order.customerEmail || '-'}</div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-zinc-600">{order.itemCount || 0} items</td>
+                  <td className="px-6 py-4 text-sm text-zinc-600 hidden sm:table-cell">{order.itemCount || 0} items</td>
                   <td className="px-6 py-4 text-sm font-semibold text-zinc-900">{formatCurrency(order.totalAmount)}</td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${statusStyles[order.status] || statusStyles['PENDING']}`}>
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${statusStyles[order.status] || statusStyles['PENDING']}`}>
                       {order.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-zinc-500">{formatDate(order.createdAt)}</td>
+                  <td className="px-6 py-4 text-sm text-zinc-500 hidden md:table-cell">{formatDate(order.createdAt)}</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-3">
                       <Link 

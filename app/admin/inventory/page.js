@@ -44,10 +44,15 @@ export default function InventoryDashboard() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [newStock, setNewStock] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('ALL'); // 'ALL', 'EYEWEAR', 'CONTACT_LENSES'
 
   const loadData = async () => {
     try {
-      const res = await adminFetch('/api/admin/inventory');
+      let url = '/api/admin/inventory';
+      if (activeCategory === 'EYEWEAR') url += '?excludeCategory=CONTACT LENSES';
+      if (activeCategory === 'CONTACT_LENSES') url += '?category=CONTACT LENSES';
+      
+      const res = await adminFetch(url);
       setData(res);
     } catch (err) {
       console.error(err);
@@ -58,7 +63,7 @@ export default function InventoryDashboard() {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [activeCategory]);
 
   const handleSearch = async (val) => {
     setSearchQuery(val);
@@ -127,6 +132,29 @@ export default function InventoryDashboard() {
           </div>
           
           {/* Quick Search & Add Stock */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="flex p-1 bg-zinc-100 rounded-xl w-fit border border-zinc-200">
+            <button 
+              onClick={() => setActiveCategory('ALL')}
+              className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${activeCategory === 'ALL' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
+            >
+              All Inventory
+            </button>
+            <button 
+              onClick={() => setActiveCategory('EYEWEAR')}
+              className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${activeCategory === 'EYEWEAR' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
+            >
+              Eyewear
+            </button>
+            <button 
+              onClick={() => setActiveCategory('CONTACT_LENSES')}
+              className={`px-6 py-2 rounded-lg text-xs font-bold transition-all ${activeCategory === 'CONTACT_LENSES' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
+            >
+              Lenses
+            </button>
+          </div>
+          
+          {/* Quick Search & Add Stock */}
           <div className="relative w-full sm:w-80">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
@@ -145,7 +173,7 @@ export default function InventoryDashboard() {
               <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-zinc-200 shadow-2xl z-50 overflow-hidden py-2">
                 {searchResults.map((p) => (
                   <button 
-                    key={p.id}
+                    key={p.id || p._id}
                     onClick={() => openUpdateModal(p)}
                     className="w-full px-4 py-3 hover:bg-zinc-50 text-left flex items-center justify-between group transition-colors"
                   >
@@ -164,6 +192,7 @@ export default function InventoryDashboard() {
               </div>
             )}
           </div>
+        </div>
         </header>
 
         {/* Top Summary Widgets */}

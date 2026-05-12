@@ -115,6 +115,9 @@ function buildUpdate(payload) {
   if (payload.topSelling !== undefined) {
     update.topSelling = Boolean(payload.topSelling);
   }
+  if (payload.showcaseLens !== undefined) {
+    update.showcaseLens = Boolean(payload.showcaseLens);
+  }
 
   if (typeof payload.colour === "string") {
     update.colour = payload.colour.trim();
@@ -157,6 +160,17 @@ function buildUpdate(payload) {
     if (Number.isFinite(extraDisc)) {
       update.extraDisc = extraDisc;
     }
+  }
+
+  if (payload.mrp !== undefined) {
+    const mrp = Number(payload.mrp);
+    if (Number.isFinite(mrp)) {
+      update.mrp = mrp;
+    }
+  }
+
+  if (payload.lensMetadata && typeof payload.lensMetadata === "object") {
+    update.lensMetadata = payload.lensMetadata;
   }
 
   if (payload.price !== undefined) {

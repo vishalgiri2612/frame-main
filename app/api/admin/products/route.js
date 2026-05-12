@@ -21,7 +21,7 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const pagination = parsePagination(searchParams);
     const sort = parseSort(searchParams, ["createdAt", "name", "price", "stock", "status"], { createdAt: -1 });
-    
+
     const db = await getDb();
     const query = {};
 
@@ -40,6 +40,19 @@ export async function GET(request) {
       ];
     }
 
+    const category = searchParams.get("category");
+    const excludeCategory = searchParams.get("excludeCategory");
+    if (category) {
+      query.category = category;
+    } else if (excludeCategory) {
+      query.category = { $ne: excludeCategory };
+    }
+
+    const brandFilter = searchParams.get("brand");
+    if (brandFilter) {
+      query.brand = brandFilter;
+    }
+
     const [items, total] = await Promise.all([
       db.collection("products")
         .find(query)
@@ -49,7 +62,7 @@ export async function GET(request) {
         .toArray(),
       db.collection("products").countDocuments(query),
     ]);
-    
+
     return NextResponse.json({
       items: serializeList(items),
       pagination: {
@@ -98,6 +111,7 @@ export async function POST(request) {
       description: payload.description?.trim() || "",
       featured: Boolean(payload.featured),
       topSelling: Boolean(payload.topSelling),
+      showcaseLens: Boolean(payload.showcaseLens),
       colour: payload.colour?.trim() || "",
       size: payload.size?.trim() || "",
       extraDisc: Number(payload.extraDisc) || 0,
@@ -111,6 +125,8 @@ export async function POST(request) {
         ? payload.tags.map((tag) => String(tag).trim()).filter(Boolean)
         : [],
       gender: payload.gender || "UNISEX",
+      mrp: Number(payload.mrp) || 0,
+      lensMetadata: payload.lensMetadata && typeof payload.lensMetadata === "object" ? payload.lensMetadata : {},
       createdAt: asDate(payload.createdAt) || now,
       updatedAt: now,
       createdBy: auth.session?.user?.id || null,
