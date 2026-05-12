@@ -46,6 +46,11 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${cormorant.variable} ${inter.variable} ${playfair.variable}`}
     >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://india.ray-ban.com" />
+      </head>
       <body className="overflow-x-hidden antialiased">
         <BackgroundGlow />
         <SmoothScroll>

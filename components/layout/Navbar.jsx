@@ -6,8 +6,10 @@ import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { useCart } from '@/components/providers/CartProvider';
 import { useWishlist } from '@/components/providers/WishlistProvider';
-import SearchOverlay from '@/components/ui/SearchOverlay';
 import { Search, ShoppingBag, User, Menu, X, Heart, LogOut } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+const SearchOverlay = dynamic(() => import('@/components/ui/SearchOverlay'), { ssr: false });
 
 const navLinks = [
   { name: 'Shop', href: '/shop' },

@@ -1,6 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function BrandShowcase({ brands = [] }) {
   if (!brands || brands.length === 0) return null;
@@ -84,16 +85,22 @@ function BrandCard({ data, className = '', isHero = false }) {
 
         {/* Floating Product Image */}
         <div className="absolute inset-0 flex items-center justify-center p-8 md:p-12 z-20 pointer-events-none">
-          <motion.img
-            src={data.image}
-            alt={data.name}
-            className="w-full h-full object-contain filter drop-shadow-[0_30px_30px_rgba(0,0,0,0.8)]"
+          <motion.div
+            className="relative w-full h-full"
             variants={{
               rest: { scale: 1, y: 0 },
               hover: { scale: 1.15, y: -10 }
             }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          />
+          >
+            <Image
+              src={data.image}
+              alt={data.name}
+              fill
+              className="object-contain filter drop-shadow-[0_30px_30px_rgba(0,0,0,0.8)]"
+              sizes="(max-width: 768px) 50vw, 33vw"
+            />
+          </motion.div>
         </div>
 
         {/* Year Badge */}

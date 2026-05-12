@@ -11,22 +11,31 @@ export default function TheRevealLoader() {
   const skipped = useRef(false);
 
   useEffect(() => {
+    // Session check for performance and UX
+    const hasSeenLoader = sessionStorage.getItem('hasSeenLoader');
+    if (hasSeenLoader) {
+      setPhase('done');
+      setIsVisible(false);
+      return;
+    }
+
     // Allow skip after 200ms
     const skipTimer = setTimeout(() => setSkippable(true), 200);
 
     // Phase sequence timing
     const lineTimer = setTimeout(() => {
       if (!skipped.current) setPhase('line');
-    }, 500); // speed up from 1000ms
+    }, 400);
 
     const curtainTimer = setTimeout(() => {
       if (!skipped.current) setPhase('curtain');
-    }, 1100); // speed up from 2000ms
+    }, 900);
 
     const doneTimer = setTimeout(() => {
       if (!skipped.current) setPhase('done');
+      sessionStorage.setItem('hasSeenLoader', 'true');
       setTimeout(() => setIsVisible(false), 200);
-    }, 1600); // speed up from 2800ms
+    }, 1300);
 
     return () => {
       clearTimeout(skipTimer);

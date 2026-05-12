@@ -51,7 +51,6 @@ export default function Magazine() {
                   fill
                   sizes="(max-width: 1024px) 100vw, 500px"
                   className="object-cover"
-                  priority
                 />
             </div>
             <div className="mt-8 text-center">

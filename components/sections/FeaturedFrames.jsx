@@ -36,13 +36,11 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
 
   return (
     <motion.div
-      layout
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ delay: index * 0.08, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       className="product-card group cursor-pointer"
-      style={{ transform: 'translateZ(0)', willChange: 'transform' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => router.push(`/shop/${product.id || product.sku}`)}
@@ -64,7 +62,6 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
             loading="lazy"
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             className="next-image object-contain p-4 md:p-8 transition-transform duration-700 group-hover:scale-[1.04]"
-            style={{ transform: 'translateZ(0)', willChange: 'transform' }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
@@ -116,7 +113,7 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
 
       </div>
 
-      <div className="mt-4 space-y-3 transition-transform duration-500 group-hover:translate-x-5" style={{ willChange: 'transform' }}>
+      <div className="mt-4 space-y-3 transition-transform duration-500 group-hover:translate-x-5">
         <div className="flex justify-between items-end">
           <h2
             style={{
