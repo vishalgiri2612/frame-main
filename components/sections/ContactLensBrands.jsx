@@ -27,7 +27,7 @@ export default function ContactLensBrands() {
             transition={{ delay: 0.1 }}
             className="text-lg text-zinc-500 leading-relaxed"
           >
-            We partner with the world's most trusted manufacturers to bring you 
+            We partner with the world&apos;s most trusted manufacturers to bring you 
             superior vision technology tailored to your specific needs.
           </motion.p>
         </div>

@@ -133,7 +133,7 @@ export default function SearchOverlay({ isOpen, onClose }) {
                      </div>
                    ) : !isLoading && (
                       <div className="text-center py-20">
-                         <p className="text-gold/40 font-serif text-2xl italic">No specimens found for "{query}"</p>
+                         <p className="text-gold/40 font-serif text-2xl italic">No specimens found for &quot;{query}&quot;</p>
                          <button 
                             onClick={() => setQuery('')}
                             className="mt-4 text-[10px] tracking-[0.4em] uppercase text-gold hover:text-white transition-colors"

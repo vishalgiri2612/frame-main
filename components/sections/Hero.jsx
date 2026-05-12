@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -50,23 +50,23 @@ export default function Hero({ slides: propSlides = [] }) {
   const timerRef = useRef(null);
 
 
-  const startAutoplay = () => {
+  const startAutoplay = useCallback(() => {
     clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % slides.length);
     }, 3000);
     resetProgress();
-  };
+  }, [slides.length]);
 
-  const resetProgress = () => {
+  const resetProgress = useCallback(() => {
     setProgressRunning(false);
     setTimeout(() => setProgressRunning(true), 50); // slight delay to re-trigger animation
-  };
+  }, []);
 
   useEffect(() => {
     startAutoplay();
     return () => clearInterval(timerRef.current);
-  }, []);
+  }, [startAutoplay]);
 
   const next = () => {
     setCurrentSlide(prev => (prev + 1) % slides.length);

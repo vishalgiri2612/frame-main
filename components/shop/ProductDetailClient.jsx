@@ -185,7 +185,7 @@ export default function ProductDetailClient({ product, similarProducts }) {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isLightboxOpen, images.length]); // Added images.length to dependencies
+  }, [isLightboxOpen, nextImage, prevImage, closeLightbox]);
 
   const cleanId = `${product.id?.substring(0, 15)}...`;
 
