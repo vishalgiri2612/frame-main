@@ -28,9 +28,9 @@ export default async function Home() {
         <TheRevealLoader />
         <Hero slides={heroSlides} />
         <BrandMarquee />
-        <BrandShowcase brands={showcaseBrands} />
         <TopSellingSection products={topSellingProducts} />
         <FeaturedFrames initialProducts={displayProducts} />
+        <BrandShowcase brands={showcaseBrands} />
         <CollectionGallery />
         <Magazine />
         <BookingSection />

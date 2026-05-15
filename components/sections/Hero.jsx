@@ -54,7 +54,7 @@ export default function Hero({ slides: propSlides = [] }) {
     clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % slides.length);
-    }, 3000);
+    }, 5000);
     resetProgress();
   }, [slides.length]);
 

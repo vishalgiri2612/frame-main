@@ -47,6 +47,7 @@ const DEFAULT_FORM = {
   showcaseLens: false,
   gender: 'UNISEX',
   tags: '',
+  newArrival: false,
 };
 
 const PRODUCT_CATEGORIES = [
@@ -128,7 +129,7 @@ export default function ProductManagement() {
 
     setIsUploading(true);
     setError('');
-    
+
     const formData = new FormData();
     formData.append('file', file);
 
@@ -137,19 +138,19 @@ export default function ProductManagement() {
         method: 'POST',
         body: formData,
       });
-      
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Upload failed');
-      
+
       setForm(prev => {
         const newImages = [...(prev.images || [])];
         if (newImages.length < 5) {
           newImages.push(data.url);
         }
-        return { 
-          ...prev, 
-          image: newImages[0] || '', 
-          images: newImages 
+        return {
+          ...prev,
+          image: newImages[0] || '',
+          images: newImages
         };
       });
     } catch (err) {
@@ -192,7 +193,7 @@ export default function ProductManagement() {
     const meta = product.lensMetadata || {};
     const type = product.category === 'CONTACT LENSES' ? 'CONTACT_LENS' : 'GLASS';
     setProductType(type);
-    
+
     setForm({
       ...DEFAULT_FORM,
       name: product.name || '',
@@ -220,6 +221,7 @@ export default function ProductManagement() {
       showcaseLens: Boolean(product.showcaseLens),
       gender: product.gender || 'UNISEX',
       tags: Array.isArray(product.tags) ? product.tags.join(', ') : '',
+      newArrival: Boolean(product.newArrival),
       // Metadata
       visionType: meta.visionType || 'Spherical',
       replacementSchedule: meta.replacementSchedule || 'Daily disposable',
@@ -467,6 +469,11 @@ export default function ProductManagement() {
                                   Showcase
                                 </span>
                               )}
+                              {product.newArrival && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-tighter text-emerald-600 ring-1 ring-inset ring-emerald-500/20">
+                                  New
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -474,7 +481,7 @@ export default function ProductManagement() {
                       <td className="px-4 py-4 text-sm text-zinc-600 font-bold">{product.brand}</td>
                       <td className="px-4 py-4">
                         <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest bg-zinc-100 px-2 py-0.5 rounded">
-                           {product.category}
+                          {product.category}
                         </span>
                       </td>
                       <td className="px-4 py-4 text-sm font-mono text-zinc-500">{product.sku}</td>
@@ -485,27 +492,26 @@ export default function ProductManagement() {
                         {product.stock || '0'}
                       </td>
                       <td className="px-4 py-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${
-                          product.status === 'ACTIVE' 
-                            ? 'text-green-700 border-green-200 bg-green-50' 
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${product.status === 'ACTIVE'
+                            ? 'text-green-700 border-green-200 bg-green-50'
                             : product.status === 'DRAFT'
-                            ? 'text-amber-700 border-amber-200 bg-amber-50'
-                            : 'text-zinc-600 border-zinc-200 bg-zinc-100'
-                        }`}>
+                              ? 'text-amber-700 border-amber-200 bg-amber-50'
+                              : 'text-zinc-600 border-zinc-200 bg-zinc-100'
+                          }`}>
                           {product.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
-                          <button 
-                            onClick={() => openEdit(product)} 
+                          <button
+                            onClick={() => openEdit(product)}
                             disabled={isMock}
                             className="p-2 rounded-md text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors disabled:opacity-30"
                           >
                             <Pencil className="w-4 h-4" />
                           </button>
-                          <button 
-                            onClick={() => deleteProduct(productId)} 
+                          <button
+                            onClick={() => deleteProduct(productId)}
                             disabled={isMock}
                             className="p-2 rounded-md text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-30"
                           >
@@ -613,8 +619,8 @@ export default function ProductManagement() {
                 {error && <div className="mb-6 rounded-xl bg-red-50 p-4 border border-red-100 text-xs font-bold text-red-600">{error}</div>}
 
                 <form id="product-form" className="space-y-10" onSubmit={onSubmit}>
-                   {/* SHARED FIELDS */}
-                   <section>
+                  {/* SHARED FIELDS */}
+                  <section>
                     <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-6 flex items-center gap-2">
                       <span className="w-4 h-px bg-zinc-200" /> Basic Information
                     </h3>
@@ -627,13 +633,13 @@ export default function ProductManagement() {
                         <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Brand *</label>
                         {productType === 'CONTACT_LENS' ? (
                           <select value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" required>
-                             <option value="">Select Brand</option>
-                             {LENS_BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
+                            <option value="">Select Brand</option>
+                            {LENS_BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
                           </select>
                         ) : (
                           <select value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" required>
-                             <option value="">Select Brand</option>
-                             {availableBrands.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+                            <option value="">Select Brand</option>
+                            {availableBrands.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
                           </select>
                         )}
                       </div>
@@ -647,10 +653,19 @@ export default function ProductManagement() {
                           <input type="text" value="CONTACT LENSES" readOnly className="w-full px-4 py-2.5 bg-zinc-100 border border-zinc-200 rounded-xl outline-none text-zinc-500 cursor-not-allowed" />
                         ) : (
                           <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" required>
-                             <option value="">Select Category</option>
-                             {PRODUCT_CATEGORIES.filter(c => c !== 'CONTACT LENSES').map(c => <option key={c} value={c}>{c}</option>)}
+                            <option value="">Select Category</option>
+                            {PRODUCT_CATEGORIES.filter(c => c !== 'CONTACT LENSES').map(c => <option key={c} value={c}>{c}</option>)}
                           </select>
                         )}
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Gender *</label>
+                        <select value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" required>
+                          <option value="UNISEX">Unisex</option>
+                          <option value="MAN">Male</option>
+                          <option value="FEMALE">Female</option>
+                          <option value="KIDS">Kids</option>
+                        </select>
                       </div>
                     </div>
                   </section>
@@ -710,19 +725,19 @@ export default function ProductManagement() {
                           <span className="w-4 h-px bg-zinc-200" /> Parameters & Availability
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                           <div className="space-y-1.5">
-                              <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Base Curves (Comma sep) *</label>
-                              <input type="text" value={form.availableBC} onChange={(e) => setForm({ ...form, availableBC: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="8.5, 8.6" required={productType === 'CONTACT_LENS'} />
-                           </div>
-                           <div className="space-y-1.5">
-                              <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Diameters (Comma sep) *</label>
-                              <input type="text" value={form.availableDia} onChange={(e) => setForm({ ...form, availableDia: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="14.0, 14.2" required={productType === 'CONTACT_LENS'} />
-                           </div>
-                           <div className="space-y-1.5 md:col-span-2">
-                              <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Available Power Range (Text description)</label>
-                              <input type="text" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. -0.50 to -10.00 (in 0.25 steps), +0.50 to +6.00" />
-                              <p className="text-[10px] text-zinc-400 mt-1 italic">Note: Use this to inform customers about the range you stock.</p>
-                           </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Base Curves (Comma sep) *</label>
+                            <input type="text" value={form.availableBC} onChange={(e) => setForm({ ...form, availableBC: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="8.5, 8.6" required={productType === 'CONTACT_LENS'} />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Diameters (Comma sep) *</label>
+                            <input type="text" value={form.availableDia} onChange={(e) => setForm({ ...form, availableDia: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="14.0, 14.2" required={productType === 'CONTACT_LENS'} />
+                          </div>
+                          <div className="space-y-1.5 md:col-span-2">
+                            <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Available Power Range (Text description)</label>
+                            <input type="text" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. -0.50 to -10.00 (in 0.25 steps), +0.50 to +6.00" />
+                            <p className="text-[10px] text-zinc-400 mt-1 italic">Note: Use this to inform customers about the range you stock.</p>
+                          </div>
                         </div>
                       </section>
                     </>
@@ -736,12 +751,28 @@ export default function ProductManagement() {
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-1.5">
-                          <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Material</label>
-                          <input type="text" value={form.material} onChange={(e) => setForm({ ...form, material: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. Titanium" />
+                          <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Primary Material</label>
+                          <input type="text" value={form.material} onChange={(e) => setForm({ ...form, material: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. High-Grade Alloy" />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Shape / Architecture</label>
-                          <input type="text" value={form.architecture} onChange={(e) => setForm({ ...form, architecture: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. Round" />
+                          <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Architecture</label>
+                          <input type="text" value={form.architecture} onChange={(e) => setForm({ ...form, architecture: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. Rectangular" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Silhouette</label>
+                          <input type="text" value={form.silhouette} onChange={(e) => setForm({ ...form, silhouette: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. Minimalist" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Finish</label>
+                          <input type="text" value={form.finish} onChange={(e) => setForm({ ...form, finish: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. Matte / Polished" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Lens Sweep</label>
+                          <input type="text" value={form.lensSweep} onChange={(e) => setForm({ ...form, lensSweep: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. 40mm Sweep" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-tight">Protection</label>
+                          <input type="text" value={form.protection} onChange={(e) => setForm({ ...form, protection: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none" placeholder="e.g. UV400 Certified" />
                         </div>
                       </div>
                     </section>
@@ -774,48 +805,56 @@ export default function ProductManagement() {
                       <span className="w-4 h-px bg-zinc-200" /> Media & Visibility
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                       {productType === 'GLASS' && (
-                         <label className="flex items-center gap-3 p-4 bg-zinc-50 border border-zinc-200 rounded-2xl cursor-pointer hover:bg-zinc-100 transition-colors">
-                            <input type="checkbox" checked={form.topSelling} onChange={(e) => setForm({ ...form, topSelling: e.target.checked })} className="w-5 h-5 rounded-md border-zinc-300 text-zinc-900 focus:ring-zinc-900" />
-                            <div className="flex-1">
-                               <div className="text-[11px] font-bold text-zinc-900 uppercase">Top 5 Selling</div>
-                               <div className="text-[10px] text-zinc-500">Display on Home Page Top Selling scroll.</div>
-                            </div>
-                         </label>
-                       )}
-                       
-                       {productType === 'CONTACT_LENS' && (
-                         <label className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-100 rounded-2xl cursor-pointer hover:bg-blue-100 transition-colors">
-                            <input type="checkbox" checked={form.showcaseLens} onChange={(e) => setForm({ ...form, showcaseLens: e.target.checked })} className="w-5 h-5 rounded-md border-blue-300 text-blue-600 focus:ring-blue-600" />
-                            <div className="flex-1">
-                               <div className="text-[11px] font-bold text-blue-900 uppercase">Showcase on Lens Page</div>
-                               <div className="text-[10px] text-blue-500">Feature this lens in the Contact Lens shop section.</div>
-                            </div>
-                         </label>
-                       )}
+                      {productType === 'GLASS' && (
+                        <label className="flex items-center gap-3 p-4 bg-zinc-50 border border-zinc-200 rounded-2xl cursor-pointer hover:bg-zinc-100 transition-colors">
+                          <input type="checkbox" checked={form.topSelling} onChange={(e) => setForm({ ...form, topSelling: e.target.checked })} className="w-5 h-5 rounded-md border-zinc-300 text-zinc-900 focus:ring-zinc-900" />
+                          <div className="flex-1">
+                            <div className="text-[11px] font-bold text-zinc-900 uppercase">Top 5 Selling</div>
+                            <div className="text-[10px] text-zinc-500">Display on Home Page Top Selling scroll.</div>
+                          </div>
+                        </label>
+                      )}
+
+                      {productType === 'CONTACT_LENS' && (
+                        <label className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-100 rounded-2xl cursor-pointer hover:bg-blue-100 transition-colors">
+                          <input type="checkbox" checked={form.showcaseLens} onChange={(e) => setForm({ ...form, showcaseLens: e.target.checked })} className="w-5 h-5 rounded-md border-blue-300 text-blue-600 focus:ring-blue-600" />
+                          <div className="flex-1">
+                            <div className="text-[11px] font-bold text-blue-900 uppercase">Showcase on Lens Page</div>
+                            <div className="text-[10px] text-blue-500">Feature this lens in the Contact Lens shop section.</div>
+                          </div>
+                        </label>
+                      )}
+
+                      <label className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl cursor-pointer hover:bg-emerald-100 transition-colors">
+                        <input type="checkbox" checked={form.newArrival} onChange={(e) => setForm({ ...form, newArrival: e.target.checked })} className="w-5 h-5 rounded-md border-emerald-300 text-emerald-600 focus:ring-emerald-600" />
+                        <div className="flex-1">
+                          <div className="text-[11px] font-bold text-emerald-900 uppercase">Set as New Arrival</div>
+                          <div className="text-[10px] text-emerald-500">Display "New Arrival" badge and prioritize in sorting.</div>
+                        </div>
+                      </label>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                        {form.images?.map((img, index) => (
-                          <div key={index} className="relative aspect-square rounded-xl bg-zinc-50 border border-zinc-200 overflow-hidden group">
-                            <img src={img} className="w-full h-full object-contain" alt="" />
-                            <button type="button" onClick={() => removeImage(index)} className="absolute inset-0 bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        ))}
-                        {form.images.length < 5 && (
-                          <label className="aspect-square rounded-xl bg-zinc-50 border-2 border-dashed border-zinc-200 flex flex-col items-center justify-center cursor-pointer hover:border-zinc-900 transition-all gap-2 group/upload">
-                             {isUploading ? (
-                               <Loader2 className="w-5 h-5 animate-spin text-zinc-400" />
-                             ) : (
-                               <>
-                                 <Plus size={24} className="text-zinc-400 group-hover/upload:text-zinc-900 transition-colors" />
-                                 <span className="text-[9px] font-black uppercase tracking-[0.1em] text-zinc-400 group-hover/upload:text-zinc-900 transition-colors">Upload the photo</span>
-                               </>
-                             )}
-                             <input type="file" className="hidden" onChange={handleImageUpload} />
-                          </label>
-                        )}
+                      {form.images?.map((img, index) => (
+                        <div key={index} className="relative aspect-square rounded-xl bg-zinc-50 border border-zinc-200 overflow-hidden group">
+                          <img src={img} className="w-full h-full object-contain" alt="" />
+                          <button type="button" onClick={() => removeImage(index)} className="absolute inset-0 bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      ))}
+                      {form.images.length < 5 && (
+                        <label className="aspect-square rounded-xl bg-zinc-50 border-2 border-dashed border-zinc-200 flex flex-col items-center justify-center cursor-pointer hover:border-zinc-900 transition-all gap-2 group/upload">
+                          {isUploading ? (
+                            <Loader2 className="w-5 h-5 animate-spin text-zinc-400" />
+                          ) : (
+                            <>
+                              <Plus size={24} className="text-zinc-400 group-hover/upload:text-zinc-900 transition-colors" />
+                              <span className="text-[9px] font-black uppercase tracking-[0.1em] text-zinc-400 group-hover/upload:text-zinc-900 transition-colors">Upload the photo</span>
+                            </>
+                          )}
+                          <input type="file" className="hidden" onChange={handleImageUpload} />
+                        </label>
+                      )}
                     </div>
                   </section>
                 </form>

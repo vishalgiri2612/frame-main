@@ -1,8 +1,16 @@
 'use client';
 
-const brands = [
-  'Ray-Ban', 'Oakley', 'Cartier', 'Tom Ford', 'Persol', 'Prada',
-  'Lindberg', 'Silhouette', 'Dior', 'Gucci', 'Lafont', 'Maui Jim',
+import Image from 'next/image';
+
+const brandList = [
+  { name: 'Ray-Ban', logo: '/brands/rayban.svg', width: 140 },
+  { name: 'Oakley', logo: '/brands/oakley.svg', width: 160 },
+  { name: 'Prada', logo: '/brands/prada.svg', width: 150 },
+  { name: 'Emporio Armani', logo: '/brands/armani.svg', width: 180 },
+  { name: 'Giorgio Armani', logo: '/brands/giorgio_armani.svg', width: 220 },
+  { name: 'Valentino', logo: '/brands/valentino.svg', width: 140 },
+  { name: 'Gucci', logo: '/brands/gucci.svg', width: 150 },
+  { name: 'Tom Ford', logo: '/brands/tomford.svg', width: 160 },
 ];
 
 export default function BrandMarquee() {
@@ -16,85 +24,120 @@ export default function BrandMarquee() {
         overflow: 'hidden',
       }}
     >
-      {/* Label */}
-      <div className="container mx-auto px-6 pt-6 pb-4 flex items-center gap-4">
-        <span
-          style={{
-            fontFamily: 'var(--font-inter)',
-            fontSize: '11px',
-            fontWeight: 700,
-            letterSpacing: '0.3em',
-            textTransform: 'uppercase',
-            color: 'var(--text-primary)',
-          }}
-        >
-          Official Stockist
-        </span>
-        <div style={{ height: '1px', flex: 1, background: 'linear-gradient(90deg, var(--border-subtle), transparent)' }} />
-      </div>
-
       {/* Dual marquee with fade mask */}
-      <div className="marquee-wrapper pb-6" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        {/* Row 1 — moves left, 40s */}
-        <div className="marquee-primary select-none" aria-hidden="true">
-          {[...brands, ...brands, ...brands].map((brand, i) => (
-            <div key={i} className="flex items-center" style={{ paddingLeft: '48px', paddingRight: '48px' }}>
-              <span
+      <div className="marquee-wrapper py-6" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {/* Row 1 — moves left */}
+        <div className="marquee-primary select-none flex items-center" aria-hidden="true">
+          {[...brandList, ...brandList, ...brandList].map((brand, i) => (
+            <div key={i} className="flex items-center" style={{ paddingLeft: '60px', paddingRight: '60px' }}>
+              <div
                 style={{
-                  fontFamily: 'var(--font-cormorant)',
-                  fontSize: '2rem',
-                  letterSpacing: '0.15em',
-                  textTransform: 'uppercase',
-                  fontWeight: 600,
-                  color: 'var(--text-primary)',
-                  cursor: 'default',
-                  transition: 'color 300ms ease, transform 300ms ease',
-                  opacity: 1,
-                  whiteSpace: 'nowrap',
+                  position: 'relative',
+                  width: `${brand.width}px`,
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: 0.8,
+                  color: 'var(--text-primary)', // Use theme text color (black in light mode)
+                  transition: 'opacity 300ms ease, transform 300ms ease',
                 }}
-                onMouseEnter={(e) => { 
-                  e.currentTarget.style.color = '#C9A84C';
-                  e.currentTarget.style.transform = 'scale(1.05)';
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.opacity = '1';
+                  e.currentTarget.style.transform = 'scale(1.1)';
                 }}
-                onMouseLeave={(e) => { 
-                  e.currentTarget.style.color = 'var(--text-primary)';
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.opacity = '0.8';
                   e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
-                {brand}
-              </span>
-              <span style={{ margin: '0 32px', color: '#C9A84C', opacity: 0.8, fontSize: '10px' }}>◆</span>
+                {/* Fallback to text if image fails or for development */}
+                <img
+                  src={brand.logo}
+                  alt={brand.name}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain',
+                    color: 'inherit', // Ensure SVG currentColor works
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextSibling.style.display = 'block';
+                  }}
+                />
+                <span
+                  style={{
+                    display: 'none',
+                    fontFamily: 'var(--font-cormorant)',
+                    fontSize: '1.5rem',
+                    fontWeight: 600,
+                    letterSpacing: '0.1em',
+                    whiteSpace: 'nowrap',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  {brand.name}
+                </span>
+              </div>
+              <span style={{ margin: '0 40px', color: '#C9A84C', opacity: 0.5, fontSize: '12px' }}>◆</span>
             </div>
           ))}
         </div>
 
-        {/* Row 2 — moves right, 60s (secondary, slower = more premium) */}
-        <div className="marquee-secondary select-none" aria-hidden="true">
-          {[...brands, ...brands, ...brands].map((brand, i) => (
-            <div key={i} className="flex items-center" style={{ paddingLeft: '48px', paddingRight: '48px' }}>
-              <span
+        {/* Row 2 — moves right (secondary) */}
+        <div className="marquee-secondary select-none flex items-center" aria-hidden="true">
+          {[...brandList, ...brandList, ...brandList].reverse().map((brand, i) => (
+            <div key={i} className="flex items-center" style={{ paddingLeft: '60px', paddingRight: '60px' }}>
+              <div
                 style={{
-                  fontFamily: 'var(--font-inter)',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  letterSpacing: '0.3em',
-                  textTransform: 'uppercase',
-                  color: '#C9A84C',
-                  opacity: 0.9,
-                  whiteSpace: 'nowrap',
-                  cursor: 'default',
-                  transition: 'color 300ms ease',
+                  position: 'relative',
+                  width: `${brand.width * 0.8}px`,
+                  height: '30px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: 0.5,
+                  color: 'var(--text-secondary)', // Subtler color for second row
+                  transition: 'opacity 300ms ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = 'var(--text-primary)';
+                  e.currentTarget.style.opacity = '0.9';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = '#C9A84C';
+                  e.currentTarget.style.opacity = '0.5';
                 }}
               >
-                {brand}
-              </span>
-              <span style={{ margin: '0 32px', color: 'var(--text-tertiary)', opacity: 0.3, fontSize: '8px' }}>◆</span>
+                <img
+                  src={brand.logo}
+                  alt={brand.name}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain',
+                    color: 'inherit',
+                  }}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextSibling.style.display = 'block';
+                  }}
+                />
+                <span
+                  style={{
+                    display: 'none',
+                    fontFamily: 'var(--font-inter)',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    whiteSpace: 'nowrap',
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  {brand.name}
+                </span>
+              </div>
+              <span style={{ margin: '0 40px', color: 'var(--text-tertiary)', opacity: 0.2, fontSize: '10px' }}>◆</span>
             </div>
           ))}
         </div>
@@ -102,3 +145,5 @@ export default function BrandMarquee() {
     </div>
   );
 }
+
+

@@ -1,15 +1,25 @@
 'use client';
+
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect, useMemo } from 'react';
-import TryOnModal from '@/components/ui/TryOnModal';
+import Image from 'next/image';
 import { useCart } from '@/components/providers/CartProvider';
 import { useWishlist } from '@/components/providers/WishlistProvider';
 import { Heart } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { toast } from 'react-hot-toast';
 
-const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCart }) => {
+const formatPrice = (price) => {
+  if (!price || price <= 0) return 'Price on Request';
+  return `₹${price.toLocaleString('en-IN')}`;
+};
+
+export default function ProductCard({ product, index }) {
+  const { addToCart } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const [added, setAdded] = useState(false);
+  const isLiked = isInWishlist(product.id || product.sku);
+
   const [isHovered, setIsHovered] = useState(false);
   const [imageIdx, setImageIdx] = useState(0);
   const router = useRouter();
@@ -36,10 +46,11 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
 
   return (
     <motion.div
+      layout
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ delay: index * 0.08, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      viewport={{ once: true }}
+      transition={{ delay: 0.05 * (index % 12), duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       className="product-card group cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -50,8 +61,6 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
         style={{
           background: 'var(--navy-surface)',
           border: '1px solid var(--border-subtle)',
-          transform: 'translateZ(0)',
-          contain: 'paint'
         }}
       >
         {images.length > 0 ? (
@@ -79,23 +88,23 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
             e.stopPropagation();
             toggleWishlist(product);
           }}
-          className="absolute top-4 right-4 z-20 p-2 rounded-full transition-all duration-300 border border-[var(--border-subtle)]"
+          className="absolute top-4 right-4 z-20 p-2 rounded-full transition-all duration-300"
           style={{
-            backgroundColor: 'var(--background)',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-            color: isInWishlist(product.id || product.sku) ? '#C9A84C' : 'var(--text-tertiary)',
-            transform: 'translateZ(0)'
+            backgroundColor: 'var(--navy-deep)',
+            backdropFilter: 'blur(8px)',
+            color: isLiked ? 'var(--gold)' : 'var(--text-tertiary)',
+            border: '1px solid var(--border-subtle)',
           }}
           aria-label="Toggle Wishlist"
         >
           <Heart
-            className={`w-5 h-5 transition-transform ${isInWishlist(product.id || product.sku) ? 'fill-current scale-110' : 'hover:scale-110'}`}
+            className={`w-5 h-5 transition-transform ${isLiked ? 'fill-current scale-110' : 'hover:scale-110'}`}
           />
         </button>
 
         <div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col gap-2 items-center justify-end pb-5"
-          style={{ background: 'transparent', transform: 'translateZ(0)' }}
+          style={{ background: 'transparent' }}
         >
           <span
             style={{
@@ -111,9 +120,23 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
           </span>
         </div>
 
+        {/* New Arrival Badge */}
+        {product.isNew && (
+          <div 
+            className="absolute top-4 left-0 z-20 px-3 py-1 text-[8px] font-bold tracking-[0.2em] uppercase"
+            style={{ 
+              background: 'var(--gold)', 
+              color: 'var(--navy-deep)',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
+            }}
+          >
+            New Arrival
+          </div>
+        )}
+
       </div>
 
-      <div className="mt-4 space-y-3 transition-transform duration-500 group-hover:translate-x-5">
+      <div className="mt-4 space-y-2 transition-transform duration-500 group-hover:translate-x-5" style={{ willChange: 'transform' }}>
         <div className="flex justify-between items-end">
           <h2
             style={{
@@ -140,7 +163,6 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
           }}
         >
           {(() => {
-            // Remove brand from name if it exists at the start, then take first 2 words
             const nameWithoutBrand = product.name.replace(new RegExp('^' + product.brand + '\\s*', 'i'), '');
             const words = nameWithoutBrand.split(' ');
             return words.slice(0, 2).join(' ');
@@ -169,80 +191,5 @@ const ProductCardItem = ({ product, index, toggleWishlist, isInWishlist, addToCa
         </div>
       </div>
     </motion.div>
-  );
-};
-
-export default function FeaturedFrames({ initialProducts = [] }) {
-  const { addToCart } = useCart();
-  const { toggleWishlist, isInWishlist } = useWishlist();
-  const [activeFilter, setActiveFilter] = useState('All');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const filters = ['All', ...new Set(initialProducts.map((p) => p.category))];
-  const filteredProducts = initialProducts
-    .filter((p) => activeFilter === 'All' || p.category === activeFilter)
-    .slice(0, 6); // Limit for performance
-
-  return (
-    <section style={{ paddingTop: 'var(--space-xl)', paddingBottom: '60px', background: 'var(--background)' }}>
-      <div className="container mx-auto px-6">
-
-        <div className="mb-10 text-left">
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            style={{
-              fontFamily: 'var(--font-cormorant)',
-              fontSize: 'clamp(3rem, 6vw, 5rem)',
-              fontWeight: 300,
-              color: 'var(--text-primary)',
-              letterSpacing: '0.02em',
-              lineHeight: 1,
-            }}
-          >
-            Shop
-          </motion.h2>
-        </div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 lg:gap-10">
-          {filteredProducts.map((product, i) => (
-            <ProductCardItem
-              key={product.sku || product._id}
-              product={product}
-              index={i}
-              toggleWishlist={toggleWishlist}
-              isInWishlist={isInWishlist}
-              addToCart={addToCart}
-            />
-          ))}
-        </div>
-
-        {/* SHOW MORE / SHOP ALL BUTTON */}
-        <div className="mt-20 flex justify-center">
-          <Link
-            href="/shop"
-            className="group relative px-16 py-4 overflow-hidden bg-[var(--gold)] border border-gold/20 rounded-full transition-all duration-500 shadow-[0_15px_40px_rgba(212,175,55,0.1)] hover:bg-[var(--gold-light)] hover:shadow-[0_20px_50px_rgba(212,175,55,0.2)]"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            <span className="relative z-10 font-mono text-[11px] tracking-[0.4em] text-[var(--navy)] uppercase font-black flex items-center gap-6 transition-colors duration-500">
-              Explore Full Archive
-              <motion.span
-                animate={{ x: [0, 5, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-              </motion.span>
-            </span>
-          </Link>
-        </div>
-      </div>
-
-      <TryOnModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-    </section>
   );
 }

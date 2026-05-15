@@ -6,18 +6,18 @@ import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { useCart } from '@/components/providers/CartProvider';
 import { useWishlist } from '@/components/providers/WishlistProvider';
-import { Search, ShoppingBag, User, Menu, X, Heart, LogOut } from 'lucide-react';
+import { Search, ShoppingBag, User, Menu, X, Heart, LogOut, Sun, Moon } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 const SearchOverlay = dynamic(() => import('@/components/ui/SearchOverlay'), { ssr: false });
 
 const navLinks = [
+  { name: 'New Arrivals', href: '/arrivals' },
   { name: 'Shop', href: '/shop' },
   { name: 'Categories', href: '/categories' },
   { name: 'Contact Lenses', href: '/contact-lens' },
-  { name: 'Magazine', href: '/magazine' },
+  { name: 'Celebrity Watch', href: '/magazine' },
   { name: 'About', href: '/about' },
-  { name: 'Support', href: '/support' },
 ];
 
 export default function Navbar() {
@@ -28,17 +28,49 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isLight, setIsLight] = useState(true);
+  const [brands, setBrands] = useState([]);
 
   useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const res = await fetch('/api/brands');
+        if (res.ok) {
+          const data = await res.json();
+          setBrands(data);
+        }
+      } catch (err) {
+        console.error('NAVBAR_BRANDS_FETCH_ERROR', err);
+      }
+    };
+    fetchBrands();
+
     const handleScroll = () => setIsScrolled(window.scrollY > 80);
     window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Theme sync
+    const savedTheme = localStorage.getItem('theme');
+    setIsLight(savedTheme !== 'dark');
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const toggleTheme = () => {
+    const newIsLight = !isLight;
+    setIsLight(newIsLight);
+    if (newIsLight) {
+      document.body.classList.remove('dark-mode');
+      localStorage.setItem('theme', 'light');
+    } else {
+      document.body.classList.add('dark-mode');
+      localStorage.setItem('theme', 'dark');
+    }
+  };
 
   if (pathname?.startsWith('/admin')) return null;
 
   const iconStyle = {
-    color: '#0F1117',
+    color: 'var(--text-primary)',
     transition: 'color 200ms ease, transform 200ms ease',
   };
 
@@ -63,8 +95,19 @@ export default function Navbar() {
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       <div className="container mx-auto px-6 flex items-center justify-between">
+        
+
         {/* Logo */}
-        <Link href="/" className="flex flex-col group relative z-50 shrink-0">
+        <Link 
+          href="/" 
+          className="flex flex-col group relative z-50 shrink-0"
+          onClick={(e) => {
+            if (pathname === '/') {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
+        >
           <motion.span
             whileHover={{ scale: 1.03 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -97,17 +140,79 @@ export default function Navbar() {
               Punjab Optical · Est. 1987
             </span>
           </div>
-          {/* Logo gold glow on hover */}
-          <div
-            className="absolute -inset-4 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-            style={{ background: 'rgba(var(--gold-rgb), 0.1)', filter: 'blur(16px)' }}
-          />
         </Link>
 
         {/* Desktop nav links */}
         <div className="hidden lg:flex items-center space-x-8 relative z-50">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
+            
+            if (link.name === 'Shop') {
+              return (
+                <div key={link.name} className="relative group py-2">
+                  <Link
+                    href={link.href}
+                    className={`nav-link text-sm uppercase tracking-widest font-medium flex items-center gap-1 ${isActive ? 'active' : ''}`}
+                    style={{ fontFamily: 'var(--font-inter)', color: 'var(--text-primary)' }}
+                  >
+                    {link.name}
+                    <motion.span 
+                      initial={{ rotate: 0 }}
+                      whileHover={{ rotate: 180 }}
+                      className="text-[10px] opacity-50"
+                    >
+                      ▼
+                    </motion.span>
+                  </Link>
+
+                  {/* Dropdown Menu */}
+                  <div className="absolute top-full left-0 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-[100]">
+                    <div 
+                      className="min-w-[260px] bg-white border border-zinc-200 backdrop-blur-xl rounded-2xl p-6 shadow-[0_20px_50px_rgba(0,0,0,0.15)]"
+                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.98)' }}
+                    >
+                      <div className="mb-4 pb-2 border-b border-zinc-100">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Shop by Brand</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 gap-1 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                        {brands.length > 0 ? (
+                          brands.map((brand) => (
+                            <Link
+                              key={brand.slug}
+                              href={`/shop?brand=${brand.name}`}
+                              className="group/item flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-zinc-50 transition-colors"
+                            >
+                              <span className="text-xs uppercase tracking-widest text-zinc-800 group-hover/item:text-gold transition-colors font-bold">
+                                {brand.name}
+                              </span>
+                              <span className="text-[10px] font-mono text-zinc-400 group-hover/item:text-gold">
+                                {brand.count}
+                              </span>
+                            </Link>
+                          ))
+                        ) : (
+                          <div className="py-2 px-3 text-[10px] text-zinc-400 uppercase tracking-widest animate-pulse">
+                            Fetching brands...
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mt-4 pt-4 border-t border-zinc-100">
+                        <Link 
+                          href="/shop"
+                          className="flex items-center justify-center gap-2 py-3 bg-zinc-900 hover:bg-black rounded-xl transition-all group/all"
+                        >
+                          <span className="text-[10px] font-black uppercase tracking-widest text-white">Explore All Pieces</span>
+                          <span className="group-hover/all:translate-x-1 transition-transform text-gold">→</span>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <Link
                 key={link.name}
@@ -121,7 +226,7 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Right actions — icons use text-primary, NOT gold */}
+        {/* Right actions */}
         <div className="flex items-center space-x-4 md:space-x-5 shrink-0 relative z-50">
           <button
             onClick={() => setIsSearchOpen(true)}
@@ -271,28 +376,6 @@ export default function Navbar() {
                 </Link>
               ))}
               
-              {/* Add Wishlist explicitly to mobile menu */}
-              <Link
-                href="/wishlist"
-                className="flex items-center gap-5 transition-colors"
-                style={{
-                  fontFamily: 'var(--font-cormorant)',
-                  fontSize: '2rem',
-                  fontWeight: 400,
-                  color: 'var(--text-secondary)',
-                }}
-                onClick={() => setIsMobileMenuOpen(false)}
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-              >
-                <span className="w-5 h-px" style={{ background: 'var(--gold)', opacity: 0.4 }} />
-                Wishlist
-                {wishlist.length > 0 && (
-                  <span className="ml-auto text-xs bg-gold text-navy px-2 py-0.5 rounded-full font-mono font-bold">
-                    {wishlist.length}
-                  </span>
-                )}
-              </Link>
             </div>
           </motion.div>
         )}

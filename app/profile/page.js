@@ -21,7 +21,8 @@ import {
   ExternalLink,
   Edit2,
   Check,
-  X
+  X,
+  HelpCircle
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useWishlist } from '@/components/providers/WishlistProvider';
@@ -232,7 +233,14 @@ export default function ProfilePage() {
           </nav>
         </div>
 
-        <div className="mt-auto pt-6 border-t border-zinc-200">
+        <div className="mt-auto pt-6 border-t border-zinc-200 space-y-1">
+          <button 
+             onClick={() => router.push('/support')}
+             className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 transition-all group"
+          >
+            <HelpCircle size={18} className="text-zinc-400 group-hover:text-zinc-900" />
+            Help & Support
+          </button>
           <button 
              onClick={() => signOut({ callbackUrl: '/' })}
              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-zinc-500 hover:text-red-600 hover:bg-red-50 transition-all group"

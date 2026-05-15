@@ -13,15 +13,18 @@ export async function GET(request) {
 
     const db = await getDb();
     
+    // Sanitize input to prevent Regex Injection
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
     // Search by name, brand, category, or SKU
     const products = await db.collection("products")
       .find({
         status: "ACTIVE",
         $or: [
-          { name: { $regex: query, $options: 'i' } },
-          { brand: { $regex: query, $options: 'i' } },
-          { category: { $regex: query, $options: 'i' } },
-          { sku: { $regex: query, $options: 'i' } }
+          { name: { $regex: escapedQuery, $options: 'i' } },
+          { brand: { $regex: escapedQuery, $options: 'i' } },
+          { category: { $regex: escapedQuery, $options: 'i' } },
+          { sku: { $regex: escapedQuery, $options: 'i' } }
         ]
       })
       .limit(8)

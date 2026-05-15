@@ -21,6 +21,7 @@ export default async function ShopPage({ searchParams }) {
 
   const initialCategory = searchParams?.category || 'ALL';
   const initialBrand = searchParams?.brand || 'ALL';
+  const initialSort = searchParams?.sort || 'newest';
 
   return (
     <ShopMain 
@@ -30,6 +31,7 @@ export default async function ShopPage({ searchParams }) {
       sortOptions={SORT_OPTIONS}
       initialCategory={initialCategory}
       initialBrand={initialBrand}
+      initialSort={initialSort}
     />
   );
 }

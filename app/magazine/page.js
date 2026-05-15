@@ -1,432 +1,500 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import Link from 'next/link';
 
-/* ── HELPER COMPONENTS ── */
-const BookImage = ({ src, alt, caption }) => (
-  <div className="w-full h-full relative flex flex-col justify-end p-10 overflow-hidden group bg-[#111]">
-    <Image src={src} alt={alt} fill className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-[3s]" sizes="50vw" />
-    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-    <div className="relative z-10">
-      <span className="font-mono text-[8px] tracking-[0.3em] text-[#C9A84C] uppercase">{caption}</span>
-      <h3 className="text-2xl font-light text-[#F7F4EF] tracking-widest mt-2">{alt}</h3>
+/* ── Tag color map ─────────────────────────────────────────────────────── */
+const TAG_COLORS = {
+  'Celebrity Sightings': { bg: '#C9A84C', text: '#0A0E1A' },
+  'Trend Alert':         { bg: '#E8453C', text: '#FFF' },
+  'Red Carpet':          { bg: '#9B59B6', text: '#FFF' },
+  'Style Guide':         { bg: '#2ECC71', text: '#0A0E1A' },
+};
+
+/* ── Article Spread Component ──────────────────────────────────────────── */
+function ArticleSpread({ article, index, articles }) {
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const tagColor = TAG_COLORS[article.tag] || { bg: '#C9A84C', text: '#0A0E1A' };
+  const fallbackImg = article.imageFallback
+    || `https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=1080&auto=format&fit=crop&sig=${index}`;
+
+  return (
+    /*
+     * RESPONSIVE LAYOUT:
+     *   Mobile  (< md): flex-col  — image on TOP, content on BOTTOM
+     *   Desktop (≥ md): flex-row  — image on LEFT, content on RIGHT
+     */
+    <div className="absolute inset-0 flex flex-col md:flex-row w-full h-full">
+
+      {/* ── IMAGE PANEL ─────────────────────────────────────────────────
+          Mobile:  full width, 45% of screen height
+          Desktop: 55% width, full height                               */}
+      <div className="relative w-full md:w-[55%] h-[45%] md:h-full overflow-hidden bg-[#0A0E1A] flex-shrink-0">
+
+        {/* Spinner while loading */}
+        {!imgLoaded && !imgError && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10">
+            <div className="w-8 h-8 border-2 border-[#C9A84C]/30 border-t-[#C9A84C] rounded-full animate-spin" />
+            <span className="font-mono text-[8px] tracking-[0.3em] text-[#C9A84C]/40 uppercase">
+              Curating Image
+            </span>
+          </div>
+        )}
+
+        <motion.img
+          src={imgError ? fallbackImg : article.image}
+          alt={article.title}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ opacity: imgLoaded ? 1 : 0, transition: 'opacity 0.6s ease' }}
+          animate={{ scale: [1, 1.04] }}
+          transition={{ duration: 10, ease: 'linear', repeat: Infinity, repeatType: 'reverse' }}
+          onLoad={() => setImgLoaded(true)}
+          onError={() => { setImgError(true); setImgLoaded(true); }}
+          loading={index === 0 ? 'eager' : 'lazy'}
+        />
+
+        {/* Gradient overlays */}
+        {/* Desktop: fade right edge into content */}
+        <div className="absolute inset-0 hidden md:block bg-gradient-to-r from-transparent via-transparent to-black/50" />
+        {/* Mobile: fade bottom edge into content panel */}
+        <div className="absolute inset-0 block md:hidden bg-gradient-to-b from-transparent via-transparent to-black/70" />
+        {/* Top and bottom vignette */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
+
+        {/* Tag badge */}
+        <div
+          className="absolute top-4 left-4 md:top-8 md:left-8 px-2.5 py-1 md:px-3 md:py-1.5 font-mono text-[7px] md:text-[8px] tracking-[0.25em] uppercase font-semibold z-10"
+          style={{ background: tagColor.bg, color: tagColor.text }}
+        >
+          {article.tag}
+        </div>
+
+        {/* Issue number */}
+        <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 font-mono text-[8px] tracking-[0.3em] text-white/30 z-10">
+          {String(index + 1).padStart(2, '0')}
+        </div>
+      </div>
+
+      {/* ── CONTENT PANEL ───────────────────────────────────────────────
+          Mobile:  full width, remaining 55% height, scrollable
+          Desktop: remaining width, full height                         */}
+      <div className="relative flex-1 min-h-0 bg-[#F7F4EF] flex flex-col overflow-hidden">
+
+        {/* Paper texture */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.035]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+            backgroundSize: '128px',
+          }}
+        />
+        {/* Left spine shadow (desktop only) */}
+        <div className="absolute left-0 top-0 w-5 h-full bg-gradient-to-r from-black/12 to-transparent pointer-events-none hidden md:block" />
+        {/* Top shadow (mobile: comes from image) */}
+        <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-black/10 to-transparent pointer-events-none md:hidden" />
+
+        {/* Scrollable inner — important for small phones */}
+        <div className="relative flex flex-col h-full overflow-y-auto overscroll-contain px-6 py-6 md:px-12 md:py-14 gap-5 md:justify-between">
+
+          {/* ── HEADER ── */}
+          <div className="flex-shrink-0">
+            {/* Byline */}
+            <div className="flex items-center gap-2.5 mb-5 md:mb-10">
+              <div className="w-6 md:w-8 h-px bg-[#C9A84C]" />
+              <span className="font-mono text-[7px] md:text-[8px] tracking-[0.35em] text-[#C9A84C] uppercase">
+                FRAME Magazine ·{' '}
+                {new Date(article.createdAt).toLocaleDateString('en-US', {
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </span>
+            </div>
+
+            {/* Title */}
+            <h2 className="font-serif italic text-[1.15rem] md:text-[1.6rem] leading-tight text-[#0A0E1A] mb-4 md:mb-8">
+              {article.title}
+            </h2>
+
+            {/* Divider */}
+            <div className="w-10 md:w-12 h-px bg-[#0A0E1A]/20 mb-4 md:mb-8" />
+
+            {/* Excerpt */}
+            <p className="text-[12px] md:text-[13px] font-light leading-[1.8] md:leading-[1.85] text-[#0A0E1A]/65 text-justify">
+              {article.excerpt}
+            </p>
+          </div>
+
+          {/* ── NEXT ARTICLE CTA ── */}
+          {articles.length > index + 1 && (
+            <button 
+              onClick={() => window.dispatchEvent(new CustomEvent('magazine-next'))}
+              className="mt-12 group flex items-center gap-5 py-8 border-t border-[#0A0E1A]/10 w-full text-left transition-all hover:bg-[#0A0E1A]/[0.02] rounded-sm px-2"
+            >
+              <div className="flex flex-col flex-1">
+                <span className="font-mono text-[8px] tracking-[0.4em] text-[#C9A84C] uppercase mb-2">Next Editorial</span>
+                <h3 className="font-serif italic text-lg md:text-xl text-[#0A0E1A] group-hover:text-[#C9A84C] transition-colors leading-tight">
+                  {articles[index + 1]?.title}
+                </h3>
+              </div>
+              <div className="w-12 h-12 rounded-full border border-[#0A0E1A]/10 flex items-center justify-center group-hover:border-[#C9A84C]/60 group-hover:bg-white shadow-sm transition-all duration-500">
+                <motion.svg 
+                  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5"
+                  animate={{ x: [0, 4, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <path d="M9 18l6-6-6-6" />
+                </motion.svg>
+              </div>
+            </button>
+          )}
+
+          {/* ── FOOTER ── */}
+          <div className="flex-shrink-0 flex items-center justify-between pt-6 border-t border-[#0A0E1A]/5">
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#C9A84C]" />
+              <span className="font-mono text-[7px] md:text-[8px] tracking-[0.2em] text-[#0A0E1A]/40 uppercase">
+                {article.readTime || '3 min'} read
+              </span>
+            </div>
+            <span className="font-mono text-[7px] md:text-[8px] text-[#0A0E1A]/25 uppercase tracking-widest">
+              Issue 01 · P.{(index + 1) * 2}
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
-const Paper = ({ children, className = '' }) => (
-  <div className={`w-full h-full flex flex-col pt-16 px-16 pb-12 bg-[#F9F7F1] text-[#0A0E1A] relative ${className}`}>
-    {children}
-  </div>
-);
-
-/* ── BOOK CONTENT ── */
-const SHEETS = [
-  {
-    id: 'cover',
-    front: (
-      <div className="w-full h-full relative overflow-hidden">
-        <Image src="/magazine/cover.png" alt="Journal of Sight" fill className="object-cover" sizes="50vw" />
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="absolute inset-0 flex flex-col justify-end p-14">
-          <span className="font-mono text-[9px] tracking-[0.5em] text-[#C9A84C] uppercase mb-4">Volume IV · Punjab Optical</span>
-          <h1 className="font-serif italic text-6xl text-white leading-none">Editorial<br/>Archives.</h1>
-        </div>
-      </div>
-    ),
-    back: (
-      <div className="w-full h-full p-16 flex flex-col justify-center bg-[#12182B]">
-        <h2 className="font-serif italic text-3xl text-[#C9A84C] mb-8">Colophon</h2>
-        <p className="font-mono text-[9px] tracking-[0.1em] leading-loose max-w-[260px] text-[#F7F4EF]/70">
-          Published by VISIO, Punjab.<br/><br/>
-          Creative Direction: A. Vasquez.<br/>
-          Photography: Studio Sterling.<br/>
-          Typefaces: Cormorant Garamond, Inter.<br/><br/>
-          Printed on 120gsm archival matte.<br/>
-          Limited Edition of 500.
-        </p>
-        <div className="absolute bottom-8 right-8 font-mono text-[8px] text-[#F7F4EF]/20">ii</div>
-      </div>
-    )
-  },
-  {
-    id: 'manifesto',
-    front: (
-      <div className="w-full h-full relative overflow-hidden bg-[#0A0E1A]">
-        <Image src="/magazine/editorial.png" alt="See the Unseen" fill className="object-cover opacity-20 grayscale" sizes="50vw" />
-        <div className="absolute inset-0 flex items-center justify-center p-16 text-center">
-          <h2 className="text-7xl font-black text-[#D4AF37] italic leading-[0.85] tracking-tighter uppercase">SEE <br/>THE <br/>UNSEEN.</h2>
-        </div>
-        <div className="absolute bottom-8 right-8 font-mono text-[8px] text-[#F7F4EF]/20">1</div>
-      </div>
-    ),
-    back: (
-      <div className="w-full h-full relative overflow-hidden bg-[#12182B]">
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-16 text-center">
-          <h2 className="text-6xl font-black text-[#D4AF37] leading-[0.9] tracking-tighter mb-8 uppercase">CRAFTING <br/>LEGENDS.</h2>
-          <div className="w-16 h-px bg-[#D4AF37] mb-8" />
-          <p className="font-mono text-[9px] text-[#F7F4EF]/40 tracking-[0.3em] uppercase">The Visio Creed / Edition IV</p>
-        </div>
-        <div className="absolute bottom-8 left-8 font-mono text-[8px] text-[#F7F4EF]/20">2</div>
-      </div>
-    )
-  },
-  {
-    id: 'intro',
-    front: (
-      <Paper>
-        <div className="flex-1">
-          <span className="font-mono text-[8px] tracking-[0.2em] text-[#337E77] uppercase">00 / Foreword</span>
-          <h2 className="text-4xl font-serif italic mt-10 mb-10 text-[#0A0E1A]">Vision as Architecture.</h2>
-          <p className="text-[12px] font-sans font-light leading-relaxed max-w-sm text-[#0A0E1A]/70 columns-2 gap-8 text-justify">
-            Eyewear is the ultimate intersection of medical necessity and aesthetic expression. The only architectural structure worn directly on the face. In this volume, we pull apart the seams of our manufacturing process — looking closely at the raw elements; titanium, Japanese acetate, 18k gold — and the hands that shape them.
-          </p>
-        </div>
-        <div className="self-end font-mono text-[8px] text-[#0A0E1A]/30">3</div>
-      </Paper>
-    ),
-    back: (
-      <BookImage src="/magazine/editorial.png" alt="THE FOUNDRY" caption="Fig 1. Master Optician at Work" />
-    )
-  },
-  {
-    id: 'titanium',
-    front: (
-      <Paper>
-        <div className="flex-1">
-          <span className="font-mono text-[8px] tracking-[0.2em] text-[#337E77] uppercase">01 / Material Science</span>
-          <h2 className="text-5xl font-light tracking-tight mt-8 mb-12 text-[#0A0E1A]">THE TITANIUM <br/>REVOLUTION</h2>
-          <div className="w-full h-px bg-[#0A0E1A]/10 mb-12" />
-          <ul className="space-y-6 font-mono text-[9px] tracking-[0.1em] text-[#0A0E1A]/60">
-            {[['TENSILE STRENGTH','834 MPa'],['MASS','18.4 GRAMS'],['ALLOY','BETA-TI 15-3-3-3'],['HYPOALLERGENIC','100% CERTIFIED']].map(([k,v]) => (
-              <li key={k} className="flex justify-between border-b border-[#0A0E1A]/5 pb-3">
-                <span>{k}</span><span>{v}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="self-end font-mono text-[8px] text-[#0A0E1A]/30">5</div>
-      </Paper>
-    ),
-    back: (
-      <Paper className="justify-center items-center">
-        <h2 className="text-8xl font-serif italic text-[#0A0E1A]/5 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap -rotate-90">AEROSPACE</h2>
-        <div className="z-10 bg-[#0A0E1A] p-14 text-center text-[#F7F4EF] shadow-2xl relative">
-          <div className="absolute -top-3 -left-3 w-6 h-6 border-t-2 border-l-2 border-[#C9A84C]" />
-          <div className="absolute -bottom-3 -right-3 w-6 h-6 border-b-2 border-r-2 border-[#C9A84C]" />
-          <p className="font-serif italic text-2xl text-[#C9A84C] mb-4">&quot;Weightless presence.&quot;</p>
-          <p className="font-mono text-[8px] tracking-[0.2em] text-[#F7F4EF]/60">TITANIUM FORGE / OSAKA, JP</p>
-        </div>
-        <div className="absolute bottom-8 left-8 font-mono text-[8px] text-[#0A0E1A]/30">6</div>
-      </Paper>
-    )
-  },
-  {
-    id: 'acetate',
-    front: (
-      <BookImage src="/magazine/craftsmanship.png" alt="TARTARUGATO" caption="Fig 2. Italian Acetate Polishing" />
-    ),
-    back: (
-      <Paper>
-        <div className="flex-1">
-          <span className="font-mono text-[8px] tracking-[0.2em] text-[#C9A84C] uppercase">02 / Craftsmanship</span>
-          <h2 className="text-4xl font-serif italic mt-10 mb-10 text-[#0A0E1A]">The Cellulose Cellar.</h2>
-          <p className="text-[12px] font-sans font-light leading-relaxed text-[#0A0E1A]/70 text-justify">
-            We cure our acetate for over 90 days. This slow-aging process allows the cotton-based polymer to settle, preventing warping over years of wear. The patterns are not printed — they are physically embedded through layers of colored sheets, resulting in a depth of tortoiseshell that cannot be counterfeited by injection molding.
-          </p>
-        </div>
-        <div className="absolute bottom-8 left-8 font-mono text-[8px] text-[#0A0E1A]/30">8</div>
-      </Paper>
-    )
-  },
-  {
-    id: 'interview',
-    front: (
-      <div className="w-full h-full p-16 flex flex-col justify-center items-center bg-[#0A0E1A]">
-        <div className="text-center space-y-8 max-w-md">
-          <span className="font-mono text-[8px] tracking-[0.3em] text-[#C9A84C] uppercase block">PERSPECTIVES</span>
-          <h2 className="text-4xl font-serif italic leading-tight text-white">
-            &quot;We do not sell frames. We engineer ways to see the world completely unimpeded.&quot;
-          </h2>
-          <div className="w-8 h-px bg-[#C9A84C]/50 mx-auto" />
-          <span className="font-mono text-[9px] tracking-widest text-[#F7F4EF]/40 uppercase block">The Founder&apos;s Dialogue</span>
-        </div>
-        <div className="absolute bottom-8 right-8 font-mono text-[8px] text-[#F7F4EF]/20">9</div>
-      </div>
-    ),
-    back: (
-      <Paper>
-        <div className="flex-1 space-y-10">
-          <div className="space-y-3">
-            <span className="font-mono text-[8px] font-bold text-[#0A0E1A]">VISIO:</span>
-            <p className="text-[11px] font-sans text-[#0A0E1A]/70 text-justify">Why restrict production to 500 units per collection?</p>
-          </div>
-          <div className="space-y-3 pl-5 border-l-2 border-[#C9A84C]/50">
-            <span className="font-mono text-[8px] font-bold text-[#C9A84C]">FD:</span>
-            <p className="text-[11px] font-sans text-[#0A0E1A]/70 text-justify">Because excellence does not scale indefinitely. When you push beyond 500 units, handmade processes turn into mechanical habits. We refuse to let machines dictate the polish of our acetate.</p>
-          </div>
-          <div className="space-y-3">
-            <span className="font-mono text-[8px] font-bold text-[#0A0E1A]">VISIO:</span>
-            <p className="text-[11px] font-sans text-[#0A0E1A]/70 text-justify">What makes the &quot;Architect&quot; series functionally different?</p>
-          </div>
-          <div className="space-y-3 pl-5 border-l-2 border-[#C9A84C]/50">
-            <span className="font-mono text-[8px] font-bold text-[#C9A84C]">FD:</span>
-            <p className="text-[11px] font-sans text-[#0A0E1A]/70 text-justify">We eliminated screws. Using a pure tension hinge system inspired by suspension bridges, the frame dynamically adapts to temporal lobes without loosening over time.</p>
-          </div>
-        </div>
-        <div className="absolute bottom-8 left-8 font-mono text-[8px] text-[#0A0E1A]/30">10</div>
-      </Paper>
-    )
-  },
-  {
-    id: 'fin',
-    front: (
-      <Paper className="items-center justify-center text-center">
-        <h2 className="font-serif text-6xl italic text-[#C9A84C] mb-14">Fin.</h2>
-        <p className="font-mono text-[8px] tracking-[0.2em] text-[#0A0E1A]/40 max-w-[200px] mb-10">
-          Explore the full curated collection physically at our flagship or via our digital portal.
-        </p>
-        <Link href="/shop" className="border border-[#C9A84C] text-[#C9A84C] px-12 py-4 font-mono text-[10px] tracking-[0.4em] uppercase hover:bg-[#C9A84C] hover:text-[#0A0E1A] transition-all duration-500 rounded-full">
-          ENTER STORE
-        </Link>
-        <div className="absolute bottom-8 right-8 font-mono text-[8px] text-[#0A0E1A]/30">11</div>
-      </Paper>
-    ),
-    back: (
-      <div className="w-full h-full flex flex-col items-center justify-center bg-[#0A0E1A] relative">
-        <span className="text-5xl font-serif text-[#C9A84C] tracking-[0.5em] font-light">VISIO</span>
-        <div className="w-16 h-px bg-[#C9A84C]/20 mt-6" />
-        <span className="font-mono text-[8px] tracking-[0.3em] text-[#F7F4EF]/20 uppercase mt-4">Punjab Optical · Est. 1987</span>
-      </div>
-    )
-  }
-];
-
-/* ── AMBIENT COLORS per spread ── */
-const AMBIENTS = [
-  'rgba(212,175,55,0.06)',
-  'rgba(10,14,26,0.8)',
-  'rgba(51,126,119,0.06)',
-  'rgba(212,175,55,0.05)',
-  'rgba(201,168,76,0.07)',
-  'rgba(10,14,26,0.8)',
-  'rgba(201,168,76,0.05)',
-];
-
+/* ── Main magazine page ────────────────────────────────────────────────── */
 export default function MagazinePage() {
-  const [currentFlip, setCurrentFlip] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [entered, setEntered] = useState(false);
-  const [flipDir, setFlipDir] = useState('next');
+  const [articles, setArticles]   = useState([]);
+  const [loading,  setLoading]    = useState(true);
+  const [current,  setCurrent]    = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [entered,   setEntered]   = useState(false);
 
-  const turnNext = useCallback(() => {
-    if (isAnimating || currentFlip >= SHEETS.length) return;
-    setFlipDir('next');
-    setIsAnimating(true);
-    setCurrentFlip(c => c + 1);
-    setTimeout(() => setIsAnimating(false), 1000);
-  }, [isAnimating, currentFlip]);
+  /* Touch-swipe state */
+  const touchStartX = useRef(null);
+  const touchStartY = useRef(null);
 
-  const turnPrev = useCallback(() => {
-    if (isAnimating || currentFlip <= 0) return;
-    setFlipDir('prev');
-    setIsAnimating(true);
-    setCurrentFlip(c => c - 1);
-    setTimeout(() => setIsAnimating(false), 1000);
-  }, [isAnimating, currentFlip]);
-
+  /* Fetch articles */
   useEffect(() => {
-    const t = setTimeout(() => setEntered(true), 400);
-    return () => clearTimeout(t);
+    (async () => {
+      try {
+        const res  = await fetch(`/api/magazine/latest?t=${Date.now()}`);
+        const json = await res.json();
+        if (json.success && json.data.length > 0) {
+          setArticles(json.data);
+        } else {
+          await fetch('/api/magazine/generate', { method: 'POST' });
+          const r2 = await fetch('/api/magazine/latest');
+          const j2 = await r2.json();
+          if (j2.success) setArticles(j2.data);
+        }
+      } catch (e) {
+        console.error('MAGAZINE_LOAD_ERROR', e);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   useEffect(() => {
-    let lastTime = 0;
-    const handleWheel = (e) => {
-      const now = Date.now();
-      if (now - lastTime < 1200) return;
-      if (Math.abs(e.deltaY) > 20) {
-        if (e.deltaY > 0) turnNext(); else turnPrev();
-        lastTime = now;
-      }
-    };
-    const handleKey = (e) => {
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') turnNext();
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') turnPrev();
-    };
-    window.addEventListener('wheel', handleWheel, { passive: true });
-    window.addEventListener('keydown', handleKey);
-    return () => {
-      window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('keydown', handleKey);
-    };
-  }, [turnNext, turnPrev]);
+    const t = setTimeout(() => setEntered(true), 300);
+    return () => clearTimeout(t);
+  }, []);
 
-  const ambientColor = AMBIENTS[Math.min(currentFlip, AMBIENTS.length - 1)];
-  const totalPages = SHEETS.length * 2;
-  const pageLabel = currentFlip === 0 ? 'Cover' : currentFlip >= SHEETS.length ? 'Back Cover' : `${currentFlip * 2 - 1} — ${currentFlip * 2}`;
+  const goTo = useCallback((idx) => {
+    if (idx < 0 || idx >= articles.length) return;
+    setDirection(idx > current ? 1 : -1);
+    setCurrent(idx);
+  }, [current, articles.length]);
+
+  const next = useCallback(() => goTo(current + 1), [goTo, current]);
+  const prev = useCallback(() => goTo(current - 1), [goTo, current]);
+
+  /* Keyboard + wheel */
+  useEffect(() => {
+    let lastWheel = 0;
+    const onKey = (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+    };
+    const onWheel = (e) => {
+      const now = Date.now();
+      if (now - lastWheel < 900) return;
+      if (Math.abs(e.deltaY) > 30) { e.deltaY > 0 ? next() : prev(); lastWheel = now; }
+    };
+    const onMagazineNext = () => next();
+    window.addEventListener('magazine-next', onMagazineNext);
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('wheel', onWheel, { passive: true });
+    return () => { 
+      window.removeEventListener('magazine-next', onMagazineNext);
+      window.removeEventListener('keydown', onKey); 
+      window.removeEventListener('wheel', onWheel); 
+    };
+  }, [next, prev]);
+
+  /* Touch swipe — horizontal on desktop layout, horizontal on mobile too */
+  const onTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+  const onTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const dx = touchStartX.current - e.changedTouches[0].clientX;
+    const dy = touchStartY.current - e.changedTouches[0].clientY;
+    // Only trigger if horizontal swipe is dominant (not accidental scroll)
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 45) {
+      dx > 0 ? next() : prev();
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
+  /* ── Loading ────────────────────────────────────────────────────────── */
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-[#0C0E14] flex flex-col items-center justify-center gap-5">
+        <div className="w-10 h-10 border-2 border-[#C9A84C]/20 border-t-[#C9A84C] rounded-full animate-spin" />
+        <p className="font-mono text-[9px] tracking-[0.5em] text-[#C9A84C]/50 uppercase">
+          Curating the Latest Issue...
+        </p>
+      </div>
+    );
+  }
+
+  /* ── Empty ──────────────────────────────────────────────────────────── */
+  if (articles.length === 0) {
+    return (
+      <div className="fixed inset-0 bg-[#0C0E14] flex flex-col items-center justify-center gap-6 px-6 text-center">
+        <span className="font-serif italic text-3xl text-[#C9A84C]">Empty Archives</span>
+        <p className="font-mono text-[9px] tracking-[0.3em] text-white/30">
+          Run the reset script to populate the magazine.
+        </p>
+        <Link
+          href="/"
+          className="font-mono text-[9px] tracking-[0.3em] text-white/40 hover:text-white uppercase border border-white/10 px-6 py-3"
+        >
+          ← Back Home
+        </Link>
+      </div>
+    );
+  }
+
+    const variants = {
+    enter: (dir) => ({
+      clipPath: dir > 0 ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0%)',
+      x: dir > 0 ? '15%' : '-15%',
+      rotateY: dir > 0 ? 10 : -10,
+      scale: 1.02,
+      zIndex: 30,
+    }),
+    center: {
+      clipPath: 'inset(0 0 0 0%)',
+      x: 0,
+      rotateY: 0,
+      scale: 1,
+      zIndex: 20,
+      transition: {
+        duration: 0.9,
+        ease: [0.4, 0, 0.2, 1], // Standard decelerate
+      }
+    },
+    exit: (dir) => ({
+      clipPath: dir > 0 ? 'inset(0 100% 0 0%)' : 'inset(0 0 0 100%)',
+      x: dir > 0 ? '-15%' : '15%',
+      rotateY: dir > 0 ? -10 : 10,
+      scale: 0.98,
+      zIndex: 10,
+      transition: {
+        duration: 0.9,
+        ease: [0.4, 0, 0.2, 1],
+      }
+    }),
+  };
+
+  const currentArticle = articles[current];
+  const tagColor = TAG_COLORS[currentArticle?.tag] || { bg: '#C9A84C' };
 
   return (
-    <div className="fixed inset-0 flex flex-col overflow-hidden" style={{ background: '#0C0E14' }}>
-
-      {/* AMBIENT GLOW — shifts per page */}
+    <div
+      className="fixed inset-0 bg-[#0C0E14] flex flex-col overflow-hidden select-none"
+      style={{ 
+        fontFamily: "'Inter', sans-serif",
+        perspective: '2000px',
+      }}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
+      {/* ── TOP NAV ─────────────────────────────────────────────────────── */}
       <motion.div
-        className="absolute inset-0 pointer-events-none z-0"
-        animate={{ background: `radial-gradient(ellipse at center, ${ambientColor} 0%, transparent 70%)` }}
-        transition={{ duration: 1.5, ease: 'easeInOut' }}
-      />
-
-      {/* GRAIN OVERLAY */}
-      <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.03]"
-        style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' opacity=\'1\'/%3E%3C/svg%3E")', backgroundRepeat: 'repeat', backgroundSize: '128px' }}
-      />
-
-      {/* TOP BAR */}
-      <div className="relative z-30 flex items-center justify-between px-8 pt-6 pb-4 shrink-0">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="font-mono text-[9px] tracking-[0.3em] text-white/30 uppercase hover:text-white/60 transition-colors">← Back</Link>
+        initial={{ y: -20, opacity: 0 }}
+        animate={entered ? { y: 0, opacity: 1 } : {}}
+        transition={{ duration: 0.5, delay: 0.15 }}
+        className="relative z-30 flex flex-col shrink-0"
+      >
+        <div className="flex items-center justify-between px-5 md:px-8 py-3 md:py-4 border-b border-white/[0.04]">
+          <Link
+            href="/"
+            className="font-mono text-[8px] md:text-[9px] tracking-[0.3em] text-white/30 uppercase hover:text-white/60 transition-colors"
+          >
+            ← Back
+          </Link>
+          <div className="flex flex-col items-center">
+            <span className="font-serif italic text-[#C9A84C] text-base md:text-lg tracking-wide">
+              FRAME
+            </span>
+            <span className="font-mono text-[6px] md:text-[7px] tracking-[0.5em] text-white/20 uppercase">
+              Magazine
+            </span>
+          </div>
+          <div className="font-mono text-[8px] md:text-[9px] tracking-[0.2em] text-white/20 uppercase">
+            {current + 1}&thinsp;/&thinsp;{articles.length}
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="w-6 h-px bg-[#C9A84C]/40" />
-          <span className="font-mono text-[9px] tracking-[0.4em] text-[#C9A84C]/60 uppercase">The Lookbook</span>
-          <div className="w-6 h-px bg-[#C9A84C]/40" />
+
+        {/* Progress Bar */}
+        <div className="w-full h-[1px] bg-white/[0.03] overflow-hidden">
+          <motion.div 
+            className="h-full bg-[#C9A84C]"
+            initial={{ width: 0 }}
+            animate={{ width: `${((current + 1) / articles.length) * 100}%` }}
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          />
         </div>
-        <div className="font-mono text-[9px] tracking-[0.2em] text-white/20 uppercase">{pageLabel}</div>
-      </div>
+      </motion.div>
 
-      {/* BOOK STAGE */}
-      <div className="relative flex-1 min-h-0 flex items-center justify-center px-4 z-10" style={{ perspective: '2800px' }}>
+      {/* ── SPREAD AREA ─────────────────────────────────────────────────── */}
+      <motion.div
+        className="relative flex-1 min-h-0 overflow-hidden"
+        initial={{ opacity: 0, y: 20 }}
+        animate={entered ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.7, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {/* Frame shadow */}
+        <div className="absolute inset-2 md:inset-4 rounded-sm shadow-[0_24px_60px_rgba(0,0,0,0.5)] pointer-events-none z-0" />
 
-        {/* BOOK ENTER ANIMATION WRAPPER */}
-        <motion.div
-          initial={{ opacity: 0, rotateX: 15, scale: 0.92, y: 40 }}
-          animate={entered ? { opacity: 1, rotateX: 0, scale: 1, y: 0 } : {}}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full"
-          style={{ maxWidth: '1100px', aspectRatio: '16/10', maxHeight: '78vh', transformStyle: 'preserve-3d' }}
-        >
-          {/* BOOK SHADOW */}
-          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-[55%] h-16 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 70%)', filter: 'blur(10px)' }}
+        <AnimatePresence initial={false} custom={direction}>
+          {/* Page Crease Shadow (Simulates the fold line moving) */}
+          <motion.div
+            key={`shadow-${current}`}
+            initial={{ x: direction > 0 ? '100%' : '-100%', opacity: 0 }}
+            animate={{ x: direction > 0 ? '-100%' : '100%', opacity: [0, 0.35, 0] }}
+            transition={{ duration: 0.9, ease: [0.4, 0, 0.2, 1] }}
+            className="absolute inset-y-0 w-24 bg-gradient-to-r from-transparent via-black/60 to-transparent z-40 pointer-events-none"
           />
 
-          {/* LEFT PAGE BASE (visible as left half when book is open) */}
-          <div className="absolute top-0 left-0 w-1/2 h-full bg-[#F0EDE6] rounded-l-sm"
-            style={{ boxShadow: 'inset -10px 0 30px rgba(0,0,0,0.08)' }}
-          />
-          {/* RIGHT PAGE BASE */}
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-[#F9F7F1] rounded-r-sm"
-            style={{ boxShadow: 'inset 10px 0 30px rgba(0,0,0,0.05)' }}
-          />
+          <motion.div
+            key={current}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="absolute inset-2 md:inset-4 rounded-sm overflow-hidden"
+            style={{ 
+              transformStyle: 'preserve-3d',
+              boxShadow: '0 30px 60px -12px rgba(0,0,0,0.5), 0 18px 36px -18px rgba(0,0,0,0.5)'
+            }}
+          >
+            <ArticleSpread article={articles[current]} index={current} articles={articles} />
+          </motion.div>
+        </AnimatePresence>
 
-          {/* SPINE */}
-          <div className="absolute left-1/2 -translate-x-1/2 w-4 h-full z-50 pointer-events-none"
-            style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.25), rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.05) 60%, rgba(0,0,0,0.2))', boxShadow: '0 0 20px rgba(0,0,0,0.3)' }}
-          />
+        {/* Desktop side-nav arrows (hidden on mobile — use swipe) */}
+        {current > 0 && (
+          <button
+            onClick={prev}
+            aria-label="Previous article"
+            className="hidden md:flex absolute left-4 top-0 bottom-0 w-14 z-20 items-center justify-start pl-2 group"
+          >
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-full p-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </div>
+          </button>
+        )}
+        {current < articles.length - 1 && (
+          <button
+            onClick={next}
+            aria-label="Next article"
+            className="hidden md:flex absolute right-4 top-0 bottom-0 w-14 z-20 items-center justify-end pr-2 group"
+          >
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-full p-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </div>
+          </button>
+        )}
+      </motion.div>
 
-          {/* SHEETS */}
-          {SHEETS.map((sheet, index) => {
-            const isFlipped = currentFlip > index;
-            const zIndex = isFlipped ? index + 1 : SHEETS.length - index;
-            return (
-              <motion.div
-                key={sheet.id}
-                onClick={isFlipped ? turnPrev : turnNext}
-                className="absolute top-0 left-1/2 w-1/2 h-full cursor-pointer"
-                style={{ transformOrigin: '0% 50%', zIndex, transformStyle: 'preserve-3d' }}
-                initial={false}
-                animate={{ rotateY: isFlipped ? -180 : 0 }}
-                transition={{ duration: 1.0, ease: [0.77, 0, 0.18, 1] }}
-              >
-                {/* FRONT FACE */}
-                <div className="absolute inset-0 overflow-hidden rounded-r-sm"
-                  style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
-                    boxShadow: !isFlipped ? '6px 0 24px rgba(0,0,0,0.2), 2px 0 6px rgba(0,0,0,0.1)' : 'none'
-                  }}
-                >
-                  {/* Page crease shadow */}
-                  <div className="absolute inset-y-0 left-0 w-12 z-50 pointer-events-none"
-                    style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.15), transparent)' }}
-                  />
-                  {sheet.front}
-                </div>
-
-                {/* BACK FACE */}
-                <div className="absolute inset-0 overflow-hidden rounded-l-sm"
-                  style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden',
-                    transform: 'rotateY(180deg)',
-                    boxShadow: isFlipped ? '-6px 0 24px rgba(0,0,0,0.2), -2px 0 6px rgba(0,0,0,0.1)' : 'none'
-                  }}
-                >
-                  <div className="absolute inset-y-0 right-0 w-12 z-50 pointer-events-none"
-                    style={{ background: 'linear-gradient(to left, rgba(0,0,0,0.15), transparent)' }}
-                  />
-                  {sheet.back}
-                </div>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      </div>
-
-      {/* BOTTOM NAVIGATION */}
-      <div className="relative z-30 flex items-center justify-center gap-8 pb-6 pt-4 shrink-0">
-        <motion.button
-          onClick={turnPrev}
-          disabled={currentFlip === 0}
-          whileHover={{ x: -3 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-2 font-mono text-[10px] tracking-[0.3em] uppercase text-white/40 hover:text-[#C9A84C] transition-colors disabled:opacity-10 disabled:cursor-not-allowed px-4 py-2"
+      {/* ── BOTTOM NAV ──────────────────────────────────────────────────── */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={entered ? { y: 0, opacity: 1 } : {}}
+        transition={{ duration: 0.5, delay: 0.35 }}
+        className="relative z-30 flex items-center justify-between px-5 md:px-8 py-3 md:py-4 shrink-0"
+      >
+        {/* Prev — always visible on mobile as a button */}
+        <button
+          onClick={prev}
+          disabled={current === 0}
+          className="font-mono text-[8px] md:text-[9px] tracking-[0.25em] uppercase text-white/30 hover:text-[#C9A84C] active:text-[#C9A84C] disabled:opacity-0 transition-colors py-2 pr-4"
         >
           ← Prev
-        </motion.button>
+        </button>
 
-        {/* Page dots */}
+        {/* Dot indicators */}
         <div className="flex items-center gap-2">
-          {SHEETS.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => { if (!isAnimating) { setCurrentFlip(i); } }}
-              className="transition-all duration-500"
-              style={{
-                width: i === currentFlip ? '24px' : '6px',
-                height: '6px',
-                borderRadius: '3px',
-                background: i === currentFlip ? '#C9A84C' : i < currentFlip ? 'rgba(201,168,76,0.3)' : 'rgba(255,255,255,0.1)',
-              }}
-            />
-          ))}
+          {articles.map((a, i) => {
+            const tc = TAG_COLORS[a.tag] || { bg: '#C9A84C' };
+            const isActive = i === current;
+            return (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                aria-label={`Article ${i + 1}`}
+                className="transition-all duration-500 rounded-full touch-manipulation"
+                style={{
+                  width:      isActive ? '24px' : '7px',
+                  height:     '7px',
+                  minWidth:   '7px',
+                  background: isActive ? tc.bg : 'rgba(255,255,255,0.12)',
+                }}
+              />
+            );
+          })}
         </div>
 
-        <motion.button
-          onClick={turnNext}
-          disabled={currentFlip === SHEETS.length}
-          whileHover={{ x: 3 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-2 font-mono text-[10px] tracking-[0.3em] uppercase text-white/40 hover:text-[#C9A84C] transition-colors disabled:opacity-10 disabled:cursor-not-allowed px-4 py-2"
+        {/* Next */}
+        <button
+          onClick={next}
+          disabled={current === articles.length - 1}
+          className="font-mono text-[8px] md:text-[9px] tracking-[0.25em] uppercase text-white/30 hover:text-[#C9A84C] active:text-[#C9A84C] disabled:opacity-0 transition-colors py-2 pl-4"
         >
           Next →
-        </motion.button>
-      </div>
+        </button>
+      </motion.div>
 
-      {/* HINT — first visit */}
-      <AnimatePresence>
-        {currentFlip === 0 && entered && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ delay: 2, duration: 0.8 }}
-            className="absolute bottom-20 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 pointer-events-none"
-          >
-            <div className="w-8 h-px bg-[#C9A84C]/30" />
-            <span className="font-mono text-[8px] tracking-[0.3em] text-white/20 uppercase">Click · Scroll · Arrow Keys</span>
-            <div className="w-8 h-px bg-[#C9A84C]/30" />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Mobile swipe hint — shows only on first article, fades after 2s */}
+      {current === 0 && entered && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.5, 0] }}
+          transition={{ duration: 2.5, delay: 1.5 }}
+          className="absolute bottom-14 left-0 right-0 flex justify-center pointer-events-none z-40 md:hidden"
+        >
+          <span className="font-mono text-[7px] tracking-[0.4em] text-white/30 uppercase">
+            ← swipe to browse →
+          </span>
+        </motion.div>
+      )}
     </div>
   );
 }

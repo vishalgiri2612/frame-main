@@ -49,7 +49,7 @@ export default function ThemeToggle() {
   };
 
   return (
-    <div className="fixed top-0 right-12 z-[100] pointer-events-none hidden md:flex flex-col items-center">
+    <div className="fixed top-0 right-12 z-[10005] pointer-events-none hidden md:flex flex-col items-center">
 
       {/* Ceiling cap */}
       <div className="w-6 h-1.5 rounded-b-md bg-gradient-to-b from-[#2a2a2a] to-[#111] border-x border-b border-white/10 z-10" />
