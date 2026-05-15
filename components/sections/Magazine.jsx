@@ -116,7 +116,7 @@ export default function Magazine() {
                   <h4 className="font-serif text-2xl md:text-3xl text-[var(--text-primary)] group-hover:text-[#C9A84C] transition-colors leading-tight line-clamp-2">
                     {article.title}
                   </h4>
-                  <p className="mt-4 text-[var(--text-secondary)] text-sm leading-relaxed line-clamp-2">{article.excerpt}</p>
+                  <p className="mt-4 text-[var(--text-secondary)] text-sm leading-relaxed line-clamp-4">{article.excerpt}</p>
                 </div>
               </Link>
             )) : (

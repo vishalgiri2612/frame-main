@@ -20,7 +20,16 @@ export async function GET() {
       .limit(5)
       .toArray();
 
-    return NextResponse.json({ success: true, data: articles });
+    return NextResponse.json(
+      { success: true, data: articles },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        }
+      }
+    );
   } catch (error) {
     console.error("MAGAZINE_FETCH_ERROR", error);
     return NextResponse.json(
