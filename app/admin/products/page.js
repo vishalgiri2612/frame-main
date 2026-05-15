@@ -829,7 +829,7 @@ export default function ProductManagement() {
                         <input type="checkbox" checked={form.newArrival} onChange={(e) => setForm({ ...form, newArrival: e.target.checked })} className="w-5 h-5 rounded-md border-emerald-300 text-emerald-600 focus:ring-emerald-600" />
                         <div className="flex-1">
                           <div className="text-[11px] font-bold text-emerald-900 uppercase">Set as New Arrival</div>
-                          <div className="text-[10px] text-emerald-500">Display "New Arrival" badge and prioritize in sorting.</div>
+                          <div className="text-[10px] text-emerald-500">Display &quot;New Arrival&quot; badge and prioritize in sorting.</div>
                         </div>
                       </label>
                     </div>
