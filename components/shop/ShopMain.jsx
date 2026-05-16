@@ -85,7 +85,24 @@ export default function ShopMain({
     }
 
     if (activeCategory !== 'ALL') {
-      list = list.filter((p) => isMatch(p.category, activeCategory));
+      const upperCat = activeCategory.toUpperCase();
+      if (upperCat === 'MEN') {
+        list = list.filter((p) => 
+          isMatch(p.gender, 'MEN') || 
+          isMatch(p.gender, 'UNISEX') || 
+          isMatch(p.gender, 'KIDS')
+        );
+      } else if (upperCat === 'WOMEN') {
+        list = list.filter((p) => 
+          isMatch(p.gender, 'WOMEN') || 
+          isMatch(p.gender, 'UNISEX') || 
+          isMatch(p.gender, 'KIDS')
+        );
+      } else if (upperCat === 'KIDS') {
+        list = list.filter((p) => isMatch(p.gender, 'KIDS'));
+      } else {
+        list = list.filter((p) => isMatch(p.category, activeCategory));
+      }
     }
 
     if (activeBrand !== 'ALL') {
